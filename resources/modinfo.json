@@ -1,10 +1,10 @@
 {
   "type": "Code",
-  "name": "TEMPLATE",
-  "modid": "template",
+  "name": "Armor Strip",
+  "modid": "armorstrip",
   "version": "1.0.0",
-  "description": "A template project for Vintage Story modding.",
-  "website": "https://github.com/JapanHasRice/VSMod-TEMPLATE",
+  "description": "Take off your armor faster",
+  "website": "https://github.com/JapanHasRice/VSMod-ArmorStrip",
   "authors": [ "JapanHasRice" ],
   "contributors": [],
   "dependencies": {

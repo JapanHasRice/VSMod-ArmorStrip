@@ -1,7 +1,7 @@
 using Vintagestory.API.Common;
 
-namespace TEMPLATE {
-  public class TEMPLATEMod : ModSystem {
+namespace ArmorStrip {
+  public class ArmorStripMod : ModSystem {
     public override void Start(ICoreAPI api) {
       base.Start(api);
     }
