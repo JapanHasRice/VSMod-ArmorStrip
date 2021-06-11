@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Vintagestory.API.Common;
 
-namespace ArmorStrip {
+namespace ShakeItDoff {
   public static class EnumCharacterDressTypeExtensions {
     public static List<EnumCharacterDressType> ArmorDressTypes {
       get { return armorDressTypes; }
@@ -12,7 +12,14 @@ namespace ArmorStrip {
     );
 
     public static bool IsArmor(this EnumCharacterDressType dressType) {
-      return ArmorDressTypes.Contains(dressType);
+      switch (dressType) {
+        case EnumCharacterDressType.ArmorHead:
+        case EnumCharacterDressType.ArmorBody:
+        case EnumCharacterDressType.ArmorLegs:
+          return true;
+        default:
+          return false;
+      }
     }
   }
 }

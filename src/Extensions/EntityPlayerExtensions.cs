@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Vintagestory.API.Common;
 
-namespace ArmorStrip {
+namespace ShakeItDoff {
   public static class EntityPlayerExtensions {
     public static Dictionary<string, ItemSlot> GetArmorSlots(this EntityPlayer playerEntity) {
       Dictionary<string, ItemSlot> armorSlots = new Dictionary<string, ItemSlot>();

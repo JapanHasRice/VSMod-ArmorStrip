@@ -1,10 +1,10 @@
 {
   "type": "Code",
-  "name": "Armor Strip",
-  "modid": "armorstrip",
+  "name": "Shake it Doff",
+  "modid": "shakeitdoff",
   "version": "1.0.0",
-  "description": "Take off your armor faster",
-  "website": "https://github.com/JapanHasRice/VSMod-ArmorStrip",
+  "description": "Quickly take off your armor.",
+  "website": "https://github.com/JapanHasRice/VSMod-ShakeItDoff",
   "authors": [ "JapanHasRice" ],
   "contributors": [],
   "dependencies": {
