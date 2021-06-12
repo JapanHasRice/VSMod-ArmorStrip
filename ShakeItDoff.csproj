@@ -25,10 +25,10 @@
       <HintPath>$(VSPath)/Lib/0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference> -->
-    <!-- <Reference Include="Newtonsoft">
+    <Reference Include="Newtonsoft">
       <HintPath>$(VSPath)/Lib/Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
-    </Reference> -->
+    </Reference>
     <Reference Include="ProtoBuf">
       <HintPath>$(VSPath)/Lib/protobuf-net.dll</HintPath>
       <Private>false</Private>

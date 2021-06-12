@@ -1,3 +1,5 @@
 {
-  "ingameerror-needbothhandsfree": "You need both of your hands free to remove your armor quickly."
+  "ingameerror-needbothhandsfree": "You need both of your hands free to quickly doff.",
+  "ingameerror-needonefreehand": "You need at least one of your hands free to quickly doff.",
+  "ingameerror-toohungrytodoff": "You are too weak to quickly doff."
 }

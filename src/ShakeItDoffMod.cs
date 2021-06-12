@@ -12,10 +12,17 @@ namespace ShakeItDoff {
     private const GlKeys DEFAULT_DOFF_KEY = GlKeys.U;
     private const string DOFF_CODE = "doffarmor";
     private const string DOFF_DESC = "Doff: Remove all armor";
-    private const string DOFF_ERROR_HANDS = "needbothhandsfree";
-    private const string DOFF_ERROR_HANDS_DESC = "Need both hands free.";
+    private const string DOFF_ERROR_BOTH_HANDS = "needbothhandsfree";
+    private const string DOFF_ERROR_BOTH_HANDS_DESC = "Need both hands free.";
+    private const string DOFF_ERROR_ONE_HAND = "needonefreehand";
+    private const string DOFF_ERROR_ONE_HAND_DESC = "Need at least 1 free hand.";
+    private const string DOFF_ERROR_SATURATION = "toohungrytodoff";
+    private const string DOFF_ERROR_SATURATION_DESC = "Not enough energy to doff.";
+    internal static ShakeItDoffConfig Config;
     public override void Start(ICoreAPI api) {
       base.Start(api);
+
+      Config = ShakeItDoffConfig.Load(api);
 
       api.Network.RegisterChannel(DOFF_CHANNEL_NAME)
         .RegisterMessageType(typeof(DoffArmorPacket))
@@ -41,19 +48,25 @@ namespace ShakeItDoff {
 
     private bool TryToDoff(ICoreClientAPI capi) {
       var doffer = capi.World.Player;
-      if (HasBothHandsEmpty(doffer)) {
+      if (HasEnoughHandsFree(doffer)) {
         var doffArmorPacket = new DoffArmorPacket(GetTargetedArmorStandEntity(doffer)?.EntityId);
         capi.Network.GetChannel(DOFF_CHANNEL_NAME).SendPacket(doffArmorPacket);
         return true;
       }
       else {
-        capi.TriggerIngameError(this, DOFF_ERROR_HANDS, Lang.GetIfExists($"shakeitdoff:ingameerror-{DOFF_ERROR_HANDS}") ?? DOFF_ERROR_HANDS_DESC);
+        TriggerHandsError(capi);
         return false;
       }
     }
 
-    private bool HasBothHandsEmpty(IPlayer doffer) {
-      return doffer.Entity.RightHandItemSlot.Empty && doffer.Entity.LeftHandItemSlot.Empty;
+    private bool HasEnoughSaturation(IServerPlayer player, float neededSaturation) {
+      return player.Entity.GetBehavior<EntityBehaviorHunger>()?.Saturation >= neededSaturation;
+    }
+
+    private bool HasEnoughHandsFree(IPlayer player) {
+      int freeHands = player.Entity.RightHandItemSlot.Empty ? 1 : 0;
+      freeHands += player.Entity.LeftHandItemSlot.Empty ? 1 : 0;
+      return freeHands >= Config.HandsNeededToDoff;
     }
 
     private EntityArmorStand GetTargetedArmorStandEntity(IClientPlayer player) {
@@ -71,10 +84,17 @@ namespace ShakeItDoff {
     }
 
     private void Doff(IServerPlayer doffer, EntityArmorStand armorStand) {
+      if (!HasEnoughSaturation(doffer, Config.SaturationCostPerDoff)) {
+        TriggerSaturationError(doffer);
+        return;
+      }
+
+      bool doffed = false;
       bool gaveToArmorStand = false;
       bool isTargetingArmorStand = armorStand != null;
       foreach (var slot in doffer.Entity.GetFilledArmorSlots()) {
         if (slot.Empty) { continue; } // just in case
+        doffed = true;
         if (!isTargetingArmorStand) {
           doffer.InventoryManager.DropItem(slot, true);
           continue;
@@ -88,12 +108,12 @@ namespace ShakeItDoff {
         else {
           doffer.InventoryManager.DropItem(slot, true);
         }
-        slot.MarkDirty();
       }
       if (gaveToArmorStand) {
         armorStand.WatchedAttributes.MarkAllDirty();
         BroadcastArmorStandUpdated(armorStand.World.Api as ICoreServerAPI, armorStand);
       }
+      if (doffed) { OnSuccessfulDoff(doffer); }
     }
 
     private ItemSlot GetAvailableSlotOnArmorStand(EntityArmorStand armorStand, ItemSlot sourceSlot) {
@@ -112,6 +132,28 @@ namespace ShakeItDoff {
       if (armorStand?.IsRendered ?? false) {
         armorStand.OnEntityLoaded();
       }
+    }
+
+    private void OnSuccessfulDoff(IServerPlayer doffer) {
+      doffer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(Config.SaturationCostPerDoff);
+    }
+
+    private void TriggerHandsError(ICoreClientAPI capi) {
+      string errorCode;
+      string errorDesc;
+      if (Config.HandsNeededToDoff == 2) {
+        errorCode = DOFF_ERROR_BOTH_HANDS;
+        errorDesc = DOFF_ERROR_BOTH_HANDS_DESC;
+      }
+      else {
+        errorCode = DOFF_ERROR_ONE_HAND;
+        errorDesc = DOFF_ERROR_ONE_HAND_DESC;
+      }
+      capi.TriggerIngameError(this, errorCode, Lang.GetIfExists($"shakeitdoff:ingameerror-{errorCode}") ?? errorDesc);
+    }
+
+    private void TriggerSaturationError(IServerPlayer player) {
+      player.SendIngameError(DOFF_ERROR_SATURATION, Lang.GetIfExists($"shakeitdoff:ingameerror-{DOFF_ERROR_SATURATION}") ?? DOFF_ERROR_SATURATION_DESC);
     }
   }
 }
