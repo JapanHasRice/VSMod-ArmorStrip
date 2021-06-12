@@ -2,14 +2,14 @@ using ProtoBuf;
 
 namespace ShakeItDoff {
   [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
-  public class DoffArmorPacket {
+  public class ArmorStandInventoryUpdatedPacket {
     // EntityID of the armor stand the doffer is targeting, if any.
-    public long? ArmorStandEntityId;
+    public long ArmorStandEntityId = -1;
 
-    public DoffArmorPacket(long? entityId) {
+    public ArmorStandInventoryUpdatedPacket(long entityId) {
       this.ArmorStandEntityId = entityId;
     }
 
-    public DoffArmorPacket() {}
+    public ArmorStandInventoryUpdatedPacket() {}
   }
 }

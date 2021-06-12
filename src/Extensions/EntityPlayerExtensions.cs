@@ -1,15 +1,15 @@
+using System.Collections.Generic;
 using Vintagestory.API.Common;
-using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
 namespace ShakeItDoff {
   public static class EntityPlayerExtensions {
-    public static ItemSlot[] GetFilledArmorSlots(this EntityPlayer playerEntity) {
-      ItemSlotCharacter[] filledArmorSlots = new ItemSlotCharacter[0];
-      foreach (ItemSlotCharacter slot in playerEntity.GearInventory) {
+    public static List<ItemSlot> GetFilledArmorSlots(this EntityPlayer playerEntity) {
+      List<ItemSlot> filledArmorSlots = new List<ItemSlot>();
+      foreach (ItemSlot slot in playerEntity.GearInventory) {
         var wearable = slot.Itemstack?.Item as ItemWearable;
         if (wearable?.IsArmor ?? false) {
-          filledArmorSlots.Append(slot);
+          filledArmorSlots.Add(slot);
         }
       }
       return filledArmorSlots;
