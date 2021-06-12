@@ -1,10 +1,10 @@
 {
   "type": "Code",
-  "name": "Shake it Doff",
-  "modid": "shakeitdoff",
+  "name": "Doff and Don Again",
+  "modid": "doffanddonagain",
   "version": "1.0.0",
-  "description": "Quickly take off your armor.",
-  "website": "https://github.com/JapanHasRice/VSMod-ShakeItDoff",
+  "description": "Quickly take off and put on your armor.",
+  "website": "https://github.com/JapanHasRice/VSMod-DoffAndDonAgain",
   "authors": [ "JapanHasRice" ],
   "contributors": [],
   "dependencies": {

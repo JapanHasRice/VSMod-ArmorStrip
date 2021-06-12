@@ -3,8 +3,8 @@ using Newtonsoft.Json;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
-namespace ShakeItDoff {
-  public class ShakeItDoffConfig {
+namespace DoffAndDonAgain {
+  public class DoffAndDonAgainConfig {
     public string GameplaySectionTitle = "=== Gameplay Settings ===";
 
     private const float DEFAULT_DOFF_COST = 20;
@@ -19,11 +19,11 @@ namespace ShakeItDoff {
     public int HandsNeededToDoff = DEFAULT_HANDS_FREE;
 
 
-    public const string filename = "ShakeItDoffConfig.json";
-    public static ShakeItDoffConfig Load(ICoreAPI api) {
-      ShakeItDoffConfig config = null;
+    public const string filename = "DoffAndDonAgainConfig.json";
+    public static DoffAndDonAgainConfig Load(ICoreAPI api) {
+      DoffAndDonAgainConfig config = null;
       try {
-        config = api.LoadModConfig<ShakeItDoffConfig>(filename);
+        config = api.LoadModConfig<DoffAndDonAgainConfig>(filename);
       }
       catch (JsonReaderException e) {
         api.Logger.Error("Unable to parse config JSON. Correct syntax errors and retry, or delete {0} and load the world again to generate a new configuration file with default settings.", filename);
@@ -36,7 +36,7 @@ namespace ShakeItDoff {
 
       if (config == null) {
         api.Logger.Notification("{0} configuration file not found. Generating with default settings.", filename);
-        config = new ShakeItDoffConfig();
+        config = new DoffAndDonAgainConfig();
       }
 
       config.SaturationCostPerDoff = Math.Max(config.SaturationCostPerDoff, MIN_DOFF_COST);
@@ -47,7 +47,7 @@ namespace ShakeItDoff {
       return config;
     }
 
-    public static void Save(ICoreAPI api, ShakeItDoffConfig config) {
+    public static void Save(ICoreAPI api, DoffAndDonAgainConfig config) {
       api.StoreModConfig(config, filename);
     }
   }

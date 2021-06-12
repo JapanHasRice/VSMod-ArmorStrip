@@ -1,6 +1,6 @@
 using ProtoBuf;
 
-namespace ShakeItDoff {
+namespace DoffAndDonAgain {
   [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
   public class ArmorStandInventoryUpdatedPacket {
     // EntityID of the armor stand the doffer is targeting, if any.

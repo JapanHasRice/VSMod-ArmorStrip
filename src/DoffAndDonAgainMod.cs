@@ -6,9 +6,9 @@ using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
-namespace ShakeItDoff {
-  public class ShakeItDoffMod : ModSystem {
-    public const string DOFF_CHANNEL_NAME = "shakeitdoff";
+namespace DoffAndDonAgain {
+  public class DoffAndDonAgainMod : ModSystem {
+    public const string DOFF_CHANNEL_NAME = "doffanddonagain";
     private const GlKeys DEFAULT_DOFF_KEY = GlKeys.U;
     private const string DOFF_CODE = "doffarmor";
     private const string DOFF_DESC = "Doff: Remove all armor";
@@ -18,11 +18,11 @@ namespace ShakeItDoff {
     private const string DOFF_ERROR_ONE_HAND_DESC = "Need at least 1 free hand.";
     private const string DOFF_ERROR_SATURATION = "toohungrytodoff";
     private const string DOFF_ERROR_SATURATION_DESC = "Not enough energy to doff.";
-    internal static ShakeItDoffConfig Config;
+    internal static DoffAndDonAgainConfig Config;
     public override void Start(ICoreAPI api) {
       base.Start(api);
 
-      Config = ShakeItDoffConfig.Load(api);
+      Config = DoffAndDonAgainConfig.Load(api);
 
       api.Network.RegisterChannel(DOFF_CHANNEL_NAME)
         .RegisterMessageType(typeof(DoffArmorPacket))
@@ -149,11 +149,11 @@ namespace ShakeItDoff {
         errorCode = DOFF_ERROR_ONE_HAND;
         errorDesc = DOFF_ERROR_ONE_HAND_DESC;
       }
-      capi.TriggerIngameError(this, errorCode, Lang.GetIfExists($"shakeitdoff:ingameerror-{errorCode}") ?? errorDesc);
+      capi.TriggerIngameError(this, errorCode, Lang.GetIfExists($"doffanddonagain:ingameerror-{errorCode}") ?? errorDesc);
     }
 
     private void TriggerSaturationError(IServerPlayer player) {
-      player.SendIngameError(DOFF_ERROR_SATURATION, Lang.GetIfExists($"shakeitdoff:ingameerror-{DOFF_ERROR_SATURATION}") ?? DOFF_ERROR_SATURATION_DESC);
+      player.SendIngameError(DOFF_ERROR_SATURATION, Lang.GetIfExists($"doffanddonagain:ingameerror-{DOFF_ERROR_SATURATION}") ?? DOFF_ERROR_SATURATION_DESC);
     }
   }
 }

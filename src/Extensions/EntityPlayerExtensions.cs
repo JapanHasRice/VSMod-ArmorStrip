@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.GameContent;
 
-namespace ShakeItDoff {
+namespace DoffAndDonAgain {
   public static class EntityPlayerExtensions {
     public static List<ItemSlot> GetFilledArmorSlots(this EntityPlayer playerEntity) {
       List<ItemSlot> filledArmorSlots = new List<ItemSlot>();
