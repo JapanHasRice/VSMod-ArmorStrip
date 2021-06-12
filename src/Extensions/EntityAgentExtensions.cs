@@ -3,10 +3,10 @@ using Vintagestory.API.Common;
 using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain {
-  public static class EntityPlayerExtensions {
-    public static List<ItemSlot> GetFilledArmorSlots(this EntityPlayer playerEntity) {
+  public static class EntityAgentExtensions {
+    public static List<ItemSlot> GetFilledArmorSlots(this EntityAgent entityAgent) {
       List<ItemSlot> filledArmorSlots = new List<ItemSlot>();
-      foreach (ItemSlot slot in playerEntity.GearInventory) {
+      foreach (ItemSlot slot in entityAgent.GearInventory) {
         var wearable = slot.Itemstack?.Item as ItemWearable;
         if (wearable?.IsArmor ?? false) {
           filledArmorSlots.Add(slot);
