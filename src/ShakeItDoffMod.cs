@@ -58,33 +58,43 @@ namespace ShakeItDoff {
     }
 
     private void Doff(IServerPlayer doffer, DoffArmorPacket packet) {
-      EntityArmorStand armorStand = doffer.Entity.World.GetNearestEntity(doffer.Entity.Pos.AsBlockPos.ToVec3d(), 10, 10, (Entity entity) => {
-        return entity.EntityId == packet.ArmorStandEntityId;
+      Doff(doffer, GetEntityArmorStandById(doffer.Entity, packet.ArmorStandEntityId));
+    }
+
+    private EntityArmorStand GetEntityArmorStandById(EntityPlayer aroundPlayer, long? armorStandEntityId) {
+      return armorStandEntityId == null ? null : aroundPlayer.World.GetNearestEntity(aroundPlayer.Pos.AsBlockPos.ToVec3d(), 10, 10, (Entity entity) => {
+        return entity.EntityId == armorStandEntityId;
       }) as EntityArmorStand;
-      Doff(doffer, armorStand);
     }
 
     private void Doff(IPlayer doffer, EntityArmorStand armorStand) {
       bool gaveToArmorStand = false;
-      foreach (var slot in doffer.Entity.GetArmorSlots().Values) {
-        if (!(slot?.Empty ?? true)) {
-          var sinkSlot = armorStand?.GearInventory?.GetBestSuitedSlot(slot);
-          if (sinkSlot?.slot != null && sinkSlot.weight > 0) {
-            if (slot.TryPutInto(doffer.Entity.World, sinkSlot.slot) > 0) {
-              gaveToArmorStand = true;
-              sinkSlot.slot.MarkDirty();
-            }
-            gaveToArmorStand = true;
-          }
-          else {
-            doffer.InventoryManager.DropItem(slot, true);
-          }
-          slot.MarkDirty();
+      bool isTargetingArmorStand = armorStand != null;
+      foreach (var slot in doffer.Entity.GetFilledArmorSlots()) {
+        if (slot.Empty) { continue; }
+        if (!isTargetingArmorStand) {
+          doffer.InventoryManager.DropItem(slot, true);
+          continue;
         }
+
+        ItemSlot sinkSlot = GetAvailableSlotOnArmorStand(armorStand, slot);
+        if (sinkSlot != null && slot.TryPutInto(doffer.Entity.World, sinkSlot) > 0) {
+          gaveToArmorStand = true;
+          sinkSlot.MarkDirty();
+        }
+        else {
+          doffer.InventoryManager.DropItem(slot, true);
+        }
+        slot.MarkDirty();
       }
       if (gaveToArmorStand) {
         armorStand.WatchedAttributes.MarkAllDirty();
       }
+    }
+
+    private ItemSlot GetAvailableSlotOnArmorStand(EntityArmorStand armorStand, ItemSlot sourceSlot) {
+      WeightedSlot sinkSlot = armorStand.GearInventory.GetBestSuitedSlot(sourceSlot);
+      return sinkSlot.weight > 0 ? sinkSlot.slot : null;
     }
   }
 }

@@ -1,20 +1,18 @@
-using System.Collections.Generic;
 using Vintagestory.API.Common;
+using Vintagestory.API.Util;
+using Vintagestory.GameContent;
 
 namespace ShakeItDoff {
   public static class EntityPlayerExtensions {
-    public static Dictionary<string, ItemSlot> GetArmorSlots(this EntityPlayer playerEntity) {
-      Dictionary<string, ItemSlot> armorSlots = new Dictionary<string, ItemSlot>();
-      foreach (EnumCharacterDressType type in EnumCharacterDressTypeExtensions.ArmorDressTypes) {
-        armorSlots[type.ToString().ToLowerInvariant()] = null;
-      }
+    public static ItemSlot[] GetFilledArmorSlots(this EntityPlayer playerEntity) {
+      ItemSlotCharacter[] filledArmorSlots = new ItemSlotCharacter[0];
       foreach (ItemSlotCharacter slot in playerEntity.GearInventory) {
-        string dressType = (slot.Itemstack?.Collectible?.Attributes["clothescategory"]?.AsString() ?? "").ToLowerInvariant();
-        if (armorSlots.ContainsKey(dressType)) {
-          armorSlots[dressType] = slot;
+        var wearable = slot.Itemstack?.Item as ItemWearable;
+        if (wearable?.IsArmor ?? false) {
+          filledArmorSlots.Append(slot);
         }
       }
-      return armorSlots;
+      return filledArmorSlots;
     }
   }
 }
