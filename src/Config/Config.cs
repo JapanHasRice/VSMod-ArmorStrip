@@ -16,6 +16,9 @@ namespace DoffAndDonAgain.Config {
     public string HandsNeededToDoffDescription = Constants.HandsNeededToDoffDescription;
     public int HandsNeededToDoff = Constants.DEFAULT_HANDS_FREE;
 
+    public string DropArmorWhenDoffingToStandDescription = Constants.DropArmorWhenDoffingToStandDescription;
+    public bool DropArmorWhenDoffingToStand = Constants.DEFAULT_DROP_ON_STAND_DOFF;
+
     public static DoffAndDonAgainConfig Load(ICoreAPI api) {
       DoffAndDonAgainConfig config = null;
       try {

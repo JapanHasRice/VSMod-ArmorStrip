@@ -12,6 +12,7 @@ namespace DoffAndDonAgain {
     private int HandsNeededToDoff;
     private float SaturationCostPerDoff;
     private float SaturationCostPerDon;
+    private bool DropArmorWhenDoffingToStand;
     public override void Start(ICoreAPI api) {
       base.Start(api);
 
@@ -19,6 +20,7 @@ namespace DoffAndDonAgain {
       HandsNeededToDoff = config.HandsNeededToDoff;
       SaturationCostPerDoff = config.SaturationCostPerDoff;
       SaturationCostPerDon = config.SaturationCostPerDon;
+      DropArmorWhenDoffingToStand = config.DropArmorWhenDoffingToStand;
 
       api.Network.RegisterChannel(Constants.CHANNEL_NAME)
         .RegisterMessageType(typeof(DoffArmorPacket))
@@ -116,13 +118,21 @@ namespace DoffAndDonAgain {
         return;
       }
 
-      OnDoffWithoutDonner dropItem = (ItemSlot couldNotBeDonnedSlot) => {
-        return doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true);
-      };
+      OnDoffWithoutDonner dropOrKeepItem = null;
+      if (!DropArmorWhenDoffingToStand && armorStand != null) {
+        dropOrKeepItem = (ItemSlot couldNotBeDonnedSlot) => {
+          return false; // False so that a doff that fails this way does not count for saturation depletion.
+        };
+      }
+      else {
+        dropOrKeepItem = (ItemSlot couldNotBeDonnedSlot) => {
+          return doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true);
+        };
+      }
       OnDonnedOneOrMore updateArmorStandRender = () => { BroadcastArmorStandUpdated(armorStand); };
       bool doffed = Doff(doffer: doffer.Entity,
                          donner: armorStand,
-                         onDoffWithoutDonner: dropItem,
+                         onDoffWithoutDonner: dropOrKeepItem,
                          onDonnedOneOrMore: updateArmorStandRender);
 
       if (doffed) { OnSuccessfulDoff(doffer); }
