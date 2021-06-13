@@ -12,7 +12,7 @@ namespace DoffAndDonAgain.Config {
     public const int DEFAULT_HANDS_FREE = 2;
     public const int MIN_HANDS_FREE = 0;
     public const int MAX_HANDS_FREE = 2;
-    public readonly static string HandsNeededToDoffDescription = $"Number of available (empty) hands needed to quickly remove all of your armor. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
+    public readonly static string HandsNeededToDoffDescription = $"Number of available (empty) hands needed to doff or don. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
     public const bool DEFAULT_DROP_ON_STAND_DOFF = false;
     public readonly static string DropArmorWhenDoffingToStandDescription = $"If enabled, when doffing to an armor stand, any armor that cannot be placed on the stand is dropped to the ground as if the player had doffed without an armor stand. [Default: {DEFAULT_DROP_ON_STAND_DOFF}]";
   }
