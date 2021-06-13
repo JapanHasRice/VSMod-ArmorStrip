@@ -85,31 +85,48 @@ namespace DoffAndDonAgain {
         return;
       }
 
-      bool doffed = false;
-      bool gaveToArmorStand = false;
-      bool isTargetingArmorStand = armorStand != null;
-      foreach (var slot in doffer.Entity.GetFilledArmorSlots()) {
-        if (slot.Empty) { continue; } // just in case
-        doffed = true;
-        if (!isTargetingArmorStand) {
-          doffer.InventoryManager.DropItem(slot, true);
-          continue;
-        }
+      OnDoffWithoutDonner dropItem = (ItemSlot couldNotBeDonnedSlot) => {
+        return doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true);
+      };
+      OnDonnedOneOrMore updateArmorStandRender = () => { BroadcastArmorStandUpdated(armorStand); };
+      bool doffed = Doff(doffer: doffer.Entity,
+                         donner: armorStand,
+                         onDoffWithoutDonner: dropItem,
+                         onDonnedOneOrMore: updateArmorStandRender);
 
-        ItemSlot sinkSlot = GetAvailableSlotOnArmorStand(armorStand, slot);
-        if (sinkSlot != null && slot.TryPutInto(doffer.Entity.World, sinkSlot) > 0) {
-          gaveToArmorStand = true;
-          sinkSlot.MarkDirty();
-        }
-        else {
-          doffer.InventoryManager.DropItem(slot, true);
-        }
-      }
-      if (gaveToArmorStand) {
-        armorStand.WatchedAttributes.MarkAllDirty();
-        BroadcastArmorStandUpdated(armorStand.World.Api as ICoreServerAPI, armorStand);
-      }
       if (doffed) { OnSuccessfulDoff(doffer); }
+    }
+
+    private bool Doff(EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
+      if (doffer == null) { return false; }
+      bool doffed = false;
+
+      if (donner == null) {
+        foreach (var slot in doffer.GetFilledArmorSlots()) {
+          if (slot.Empty) { continue; }
+          doffed = onDoffWithoutDonner?.Invoke(slot) ?? true || doffed;
+        }
+      }
+      else {
+        bool donnerDonned = false;
+        foreach (var slot in doffer.GetFilledArmorSlots()) {
+          if (slot.Empty) { continue; }
+          doffed = true;
+
+          ItemSlot sinkSlot = GetAvailableSlotOn(donner, slot);
+          if (sinkSlot != null && slot.TryPutInto(doffer.World, sinkSlot) > 0) {
+            donnerDonned = true;
+            sinkSlot.MarkDirty();
+          }
+          else {
+            doffed = onDoffWithoutDonner?.Invoke(slot) ?? true || doffed;
+          }
+        }
+        if (donnerDonned) {
+          onDonnedOneOrMore?.Invoke();
+        }
+      }
+      return doffed;
     }
 
     private ItemSlot GetAvailableSlotOnArmorStand(EntityArmorStand armorStand, ItemSlot sourceSlot) {
@@ -117,11 +134,19 @@ namespace DoffAndDonAgain {
       return sinkSlot.weight > 0 ? sinkSlot.slot : null;
     }
 
-    private void BroadcastArmorStandUpdated(ICoreServerAPI sapi, EntityArmorStand armorStand) {
-      sapi.World.RegisterCallback((IWorldAccessor world, BlockPos pos, float dt) => {
-        (world.Api as ICoreServerAPI).Network.GetChannel(Constants.DOFF_CHANNEL_NAME).BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
-      }, armorStand.Pos.AsBlockPos, 500);
-      sapi.Network.GetChannel(Constants.DOFF_CHANNEL_NAME).BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
+    private ItemSlot GetAvailableSlotOn(EntityAgent entityAgent, ItemSlot sourceSlot) {
+      return entityAgent.GearInventory.GetBestSuitedSlot(sourceSlot).slot;
+    }
+
+    private void BroadcastArmorStandUpdated(EntityAgent armorStand) {
+      if (armorStand == null) { return; }
+      if (armorStand.World?.Side == EnumAppSide.Server && armorStand.GetType() == typeof(EntityArmorStand)) {
+        armorStand.WatchedAttributes.MarkAllDirty();
+        var sapi = armorStand.World.Api as ICoreServerAPI;
+        sapi.World.RegisterCallback((IWorldAccessor world, BlockPos pos, float dt) => {
+          sapi.Network.GetChannel(Constants.DOFF_CHANNEL_NAME).BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
+        }, armorStand.Pos.AsBlockPos, 500);
+      }
     }
 
     private void MarkArmorStandDirty(EntityArmorStand armorStand) {
@@ -152,4 +177,9 @@ namespace DoffAndDonAgain {
       player.SendIngameError(Constants.DOFF_ERROR_SATURATION, Lang.GetIfExists($"doffanddonagain:ingameerror-{Constants.DOFF_ERROR_SATURATION}") ?? Constants.DOFF_ERROR_SATURATION_DESC);
     }
   }
+
+  public delegate void OnDonnedOneOrMore();
+
+  // Return true to indicate a successful doffing.
+  public delegate bool OnDoffWithoutDonner(ItemSlot couldNotBeDonnedSlot);
 }
