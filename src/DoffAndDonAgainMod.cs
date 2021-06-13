@@ -11,25 +11,30 @@ namespace DoffAndDonAgain {
   public class DoffAndDonAgainMod : ModSystem {
     private int HandsNeededToDoff;
     private float SaturationCostPerDoff;
+    private float SaturationCostPerDon;
     public override void Start(ICoreAPI api) {
       base.Start(api);
 
       var config = DoffAndDonAgainConfig.Load(api);
       HandsNeededToDoff = config.HandsNeededToDoff;
       SaturationCostPerDoff = config.SaturationCostPerDoff;
+      SaturationCostPerDon = config.SaturationCostPerDon;
 
-      api.Network.RegisterChannel(Constants.DOFF_CHANNEL_NAME)
+      api.Network.RegisterChannel(Constants.CHANNEL_NAME)
         .RegisterMessageType(typeof(DoffArmorPacket))
+        .RegisterMessageType(typeof(DonArmorPacket))
         .RegisterMessageType(typeof(ArmorStandInventoryUpdatedPacket));
     }
 
     public override void StartClientSide(ICoreClientAPI capi) {
       base.StartClientSide(capi);
 
-      capi.Input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_DOFF_KEY, HotkeyType.CharacterControls);
+      capi.Input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
+      capi.Input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
       capi.Input.SetHotKeyHandler(Constants.DOFF_CODE, (KeyCombination kc) => { return TryToDoff(capi); });
+      capi.Input.SetHotKeyHandler(Constants.DON_CODE, (KeyCombination kc) => { return TryToDon(capi); });
 
-      capi.Network.GetChannel(Constants.DOFF_CHANNEL_NAME).SetMessageHandler<ArmorStandInventoryUpdatedPacket>((ArmorStandInventoryUpdatedPacket packet) => {
+      capi.Network.GetChannel(Constants.CHANNEL_NAME).SetMessageHandler<ArmorStandInventoryUpdatedPacket>((ArmorStandInventoryUpdatedPacket packet) => {
         MarkArmorStandDirty(GetEntityArmorStandById(capi.World.Player.Entity, packet.ArmorStandEntityId, 100, 100));
       });
     }
@@ -37,22 +42,44 @@ namespace DoffAndDonAgain {
     public override void StartServerSide(ICoreServerAPI sapi) {
       base.StartServerSide(sapi);
 
-      sapi.Network.GetChannel(Constants.DOFF_CHANNEL_NAME).SetMessageHandler<DoffArmorPacket>((IServerPlayer doffer, DoffArmorPacket packet) => {
-        Doff(doffer, packet);
-      });
+      sapi.Network.GetChannel(Constants.CHANNEL_NAME)
+        .SetMessageHandler<DoffArmorPacket>((IServerPlayer doffer, DoffArmorPacket packet) => {
+          Doff(doffer, packet);
+        })
+        .SetMessageHandler<DonArmorPacket>((IServerPlayer donner, DonArmorPacket packet) => {
+          Don(donner, packet);
+        });
     }
 
     private bool TryToDoff(ICoreClientAPI capi) {
       var doffer = capi.World.Player;
       if (HasEnoughHandsFree(doffer)) {
         var doffArmorPacket = new DoffArmorPacket(GetTargetedArmorStandEntity(doffer)?.EntityId);
-        capi.Network.GetChannel(Constants.DOFF_CHANNEL_NAME).SendPacket(doffArmorPacket);
+        capi.Network.GetChannel(Constants.CHANNEL_NAME).SendPacket(doffArmorPacket);
         return true;
       }
       else {
-        TriggerHandsError(capi);
+        TriggerHandsError(doffer);
         return false;
       }
+    }
+
+    private bool TryToDon(ICoreClientAPI capi) {
+      var donner = capi.World.Player;
+      if (!HasEnoughHandsFree(donner)) {
+        TriggerHandsError(donner);
+        return false;
+      }
+
+      var armorStand = GetTargetedArmorStandEntity(donner);
+      if (armorStand == null) {
+        TriggerArmorStandTargetError(donner);
+        return false;
+      }
+
+      var donArmorPacket = new DonArmorPacket(armorStand.EntityId);
+      capi.Network.GetChannel(Constants.CHANNEL_NAME).SendPacket(donArmorPacket);
+      return true;
     }
 
     private bool HasEnoughSaturation(IServerPlayer player, float neededSaturation) {
@@ -71,6 +98,10 @@ namespace DoffAndDonAgain {
 
     private void Doff(IServerPlayer doffer, DoffArmorPacket packet) {
       Doff(doffer, GetEntityArmorStandById(doffer.Entity, packet.ArmorStandEntityId));
+    }
+
+    private void Don(IServerPlayer donner, DonArmorPacket packet) {
+      Don(donner, GetEntityArmorStandById(donner.Entity, packet.ArmorStandEntityId));
     }
 
     private EntityArmorStand GetEntityArmorStandById(EntityPlayer aroundPlayer, long? armorStandEntityId, float horRange = 10, float vertRange = 10) {
@@ -95,6 +126,21 @@ namespace DoffAndDonAgain {
                          onDonnedOneOrMore: updateArmorStandRender);
 
       if (doffed) { OnSuccessfulDoff(doffer); }
+    }
+
+    private void Don(IServerPlayer donner, EntityArmorStand armorStand) {
+      if (!HasEnoughSaturation(donner, SaturationCostPerDon)) {
+        TriggerSaturationError(donner);
+        return;
+      }
+
+      OnDonnedOneOrMore updateArmorStandRender = () => { BroadcastArmorStandUpdated(armorStand); };
+      bool donned = Doff(doffer: armorStand,
+                         donner: donner.Entity,
+                         onDoffWithoutDonner: null,
+                         onDonnedOneOrMore: updateArmorStandRender);
+
+      if (donned) { OnSuccessfulDon(donner); }
     }
 
     private bool Doff(EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
@@ -135,7 +181,13 @@ namespace DoffAndDonAgain {
     }
 
     private ItemSlot GetAvailableSlotOn(EntityAgent entityAgent, ItemSlot sourceSlot) {
-      return entityAgent.GearInventory.GetBestSuitedSlot(sourceSlot).slot;
+      // Do not use IInventory#GetBestSuitedSlot because it always returns a null slot for the character's gear inventory
+      foreach (var slot in entityAgent.GearInventory) {
+        if (slot.CanHold(sourceSlot)) {
+          return slot.Empty ? slot : null;
+        }
+      }
+      return null;
     }
 
     private void BroadcastArmorStandUpdated(EntityAgent armorStand) {
@@ -144,7 +196,7 @@ namespace DoffAndDonAgain {
         armorStand.WatchedAttributes.MarkAllDirty();
         var sapi = armorStand.World.Api as ICoreServerAPI;
         sapi.World.RegisterCallback((IWorldAccessor world, BlockPos pos, float dt) => {
-          sapi.Network.GetChannel(Constants.DOFF_CHANNEL_NAME).BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
+          sapi.Network.GetChannel(Constants.CHANNEL_NAME).BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
         }, armorStand.Pos.AsBlockPos, 500);
       }
     }
@@ -159,22 +211,36 @@ namespace DoffAndDonAgain {
       doffer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationCostPerDoff);
     }
 
-    private void TriggerHandsError(ICoreClientAPI capi) {
+    private void OnSuccessfulDon(IServerPlayer donner) {
+      donner.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationCostPerDon);
+    }
+
+    private void TriggerHandsError(IClientPlayer player) {
       string errorCode;
       string errorDesc;
       if (HandsNeededToDoff == 2) {
-        errorCode = Constants.DOFF_ERROR_BOTH_HANDS;
-        errorDesc = Constants.DOFF_ERROR_BOTH_HANDS_DESC;
+        errorCode = Constants.ERROR_BOTH_HANDS;
+        errorDesc = Constants.ERROR_BOTH_HANDS_DESC;
       }
       else {
-        errorCode = Constants.DOFF_ERROR_ONE_HAND;
-        errorDesc = Constants.DOFF_ERROR_ONE_HAND_DESC;
+        errorCode = Constants.ERROR_ONE_HAND;
+        errorDesc = Constants.ERROR_ONE_HAND_DESC;
       }
-      capi.TriggerIngameError(this, errorCode, Lang.GetIfExists($"doffanddonagain:ingameerror-{errorCode}") ?? errorDesc);
+      TriggerError(player, errorCode, errorDesc);
+    }
+
+    private void TriggerArmorStandTargetError(IClientPlayer player) {
+      TriggerError(player, Constants.ERROR_MISSING_ARMOR_STAND_TARGET, Constants.ERROR_MISSING_ARMOR_STAND_TARGET_DESC);
     }
 
     private void TriggerSaturationError(IServerPlayer player) {
-      player.SendIngameError(Constants.DOFF_ERROR_SATURATION, Lang.GetIfExists($"doffanddonagain:ingameerror-{Constants.DOFF_ERROR_SATURATION}") ?? Constants.DOFF_ERROR_SATURATION_DESC);
+      TriggerError(player, Constants.ERROR_SATURATION, Constants.ERROR_SATURATION_DESC);
+    }
+
+    private void TriggerError(IPlayer player, string errorCode, string errorFallbackDesc) {
+      string errorText = Lang.GetIfExists($"doffanddonagain:ingameerror-{errorCode}") ?? errorFallbackDesc;
+      (player as IServerPlayer)?.SendIngameError(errorCode, errorText);
+      (player?.Entity?.Api as ICoreClientAPI)?.TriggerIngameError(this, errorCode, errorText);
     }
   }
 

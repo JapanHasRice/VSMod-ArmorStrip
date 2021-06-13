@@ -18,15 +18,20 @@ namespace DoffAndDonAgain.Config {
 
 namespace DoffAndDonAgain {
   public static class Constants {
-    public const string DOFF_CHANNEL_NAME = "doffanddonagain";
-    public const GlKeys DEFAULT_DOFF_KEY = GlKeys.U;
+    public const string CHANNEL_NAME = "doffanddonagain";
+    public const GlKeys DEFAULT_KEY = GlKeys.U;
     public const string DOFF_CODE = "doffarmor";
     public const string DOFF_DESC = "Doff: Remove all armor";
-    public const string DOFF_ERROR_BOTH_HANDS = "needbothhandsfree";
-    public const string DOFF_ERROR_BOTH_HANDS_DESC = "Need both hands free.";
-    public const string DOFF_ERROR_ONE_HAND = "needonefreehand";
-    public const string DOFF_ERROR_ONE_HAND_DESC = "Need at least 1 free hand.";
-    public const string DOFF_ERROR_SATURATION = "toohungrytodoff";
-    public const string DOFF_ERROR_SATURATION_DESC = "Not enough energy to doff.";
+    public const string DON_CODE = "donarmor";
+    public const string DON_DESC = "Don: Equip empty armor slots from Armor Stand";
+
+    public const string ERROR_BOTH_HANDS = "needbothhandsfree";
+    public const string ERROR_BOTH_HANDS_DESC = "Need both hands free.";
+    public const string ERROR_ONE_HAND = "needonefreehand";
+    public const string ERROR_ONE_HAND_DESC = "Need at least 1 free hand.";
+    public const string ERROR_SATURATION = "toohungry";
+    public const string ERROR_SATURATION_DESC = "Not enough energy to doff/don.";
+    public const string ERROR_MISSING_ARMOR_STAND_TARGET = "musttargetarmorstand";
+    public const string ERROR_MISSING_ARMOR_STAND_TARGET_DESC = "Need to be targeting an armor stand.";
   }
 }

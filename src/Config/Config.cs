@@ -3,52 +3,49 @@ using Newtonsoft.Json;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
-namespace DoffAndDonAgain {
+namespace DoffAndDonAgain.Config {
   public class DoffAndDonAgainConfig {
     public string GameplaySectionTitle = "=== Gameplay Settings ===";
 
-    private const float DEFAULT_DOFF_COST = 20;
-    private const float MIN_DOFF_COST = 0;
-    public string SaturationCostPerDoffDescription = $"Satiety required to quickly remove all of your armor. [Default: {DEFAULT_DOFF_COST}, Min: {MIN_DOFF_COST}]";
-    public float SaturationCostPerDoff = DEFAULT_DOFF_COST;
+    public string SaturationCostPerDoffDescription = Constants.SaturationCostPerDoffDescription;
+    public float SaturationCostPerDoff = Constants.DEFAULT_DOFF_COST;
 
-    private const int DEFAULT_HANDS_FREE = 2;
-    private const int MIN_HANDS_FREE = 0;
-    private const int MAX_HANDS_FREE = 2;
-    public string HandsNeededToDoffDescription = $"Number of available (empty) hands needed to quickly remove all of your armor. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
-    public int HandsNeededToDoff = DEFAULT_HANDS_FREE;
+    public string SaturationCostPerDonDescription = Constants.SaturationCostPerDonDescription;
+    public float SaturationCostPerDon = Constants.DEFAULT_DON_COST;
 
+    public string HandsNeededToDoffDescription = Constants.HandsNeededToDoffDescription;
+    public int HandsNeededToDoff = Constants.DEFAULT_HANDS_FREE;
 
-    public const string filename = "DoffAndDonAgainConfig.json";
     public static DoffAndDonAgainConfig Load(ICoreAPI api) {
       DoffAndDonAgainConfig config = null;
       try {
-        config = api.LoadModConfig<DoffAndDonAgainConfig>(filename);
+        config = api.LoadModConfig<DoffAndDonAgainConfig>(Constants.FILENAME);
       }
       catch (JsonReaderException e) {
-        api.Logger.Error("Unable to parse config JSON. Correct syntax errors and retry, or delete {0} and load the world again to generate a new configuration file with default settings.", filename);
+        api.Logger.Error("Unable to parse config JSON. Correct syntax errors and retry, or delete {0} and load the world again to generate a new configuration file with default settings.", Constants.FILENAME);
         throw e;
       }
       catch (Exception e) {
-        api.Logger.Error("I don't know what happened. Delete {0} in the config folder and try again.", filename);
+        api.Logger.Error("I don't know what happened. Delete {0} in the config folder and try again.", Constants.FILENAME);
         throw e;
       }
 
       if (config == null) {
-        api.Logger.Notification("{0} configuration file not found. Generating with default settings.", filename);
+        api.Logger.Notification("{0} configuration file not found. Generating with default settings.", Constants.FILENAME);
         config = new DoffAndDonAgainConfig();
       }
 
-      config.SaturationCostPerDoff = Math.Max(config.SaturationCostPerDoff, MIN_DOFF_COST);
+      config.SaturationCostPerDoff = Math.Max(config.SaturationCostPerDoff, Constants.MIN_DOFF_COST);
+      config.SaturationCostPerDon = Math.Max(config.SaturationCostPerDon, Constants.MIN_DON_COST);
 
-      config.HandsNeededToDoff = GameMath.Clamp(config.HandsNeededToDoff, MIN_HANDS_FREE, MAX_HANDS_FREE);
+      config.HandsNeededToDoff = GameMath.Clamp(config.HandsNeededToDoff, Constants.MIN_HANDS_FREE, Constants.MAX_HANDS_FREE);
 
       Save(api, config);
       return config;
     }
 
     public static void Save(ICoreAPI api, DoffAndDonAgainConfig config) {
-      api.StoreModConfig(config, filename);
+      api.StoreModConfig(config, Constants.FILENAME);
     }
   }
 }

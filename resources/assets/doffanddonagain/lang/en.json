@@ -1,5 +1,5 @@
 {
-  "ingameerror-needbothhandsfree": "You need both of your hands free to quickly doff.",
-  "ingameerror-needonefreehand": "You need at least one of your hands free to quickly doff.",
-  "ingameerror-toohungrytodoff": "You are too weak to quickly doff."
+  "ingameerror-needbothhandsfree": "You need both of your hands free to quickly doff/don.",
+  "ingameerror-needonefreehand": "You need at least one of your hands free to quickly doff/don.",
+  "ingameerror-toohungry": "You are too weak to quickly doff/don."
 }
