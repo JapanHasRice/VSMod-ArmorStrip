@@ -12,7 +12,8 @@ namespace DoffAndDonAgain {
 #region Variables and Properties
     private ICoreAPI Api;
     private INetworkChannel Channel;
-    private int HandsNeededToDoff;
+    private AvailableHandsCheck HasEnoughHandsFree;
+    private AvailableHandsError TriggerHandsError;
     private float SaturationCostPerDoff;
     private float SaturationCostPerDon;
     private bool DropArmorWhenDoffingToStand;
@@ -32,6 +33,7 @@ namespace DoffAndDonAgain {
     private IServerNetworkChannel ServerChannel {
       get { return Channel as IServerNetworkChannel; }
     }
+
 #endregion
 
 #region Delegates
@@ -40,6 +42,10 @@ namespace DoffAndDonAgain {
 
     // Return true to indicate a successful doffing.
     public delegate bool OnDoffWithoutDonner(IServerPlayer player, ItemSlot couldNotBeDonnedSlot);
+
+    private delegate bool AvailableHandsCheck(IPlayer player);
+
+    private delegate void AvailableHandsError(IPlayer player);
 
 #endregion
 
@@ -55,7 +61,23 @@ namespace DoffAndDonAgain {
 
     private void LoadConfigs() {
       var config = DoffAndDonAgainConfig.LoadOrCreateDefault(Api);
-      HandsNeededToDoff = config.HandsNeededToDoff;
+
+      switch (config.HandsNeededToDoff) {
+        case 2:
+          HasEnoughHandsFree = HasBothHandsFree;
+          TriggerHandsError = TriggerBothHandsError;
+          break;
+        case 1:
+          HasEnoughHandsFree = HasOneHandFree;
+          TriggerHandsError = TriggerOneHandError;
+          break;
+        case 0:
+        default:
+          HasEnoughHandsFree = LookMomNoHands;
+          TriggerHandsError = TriggerNoHandsError;
+          break;
+      }
+
       SaturationCostPerDoff = config.SaturationCostPerDoff;
       SaturationCostPerDon = config.SaturationCostPerDon;
       DropArmorWhenDoffingToStand = config.DropArmorWhenDoffingToStand;
@@ -191,14 +213,22 @@ namespace DoffAndDonAgain {
       return player.CurrentEntitySelection?.Entity as EntityArmorStand;
     }
 
+    private bool HasBothHandsFree(IPlayer player) {
+      if (player == null) { return true; }
+      return player.Entity.LeftHandItemSlot.Empty && player.Entity.RightHandItemSlot.Empty;
+    }
+
     private bool HasEnoughSaturation(IServerPlayer player, float neededSaturation) {
       return player.Entity.GetBehavior<EntityBehaviorHunger>()?.Saturation >= neededSaturation;
     }
 
-    private bool HasEnoughHandsFree(IPlayer player) {
-      int freeHands = player.Entity.RightHandItemSlot.Empty ? 1 : 0;
-      freeHands += player.Entity.LeftHandItemSlot.Empty ? 1 : 0;
-      return freeHands >= HandsNeededToDoff;
+    private bool HasOneHandFree(IPlayer player) {
+      if (player == null) { return true; }
+      return player.Entity.RightHandItemSlot.Empty || player.Entity.LeftHandItemSlot.Empty;
+    }
+
+    private bool LookMomNoHands(IPlayer player) {
+      return true;
     }
 
     private void MarkArmorStandDirty(EntityArmorStand armorStand) {
@@ -272,22 +302,20 @@ namespace DoffAndDonAgain {
       ClientChannel.SendPacket(donArmorPacket);
     }
 
-    private void TriggerHandsError(IClientPlayer player) {
-      string errorCode;
-      string errorDesc;
-      if (HandsNeededToDoff == 2) {
-        errorCode = Constants.ERROR_BOTH_HANDS;
-        errorDesc = Constants.ERROR_BOTH_HANDS_DESC;
-      }
-      else {
-        errorCode = Constants.ERROR_ONE_HAND;
-        errorDesc = Constants.ERROR_ONE_HAND_DESC;
-      }
-      TriggerError(player, errorCode, errorDesc);
-    }
-
     private void TriggerArmorStandTargetError(IClientPlayer player) {
       TriggerError(player, Constants.ERROR_MISSING_ARMOR_STAND_TARGET, Constants.ERROR_MISSING_ARMOR_STAND_TARGET_DESC);
+    }
+
+    private void TriggerBothHandsError(IPlayer player) {
+      TriggerError(player, Constants.ERROR_BOTH_HANDS, Constants.ERROR_BOTH_HANDS_DESC);
+    }
+
+    private void TriggerNoHandsError(IPlayer player) {
+      return;
+    }
+
+    private void TriggerOneHandError(IPlayer player) {
+      TriggerError(player, Constants.ERROR_ONE_HAND, Constants.ERROR_ONE_HAND_DESC);
     }
 
     private void TriggerSaturationError(IServerPlayer player) {
