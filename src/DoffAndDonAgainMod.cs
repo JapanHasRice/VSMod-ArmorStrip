@@ -118,11 +118,6 @@ namespace DoffAndDonAgain {
     }
 
     private void Doff(IServerPlayer doffer, EntityArmorStand armorStand) {
-      if (!HasEnoughSaturation(doffer, SaturationCostPerDoff)) {
-        TriggerSaturationError(doffer);
-        return;
-      }
-
       OnDoffWithoutDonner dropOrKeepItem = null;
       if (!DropArmorWhenDoffingToStand && armorStand != null) {
         dropOrKeepItem = KeepUndonnableOnDoff;
@@ -173,11 +168,6 @@ namespace DoffAndDonAgain {
     }
 
     private void Don(IServerPlayer donner, EntityArmorStand armorStand) {
-      if (!HasEnoughSaturation(donner, SaturationCostPerDon)) {
-        TriggerSaturationError(donner);
-        return;
-      }
-
       OnDonnedOneOrMore updateArmorStandRender = () => { BroadcastArmorStandUpdated(armorStand); };
       bool donned = Doff(initiatingPlayer: donner,
                          doffer: armorStand,
@@ -218,8 +208,10 @@ namespace DoffAndDonAgain {
       return player.Entity.LeftHandItemSlot.Empty && player.Entity.RightHandItemSlot.Empty;
     }
 
-    private bool HasEnoughSaturation(IServerPlayer player, float neededSaturation) {
-      return player.Entity.GetBehavior<EntityBehaviorHunger>()?.Saturation >= neededSaturation;
+    private bool HasEnoughSaturation(IPlayer player, float neededSaturation) {
+      var currentSaturation = player.Entity.WatchedAttributes.GetTreeAttribute("hunger")?.TryGetFloat("currentsaturation");
+      if (currentSaturation == null) { return true; }
+      return currentSaturation >= neededSaturation;
     }
 
     private bool HasOneHandFree(IPlayer player) {
@@ -271,6 +263,11 @@ namespace DoffAndDonAgain {
         return false;
       }
 
+      if (!HasEnoughSaturation(doffer, SaturationCostPerDoff)) {
+        TriggerSaturationError(doffer);
+        return false;
+      }
+
       SendDoffRequest(doffer);
       return true;
     }
@@ -285,6 +282,11 @@ namespace DoffAndDonAgain {
       var armorStand = GetTargetedArmorStandEntity(donner);
       if (armorStand == null) {
         TriggerArmorStandTargetError(donner);
+        return false;
+      }
+
+      if (!HasEnoughSaturation(donner, SaturationCostPerDon)) {
+        TriggerSaturationError(donner);
         return false;
       }
 
@@ -318,7 +320,7 @@ namespace DoffAndDonAgain {
       TriggerError(player, Constants.ERROR_ONE_HAND, Constants.ERROR_ONE_HAND_DESC);
     }
 
-    private void TriggerSaturationError(IServerPlayer player) {
+    private void TriggerSaturationError(IPlayer player) {
       TriggerError(player, Constants.ERROR_SATURATION, Constants.ERROR_SATURATION_DESC);
     }
 
