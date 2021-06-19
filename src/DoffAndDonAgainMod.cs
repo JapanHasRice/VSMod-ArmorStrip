@@ -39,7 +39,7 @@ namespace DoffAndDonAgain {
     public delegate void OnDonnedOneOrMore();
 
     // Return true to indicate a successful doffing.
-    public delegate bool OnDoffWithoutDonner(ItemSlot couldNotBeDonnedSlot);
+    public delegate bool OnDoffWithoutDonner(IServerPlayer player, ItemSlot couldNotBeDonnedSlot);
 
 #endregion
 
@@ -86,15 +86,13 @@ namespace DoffAndDonAgain {
     }
 #endregion
 
-    private void BroadcastArmorStandUpdated(EntityAgent armorStand) {
-      if (armorStand == null) { return; }
-      if (armorStand.World?.Side == EnumAppSide.Server && armorStand.GetType() == typeof(EntityArmorStand)) {
-        armorStand.WatchedAttributes.MarkAllDirty();
-        var sapi = armorStand.World.Api as ICoreServerAPI;
-        sapi.World.RegisterCallback((IWorldAccessor world, BlockPos pos, float dt) => {
-          sapi.Network.GetChannel(Constants.CHANNEL_NAME).BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
-        }, armorStand.Pos.AsBlockPos, 500);
-      }
+    private void BroadcastArmorStandUpdated(EntityArmorStand armorStand) {
+      if (armorStand == null || armorStand.World?.Side != EnumAppSide.Server) { return; }
+
+      armorStand.WatchedAttributes.MarkAllDirty();
+      ServerAPI.World.RegisterCallback((IWorldAccessor world, BlockPos pos, float dt) => {
+        ServerChannel.BroadcastPacket(new ArmorStandInventoryUpdatedPacket(armorStand.EntityId));
+      }, armorStand.Pos.AsBlockPos, 500);
     }
 
     private void Doff(IServerPlayer doffer, EntityArmorStand armorStand) {
@@ -105,17 +103,14 @@ namespace DoffAndDonAgain {
 
       OnDoffWithoutDonner dropOrKeepItem = null;
       if (!DropArmorWhenDoffingToStand && armorStand != null) {
-        dropOrKeepItem = (ItemSlot couldNotBeDonnedSlot) => {
-          return false; // False so that a doff that fails this way does not count for saturation depletion.
-        };
+        dropOrKeepItem = KeepUndonnableOnDoff;
       }
       else {
-        dropOrKeepItem = (ItemSlot couldNotBeDonnedSlot) => {
-          return doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true);
-        };
+        dropOrKeepItem = DropUndonnableOnDoff;
       }
       OnDonnedOneOrMore updateArmorStandRender = () => { BroadcastArmorStandUpdated(armorStand); };
-      bool doffed = Doff(doffer: doffer.Entity,
+      bool doffed = Doff(initiatingPlayer: doffer,
+                         doffer: doffer.Entity,
                          donner: armorStand,
                          onDoffWithoutDonner: dropOrKeepItem,
                          onDonnedOneOrMore: updateArmorStandRender);
@@ -123,29 +118,29 @@ namespace DoffAndDonAgain {
       if (doffed) { OnSuccessfulDoff(doffer); }
     }
 
-    private bool Doff(EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
+    private bool Doff(IServerPlayer initiatingPlayer, EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
       if (doffer == null) { return false; }
       bool doffed = false;
 
       if (donner == null) {
         foreach (var slot in doffer.GetFilledArmorSlots()) {
           if (slot.Empty) { continue; }
-          doffed = onDoffWithoutDonner?.Invoke(slot) ?? true || doffed;
+          doffed = onDoffWithoutDonner?.Invoke(initiatingPlayer, slot) ?? true || doffed;
         }
       }
       else {
         bool donnerDonned = false;
         foreach (var slot in doffer.GetFilledArmorSlots()) {
           if (slot.Empty) { continue; }
-          doffed = true;
 
           ItemSlot sinkSlot = GetAvailableSlotOn(donner, slot);
           if (sinkSlot != null && slot.TryPutInto(doffer.World, sinkSlot) > 0) {
             donnerDonned = true;
             sinkSlot.MarkDirty();
+            doffed = true;
           }
           else {
-            doffed = onDoffWithoutDonner?.Invoke(slot) ?? true || doffed;
+            doffed = onDoffWithoutDonner?.Invoke(initiatingPlayer, slot) ?? true || doffed;
           }
         }
         if (donnerDonned) {
@@ -162,12 +157,18 @@ namespace DoffAndDonAgain {
       }
 
       OnDonnedOneOrMore updateArmorStandRender = () => { BroadcastArmorStandUpdated(armorStand); };
-      bool donned = Doff(doffer: armorStand,
+      bool donned = Doff(initiatingPlayer: donner,
+                         doffer: armorStand,
                          donner: donner.Entity,
-                         onDoffWithoutDonner: null,
+                         onDoffWithoutDonner: KeepUndonnableOnDoff,
                          onDonnedOneOrMore: updateArmorStandRender);
 
       if (donned) { OnSuccessfulDon(donner); }
+    }
+
+    private bool DropUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
+      if (doffer == null) return false;
+      return doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true);
     }
 
     private ItemSlot GetAvailableSlotOn(EntityAgent entityAgent, ItemSlot sourceSlot) {
@@ -202,13 +203,17 @@ namespace DoffAndDonAgain {
 
     private void MarkArmorStandDirty(EntityArmorStand armorStand) {
       if (armorStand?.IsRendered ?? false) {
-        armorStand.OnEntityLoaded(); // Should figure out if this has unwanted side effects or if there's a proper, more direct way of solving
+        armorStand.OnEntityLoaded(); // TODO: figure out if this has unwanted side effects or if there's a proper, more direct way of solving
       }
+    }
+
+    private bool KeepUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
+      return false; // False so that a doff that fails this way does not count for saturation depletion.
     }
 
     private void OnArmorStandInventoryUpdated(ArmorStandInventoryUpdatedPacket packet) {
       if (Api.Side != EnumAppSide.Client) { return; }
-      var armorStand = GetEntityArmorStandById((Api as ICoreClientAPI).World.Player.Entity, packet.ArmorStandEntityId, 100, 100);
+      var armorStand = GetEntityArmorStandById(ClientAPI.World.Player.Entity, packet.ArmorStandEntityId, 100, 100);
       MarkArmorStandDirty(armorStand);
     }
 
@@ -292,7 +297,7 @@ namespace DoffAndDonAgain {
     private void TriggerError(IPlayer player, string errorCode, string errorFallbackDesc) {
       string errorText = Lang.GetIfExists($"doffanddonagain:ingameerror-{errorCode}") ?? errorFallbackDesc;
       (player as IServerPlayer)?.SendIngameError(errorCode, errorText);
-      (player?.Entity?.Api as ICoreClientAPI)?.TriggerIngameError(this, errorCode, errorText);
+      ClientAPI?.TriggerIngameError(this, errorCode, errorText);
     }
   }
 }
