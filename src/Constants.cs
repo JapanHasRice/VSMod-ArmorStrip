@@ -43,5 +43,7 @@ namespace DoffAndDonAgain {
     public const string ERROR_NOTHING_TO_DON_DESC = "The armor stand has nothing for you to don.";
     public const string ERROR_BIRTHDAY_SUIT_PARTY = "birthdaysuitparty";
     public const string ERROR_BIRTHDAY_SUIT_PARTY_DESC = "Neither you or the armor stand have armor to swap.";
+    public const string ERROR_TARGET_LOST = "targetlost";
+    public const string ERROR_TARGET_LOST_DESC = "Server could not locate the targeted armor stand.";
   }
 }

@@ -135,15 +135,32 @@ namespace DoffAndDonAgain {
     }
 
     protected void OnDoff(IServerPlayer doffer, DoffArmorPacket packet) {
-      Doff(doffer, GetEntityArmorStandById(doffer.Entity, packet.ArmorStandEntityId));
+      var armorStand = GetEntityArmorStandById(doffer.Entity, packet.ArmorStandEntityId);
+      if (armorStand == null && packet.ArmorStandEntityId != null) {
+        // Armor stand entity id was provided, but was not found nearby the player for some reason.
+        // It may have been picked up or destroyed during network transmission.
+        TriggerDoffTargetLostError(doffer);
+        return;
+      }
+      Doff(doffer, armorStand);
     }
 
     protected void OnDon(IServerPlayer donner, DonArmorPacket packet) {
-      Don(donner, GetEntityArmorStandById(donner.Entity, packet.ArmorStandEntityId));
+      var armorStand = GetEntityArmorStandById(donner.Entity, packet.ArmorStandEntityId);
+      if (armorStand == null) {
+        TriggerDoffTargetLostError(donner);
+        return;
+      }
+      Don(donner, armorStand);
     }
 
     protected void OnSwap(IServerPlayer swapper, SwapArmorPacket packet) {
-      Swap(swapper, GetEntityArmorStandById(swapper.Entity, packet.ArmorStandEntityId));
+      var armorStand = GetEntityArmorStandById(swapper.Entity, packet.ArmorStandEntityId);
+      if (armorStand == null) {
+        TriggerDoffTargetLostError(swapper);
+        return;
+      }
+      Swap(swapper, armorStand);
     }
 
     protected void OnSuccessfulDoff(IServerPlayer doffer) {
@@ -173,6 +190,10 @@ namespace DoffAndDonAgain {
         OnSuccessfulSwap(swapper);
         BroadcastArmorStandUpdated(armorStand);
       }
+    }
+
+    protected void TriggerDoffTargetLostError(IServerPlayer player) {
+      TriggerError(player, Constants.ERROR_TARGET_LOST, Constants.ERROR_TARGET_LOST_DESC);
     }
 
     protected void TriggerError(IServerPlayer player, string errorCode, string errorFallbackText) {
