@@ -124,6 +124,11 @@ namespace DoffAndDonAgain {
         return false;
       }
 
+      if (PlayerEntity.GetFilledArmorSlots().Count == 0) {
+        TriggerNotWearingArmorError();
+        return false;
+      }
+
       SendDoffRequest();
       return true;
     }
@@ -199,6 +204,10 @@ namespace DoffAndDonAgain {
 
     protected void TriggerNoHandsError() {
       return;
+    }
+
+    protected void TriggerNotWearingArmorError() {
+      TriggerError(Constants.ERROR_NOTHING_TO_DOFF, Constants.ERROR_NOTHING_TO_DOFF_DESC);
     }
 
     protected void TriggerOneHandError() {

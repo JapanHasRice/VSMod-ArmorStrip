@@ -37,5 +37,7 @@ namespace DoffAndDonAgain {
     public const string ERROR_SATURATION_DESC = "Not enough energy to doff/don.";
     public const string ERROR_MISSING_ARMOR_STAND_TARGET = "musttargetarmorstand";
     public const string ERROR_MISSING_ARMOR_STAND_TARGET_DESC = "Need to be targeting an armor stand.";
+    public const string ERROR_NOTHING_TO_DOFF = "noprotection";
+    public const string ERROR_NOTHING_TO_DOFF_DESC = "You aren't wearing any armor to doff.";
   }
 }
