@@ -73,6 +73,9 @@ namespace DoffAndDonAgain {
 
       ClientAPI.Input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
       ClientAPI.Input.SetHotKeyHandler(Constants.DON_CODE, OnTryToDon);
+
+      ClientAPI.Input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
+      ClientAPI.Input.SetHotKeyHandler(Constants.SWAP_CODE, OnTryToSwap);
     }
 
     #endregion
@@ -146,6 +149,27 @@ namespace DoffAndDonAgain {
       return true;
     }
 
+    protected bool OnTryToSwap(KeyCombination kc) {
+      if (!HasEnoughHandsFree()) {
+        TriggerHandsError();
+        return false;
+      }
+
+      var armorStand = GetTargetedArmorStandEntity();
+      if (armorStand == null) {
+        TriggerArmorStandTargetError();
+        return false;
+      }
+
+      if (!HasEnoughSaturation(SaturationCostPerSwap)) {
+        TriggerSaturationError();
+        return false;
+      }
+
+      SendSwapRequest(armorStand);
+      return true;
+    }
+
     protected void SendDoffRequest() {
       var doffArmorPacket = new DoffArmorPacket(GetTargetedArmorStandEntity()?.EntityId);
       ClientChannel.SendPacket(doffArmorPacket);
@@ -154,6 +178,11 @@ namespace DoffAndDonAgain {
     protected void SendDonRequest(EntityArmorStand armorStand) {
       var donArmorPacket = new DonArmorPacket(armorStand.EntityId);
       ClientChannel.SendPacket(donArmorPacket);
+    }
+
+    protected void SendSwapRequest(EntityArmorStand armorStand) {
+      var swapArmorPacket = new SwapArmorPacket(armorStand.EntityId);
+      ClientChannel.SendPacket(swapArmorPacket);
     }
 
     protected void TriggerArmorStandTargetError() {

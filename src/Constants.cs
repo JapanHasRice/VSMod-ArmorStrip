@@ -26,6 +26,8 @@ namespace DoffAndDonAgain {
     public const string DOFF_DESC = "Doff: Remove all armor";
     public const string DON_CODE = "donarmor";
     public const string DON_DESC = "Don: Equip empty armor slots from Armor Stand";
+    public const string SWAP_CODE = "swaparmor";
+    public const string SWAP_DESC = "Doff and Don: Swap all armor with targeted Armor Stand";
 
     public const string ERROR_BOTH_HANDS = "needbothhandsfree";
     public const string ERROR_BOTH_HANDS_DESC = "Need both hands free.";

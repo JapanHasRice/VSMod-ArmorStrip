@@ -12,6 +12,7 @@ namespace DoffAndDonAgain {
     protected INetworkChannel Channel;
     protected float SaturationCostPerDoff;
     protected float SaturationCostPerDon;
+    protected float SaturationCostPerSwap;
     protected bool DropArmorWhenDoffingToStand;
 
     #endregion
@@ -37,6 +38,7 @@ namespace DoffAndDonAgain {
 
       SaturationCostPerDoff = config.SaturationCostPerDoff;
       SaturationCostPerDon = config.SaturationCostPerDon;
+      SaturationCostPerSwap = (SaturationCostPerDoff + SaturationCostPerDon) * 0.6f;
       DropArmorWhenDoffingToStand = config.DropArmorWhenDoffingToStand;
     }
 
@@ -44,7 +46,8 @@ namespace DoffAndDonAgain {
       Channel = Api.Network.RegisterChannel(Constants.CHANNEL_NAME)
         .RegisterMessageType(typeof(DoffArmorPacket))
         .RegisterMessageType(typeof(DonArmorPacket))
-        .RegisterMessageType(typeof(ArmorStandInventoryUpdatedPacket));
+        .RegisterMessageType(typeof(ArmorStandInventoryUpdatedPacket))
+        .RegisterMessageType(typeof(SwapArmorPacket));
     }
 
     #endregion

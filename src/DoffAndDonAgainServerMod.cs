@@ -38,8 +38,9 @@ namespace DoffAndDonAgain {
 
     private void SetupServerNetwork() {
       ServerChannel
-        ?.SetMessageHandler<DoffArmorPacket>(OnDoff)
-        ?.SetMessageHandler<DonArmorPacket>(OnDon);
+        .SetMessageHandler<DoffArmorPacket>(OnDoff)
+        .SetMessageHandler<DonArmorPacket>(OnDon)
+        .SetMessageHandler<SwapArmorPacket>(OnSwap);
     }
 
     #endregion
@@ -141,12 +142,37 @@ namespace DoffAndDonAgain {
       Don(donner, GetEntityArmorStandById(donner.Entity, packet.ArmorStandEntityId));
     }
 
+    protected void OnSwap(IServerPlayer swapper, SwapArmorPacket packet) {
+      Swap(swapper, GetEntityArmorStandById(swapper.Entity, packet.ArmorStandEntityId));
+    }
+
     protected void OnSuccessfulDoff(IServerPlayer doffer) {
       doffer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationCostPerDoff);
     }
 
     protected void OnSuccessfulDon(IServerPlayer donner) {
       donner.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationCostPerDon);
+    }
+
+    protected void OnSuccessfulSwap(IServerPlayer swapper) {
+      swapper.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationCostPerSwap);
+    }
+
+    protected void Swap(IServerPlayer swapper, EntityArmorStand armorStand) {
+      if (swapper == null || armorStand == null) { return; }
+      bool swapped = false;
+
+      var playerArmorSlots = swapper.Entity.GetArmorSlots();
+      var armorStandArmorSlots = armorStand.GetArmorSlots();
+      for (int i = 0; i < playerArmorSlots.Count; i++) {
+        if (playerArmorSlots[i].Empty && armorStandArmorSlots[i].Empty) { continue; }
+        swapped = playerArmorSlots[i].TryFlipWith(armorStandArmorSlots[i]) || swapped;
+      }
+
+      if (swapped) {
+        OnSuccessfulSwap(swapper);
+        BroadcastArmorStandUpdated(armorStand);
+      }
     }
 
     protected void TriggerError(IServerPlayer player, string errorCode, string errorFallbackText) {
