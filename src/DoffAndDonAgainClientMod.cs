@@ -129,7 +129,7 @@ namespace DoffAndDonAgain {
         return false;
       }
 
-      SendDoffRequest();
+      SendDoffRequest(GetTargetedArmorStandEntity()?.EntityId);
       return true;
     }
 
@@ -140,7 +140,8 @@ namespace DoffAndDonAgain {
       }
 
       var armorStand = GetTargetedArmorStandEntity();
-      if (armorStand == null) {
+      long? armorStandEntityId = armorStand?.EntityId;
+      if (armorStandEntityId == null) {
         TriggerArmorStandTargetError();
         return false;
       }
@@ -150,12 +151,12 @@ namespace DoffAndDonAgain {
         return false;
       }
 
-      if (armorStand.GetFilledArmorSlots().Count == 0) {
+      if ((armorStand?.GetFilledArmorSlots()?.Count ?? 0) == 0) {
         TriggerEmptyArmorStandError();
         return false;
       }
 
-      SendDonRequest(armorStand);
+      SendDonRequest((long)armorStandEntityId);
       return true;
     }
 
@@ -166,7 +167,8 @@ namespace DoffAndDonAgain {
       }
 
       var armorStand = GetTargetedArmorStandEntity();
-      if (armorStand == null) {
+      long? armorStandEntityId = armorStand?.EntityId;
+      if (armorStandEntityId == null) {
         TriggerArmorStandTargetError();
         return false;
       }
@@ -176,28 +178,25 @@ namespace DoffAndDonAgain {
         return false;
       }
 
-      if (PlayerEntity.GetFilledArmorSlots().Count == 0 && armorStand.GetFilledArmorSlots().Count == 0) {
+      if (PlayerEntity.GetFilledArmorSlots().Count == 0 && (armorStand?.GetFilledArmorSlots()?.Count ?? 0) == 0) {
         TriggerNothingToSwapError();
         return false;
       }
 
-      SendSwapRequest(armorStand);
+      SendSwapRequest((long)armorStandEntityId);
       return true;
     }
 
-    protected void SendDoffRequest() {
-      var doffArmorPacket = new DoffArmorPacket(GetTargetedArmorStandEntity()?.EntityId);
-      ClientChannel.SendPacket(doffArmorPacket);
+    protected void SendDoffRequest(long? armorStandEntityId = null) {
+      ClientChannel.SendPacket(new DoffArmorPacket(armorStandEntityId));
     }
 
-    protected void SendDonRequest(EntityArmorStand armorStand) {
-      var donArmorPacket = new DonArmorPacket(armorStand.EntityId);
-      ClientChannel.SendPacket(donArmorPacket);
+    protected void SendDonRequest(long armorStandEntityId) {
+      ClientChannel.SendPacket(new DonArmorPacket(armorStandEntityId));
     }
 
-    protected void SendSwapRequest(EntityArmorStand armorStand) {
-      var swapArmorPacket = new SwapArmorPacket(armorStand.EntityId);
-      ClientChannel.SendPacket(swapArmorPacket);
+    protected void SendSwapRequest(long armorStandEntityId) {
+      ClientChannel.SendPacket(new SwapArmorPacket(armorStandEntityId));
     }
 
     protected void TriggerArmorStandTargetError() {

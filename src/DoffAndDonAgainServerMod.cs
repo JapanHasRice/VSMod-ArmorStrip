@@ -46,7 +46,7 @@ namespace DoffAndDonAgain {
     #endregion
 
     protected void BroadcastArmorStandUpdated(EntityArmorStand armorStand) {
-      if (armorStand == null || armorStand.World?.Side != EnumAppSide.Server) { return; }
+      if (armorStand == null) { return; }
 
       armorStand.WatchedAttributes.MarkAllDirty();
       ServerAPI.World.RegisterCallback((IWorldAccessor world, BlockPos pos, float dt) => {
