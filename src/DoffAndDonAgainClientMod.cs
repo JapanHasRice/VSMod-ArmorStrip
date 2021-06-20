@@ -150,6 +150,11 @@ namespace DoffAndDonAgain {
         return false;
       }
 
+      if (armorStand.GetFilledArmorSlots().Count == 0) {
+        TriggerEmptyArmorStandError();
+        return false;
+      }
+
       SendDonRequest(armorStand);
       return true;
     }
@@ -196,6 +201,10 @@ namespace DoffAndDonAgain {
 
     protected void TriggerBothHandsError() {
       TriggerError(Constants.ERROR_BOTH_HANDS, Constants.ERROR_BOTH_HANDS_DESC);
+    }
+
+    protected void TriggerEmptyArmorStandError() {
+      TriggerError(Constants.ERROR_NOTHING_TO_DON, Constants.ERROR_NOTHING_TO_DON_DESC);
     }
 
     protected void TriggerError(string errorCode, string errorFallbackText) {

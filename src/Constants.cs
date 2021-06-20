@@ -39,5 +39,7 @@ namespace DoffAndDonAgain {
     public const string ERROR_MISSING_ARMOR_STAND_TARGET_DESC = "Need to be targeting an armor stand.";
     public const string ERROR_NOTHING_TO_DOFF = "noprotection";
     public const string ERROR_NOTHING_TO_DOFF_DESC = "You aren't wearing any armor to doff.";
+    public const string ERROR_NOTHING_TO_DON = "outofprotection";
+    public const string ERROR_NOTHING_TO_DON_DESC = "The armor stand has nothing for you to don.";
   }
 }
