@@ -4,5 +4,6 @@
   "ingameerror-toohungry": "You are too weak to quickly doff/don.",
   "ingameerror-musttargetarmorstand": "You need to be targeting an armor stand.",
   "ingameerror-noprotection": "You aren't wearing any armor to doff.",
-  "ingameerror-outofprotection": "The armor stand has nothing for you to don."
+  "ingameerror-outofprotection": "The armor stand has nothing for you to don.",
+  "ingameerror-birthdaysuitparty": "Neither you or the armor stand have armor to swap."
 }

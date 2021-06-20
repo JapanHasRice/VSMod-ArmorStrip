@@ -176,6 +176,11 @@ namespace DoffAndDonAgain {
         return false;
       }
 
+      if (PlayerEntity.GetFilledArmorSlots().Count == 0 && armorStand.GetFilledArmorSlots().Count == 0) {
+        TriggerNothingToSwapError();
+        return false;
+      }
+
       SendSwapRequest(armorStand);
       return true;
     }
@@ -197,6 +202,10 @@ namespace DoffAndDonAgain {
 
     protected void TriggerArmorStandTargetError() {
       TriggerError(Constants.ERROR_MISSING_ARMOR_STAND_TARGET, Constants.ERROR_MISSING_ARMOR_STAND_TARGET_DESC);
+    }
+
+    protected void TriggerNothingToSwapError() {
+      TriggerError(Constants.ERROR_BIRTHDAY_SUIT_PARTY, Constants.ERROR_BIRTHDAY_SUIT_PARTY_DESC);
     }
 
     protected void TriggerBothHandsError() {
