@@ -69,7 +69,12 @@ namespace DoffAndDonAgain {
                          onDoffWithoutDonner: dropOrKeepItem,
                          onDonnedOneOrMore: updateArmorStandRender);
 
-      if (doffed) { OnSuccessfulDoff(doffer); }
+      if (doffed) {
+        OnSuccessfulDoff(doffer);
+      }
+      else {
+        TriggerCouldNotDoffError(doffer);
+      }
     }
 
     protected bool Doff(IServerPlayer initiatingPlayer, EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
@@ -112,7 +117,12 @@ namespace DoffAndDonAgain {
                          onDoffWithoutDonner: KeepUndonnableOnDoff,
                          onDonnedOneOrMore: updateArmorStandRender);
 
-      if (donned) { OnSuccessfulDon(donner); }
+      if (donned) {
+        OnSuccessfulDon(donner);
+      }
+      else {
+        TriggerCouldNotDonError(donner);
+      }
     }
 
     protected bool DropUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
@@ -190,6 +200,21 @@ namespace DoffAndDonAgain {
         OnSuccessfulSwap(swapper);
         BroadcastArmorStandUpdated(armorStand);
       }
+      else {
+        TriggerCouldNotSwapError(swapper);
+      }
+    }
+
+    protected void TriggerCouldNotDoffError(IServerPlayer player) {
+      TriggerError(player, Constants.ERROR_UNDOFFABLE, Constants.ERROR_UNDOFFABLE_DESC);
+    }
+
+    protected void TriggerCouldNotDonError(IServerPlayer player) {
+      TriggerError(player, Constants.ERROR_UNDONNABLE, Constants.ERROR_UNDONNABLE_DESC);
+    }
+
+    protected void TriggerCouldNotSwapError(IServerPlayer player) {
+      TriggerError(player, Constants.ERROR_COULD_NOT_SWAP, Constants.ERROR_COULD_NOT_SWAP_DESC);
     }
 
     protected void TriggerDoffTargetLostError(IServerPlayer player) {

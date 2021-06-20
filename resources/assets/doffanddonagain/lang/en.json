@@ -6,5 +6,8 @@
   "ingameerror-noprotection": "You aren't wearing any armor to doff.",
   "ingameerror-outofprotection": "The armor stand has nothing for you to don.",
   "ingameerror-birthdaysuitparty": "Neither you or the armor stand have armor to swap.",
-  "ingameerror-targetlost": "Server could not locate the targeted armor stand."
+  "ingameerror-targetlost": "Server could not locate the targeted armor stand.",
+  "ingameerror-undoffable": "Nothing to doff or the armor stand does not have room.",
+  "ingameerror-undonnable": "Nothing to don or you do not have room.",
+  "ingameerror-unswappable": "Nothing to swap, or none of the armor could be exchanged."
 }

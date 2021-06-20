@@ -45,5 +45,11 @@ namespace DoffAndDonAgain {
     public const string ERROR_BIRTHDAY_SUIT_PARTY_DESC = "Neither you or the armor stand have armor to swap.";
     public const string ERROR_TARGET_LOST = "targetlost";
     public const string ERROR_TARGET_LOST_DESC = "Server could not locate the targeted armor stand.";
+    public const string ERROR_UNDOFFABLE = "undoffable";
+    public const string ERROR_UNDOFFABLE_DESC = "Nothing to doff or the armor stand does not have room.";
+    public const string ERROR_UNDONNABLE = "undonnable";
+    public const string ERROR_UNDONNABLE_DESC = "Nothing to don or you do not have room.";
+    public const string ERROR_COULD_NOT_SWAP = "unswappable";
+    public const string ERROR_COULD_NOT_SWAP_DESC = "Nothing to swap, or none of the armor could be exchanged.";
   }
 }
