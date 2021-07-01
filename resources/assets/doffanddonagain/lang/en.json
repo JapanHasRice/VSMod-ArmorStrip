@@ -11,5 +11,8 @@
 
   "Not enough satiety, need at least {0}.": "Not enough satiety, need at least {0}.",
 
-  "Donning armor is disabled by configuration.": "Donning armor is disabled by configuration."
+  "Donning armor is disabled by configuration.": "Donning armor is disabled by configuration.",
+  "Swapping armor is disabled by configuration.": "Swapping armor is disabled by configuration.",
+  "Doffing armor to the ground is disabled by configuration.": "Doffing armor to the ground is disabled by configuration.",
+  "Doffing armor to an armor stand is disabled by configuration.": "Doffing armor to an armor stand is disabled by configuration."
 }
