@@ -31,6 +31,9 @@ namespace DoffAndDonAgain.Common {
 
     public string SwapConfigOptions = "--- Swap: Exchange armor with an armor stand ---";
 
+    public string EnableSwapDescription = Constants.EnableSwapDescription;
+    public bool EnableSwap = Constants.DEFAULT_ENABLE_SWAP;
+
     public string SaturationCostPerSwapDescription = Constants.SaturationCostPerSwapDescription;
     public float SaturationCostPerSwap = Constants.DEFAULT_SWAP_COST;
 

@@ -15,7 +15,13 @@ namespace DoffAndDonAgain.Server {
         return;
       }
       System = system;
-      System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacket);
+
+      if (System.Config.EnableSwap) {
+        System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacket);
+      }
+      else {
+        System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacketSwapDisabled);
+      }
     }
 
     private void OnSwapArmorPacket(IServerPlayer player, SwapArmorPacket packet) {
@@ -58,6 +64,10 @@ namespace DoffAndDonAgain.Server {
 
     private void OnSuccessfulSwap(IServerPlayer player) {
       player.Entity.ConsumeSaturation(System.Config.SaturationCostPerSwap);
+    }
+
+    private void OnSwapArmorPacketSwapDisabled(IServerPlayer wouldBeSwapper, SwapArmorPacket packet) {
+      System.Error.TriggerFromServer(Constants.ERROR_SWAP_DISABLED, wouldBeSwapper);
     }
   }
 }
