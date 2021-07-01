@@ -20,6 +20,8 @@ namespace DoffAndDonAgain.Common {
     public readonly static string HandsNeededToSwapDescription = $"Number of available (empty) hands needed to swap. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
     public const bool DEFAULT_DROP_ON_STAND_DOFF = false;
     public readonly static string DropArmorWhenDoffingToStandDescription = $"If enabled, when doffing to an armor stand, any armor that cannot be placed on the stand is dropped to the ground as if the player had doffed without an armor stand. [Default: {DEFAULT_DROP_ON_STAND_DOFF}]";
+    public const bool DEFAULT_ENABLE_DON = true;
+    public readonly static string EnableDonDescription = $"If enabled, player can quickly equip armor from an armor stand they are currently targeting. [Default: {DEFAULT_ENABLE_DON}]";
 
     #endregion
 
@@ -31,6 +33,7 @@ namespace DoffAndDonAgain.Common {
     public const string DOFF_DESC = "Doff: Remove all armor";
     public const string DON_CODE = "donarmor";
     public const string DON_DESC = "Don: Equip empty armor slots from Armor Stand";
+    public const string DON_DISABLED_DESC = "Don: DISABLED BY CONFIGURATION";
     public const string SWAP_CODE = "swaparmor";
     public const string SWAP_DESC = "Doff and Don: Swap all armor with targeted Armor Stand";
 
@@ -46,6 +49,7 @@ namespace DoffAndDonAgain.Common {
     public const string ERROR_UNDOFFABLE = "Nothing to doff or the armor stand does not have room.";
     public const string ERROR_UNDONNABLE = "Nothing to don or you do not have room.";
     public const string ERROR_COULD_NOT_SWAP = "Nothing to swap, or none of the armor could be exchanged.";
+    public const string ERROR_DON_DISABLED = "Donning armor is disabled by configuration.";
 
     #endregion
   }

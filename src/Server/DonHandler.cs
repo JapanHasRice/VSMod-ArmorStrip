@@ -14,7 +14,13 @@ namespace DoffAndDonAgain.Server {
         return;
       }
       System = system;
-      System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacket);
+
+      if (System.Config.EnableDon) {
+        System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacket);
+      }
+      else {
+        System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacketDonDisabled);
+      }
     }
 
     private void OnDonPacket(IServerPlayer donner, DonArmorPacket packet) {
@@ -49,6 +55,10 @@ namespace DoffAndDonAgain.Server {
 
     private void OnSuccessfulDon(IServerPlayer donner) {
       donner.Entity.ConsumeSaturation(System.Config.SaturationCostPerDon);
+    }
+
+    private void OnDonPacketDonDisabled(IServerPlayer wouldBeDonner, DonArmorPacket packet) {
+      System.Error.TriggerFromServer(Constants.ERROR_DON_DISABLED, wouldBeDonner);
     }
   }
 }

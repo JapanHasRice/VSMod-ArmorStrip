@@ -7,7 +7,7 @@ namespace DoffAndDonAgain.Common {
   public class DoffAndDonAgainConfig {
     public string GameplaySectionTitle = "=== Gameplay Settings ===";
 
-    public string DoffConfigOptions = "--- Doff ---";
+    public string DoffConfigOptions = "--- Doff: Remove armor ---";
 
     public string SaturationCostPerDoffDescription = Constants.SaturationCostPerDoffDescription;
     public float SaturationCostPerDoff = Constants.DEFAULT_DOFF_COST;
@@ -18,7 +18,10 @@ namespace DoffAndDonAgain.Common {
     public string DropArmorWhenDoffingToStandDescription = Constants.DropArmorWhenDoffingToStandDescription;
     public bool DropArmorWhenDoffingToStand = Constants.DEFAULT_DROP_ON_STAND_DOFF;
 
-    public string DonConfigOptions = "--- Don ---";
+    public string DonConfigOptions = "--- Don: Equip armor from an armor stand ---";
+
+    public string EnableDonDescription = Constants.EnableDonDescription;
+    public bool EnableDon = Constants.DEFAULT_ENABLE_DON;
 
     public string SaturationCostPerDonDescription = Constants.SaturationCostPerDonDescription;
     public float SaturationCostPerDon = Constants.DEFAULT_DON_COST;
@@ -26,7 +29,7 @@ namespace DoffAndDonAgain.Common {
     public string HandsNeededToDonDescription = Constants.HandsNeededToDonDescription;
     public int HandsNeededToDon = Constants.DEFAULT_HANDS_FREE;
 
-    public string SwapConfigOptions = "--- Swap ---";
+    public string SwapConfigOptions = "--- Swap: Exchange armor with an armor stand ---";
 
     public string SaturationCostPerSwapDescription = Constants.SaturationCostPerSwapDescription;
     public float SaturationCostPerSwap = Constants.DEFAULT_SWAP_COST;

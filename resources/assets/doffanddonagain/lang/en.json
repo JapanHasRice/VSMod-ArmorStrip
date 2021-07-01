@@ -9,5 +9,7 @@
   "Nothing to don or you do not have room.": "Nothing to don or you do not have room.",
   "Nothing to swap, or none of the armor could be exchanged.": "Nothing to swap, or none of the armor could be exchanged.",
 
-  "Not enough satiety, need at least {0}.": "Not enough satiety, need at least {0}."
+  "Not enough satiety, need at least {0}.": "Not enough satiety, need at least {0}.",
+
+  "Donning armor is disabled by configuration.": "Donning armor is disabled by configuration."
 }
