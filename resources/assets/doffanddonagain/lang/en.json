@@ -1,13 +1,13 @@
 {
-  "ingameerror-needbothhandsfree": "You need both of your hands free to quickly doff/don.",
-  "ingameerror-needonefreehand": "You need at least one of your hands free to quickly doff/don.",
-  "ingameerror-toohungry": "You are too weak to quickly doff/don.",
-  "ingameerror-musttargetarmorstand": "You need to be targeting an armor stand.",
-  "ingameerror-noprotection": "You aren't wearing any armor to doff.",
-  "ingameerror-outofprotection": "The armor stand has nothing for you to don.",
-  "ingameerror-birthdaysuitparty": "Neither you or the armor stand have armor to swap.",
-  "ingameerror-targetlost": "Server could not locate the targeted armor stand.",
-  "ingameerror-undoffable": "Nothing to doff or the armor stand does not have room.",
-  "ingameerror-undonnable": "Nothing to don or you do not have room.",
-  "ingameerror-unswappable": "Nothing to swap, or none of the armor could be exchanged."
+  "Need both hands free.": "Need both hands free.",
+  "Need at least 1 free hand.": "Need at least 1 free hand.",
+
+  "Need to be targeting an armor stand.": "Need to be targeting an armor stand.",
+  "Server could not locate the targeted armor stand.": "Server could not locate the targeted armor stand.",
+
+  "Nothing to doff or the armor stand does not have room.": "Nothing to doff or the armor stand does not have room.",
+  "Nothing to don or you do not have room.": "Nothing to don or you do not have room.",
+  "Nothing to swap, or none of the armor could be exchanged.": "Nothing to swap, or none of the armor could be exchanged.",
+
+  "Not enough satiety, need at least {0}.": "Not enough satiety, need at least {0}."
 }

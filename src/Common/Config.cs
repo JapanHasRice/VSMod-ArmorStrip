@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 
-namespace DoffAndDonAgain.Config {
+namespace DoffAndDonAgain.Common {
   public class DoffAndDonAgainConfig {
     public string GameplaySectionTitle = "=== Gameplay Settings ===";
 
