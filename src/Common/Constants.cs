@@ -39,10 +39,8 @@ namespace DoffAndDonAgain.Common {
     public const string DOFF_DESC = "Doff: Remove all armor";
     public const string DON_CODE = "donarmor";
     public const string DON_DESC = "Don: Equip empty armor slots from Armor Stand";
-    public const string DON_DISABLED_DESC = "Don: DISABLED BY CONFIGURATION";
     public const string SWAP_CODE = "swaparmor";
     public const string SWAP_DESC = "Swap: Exchange all armor with targeted Armor Stand";
-    public const string SWAP_DISABLED_DESC = "Swap: DISABLED BY CONFIGURATION";
 
     #endregion
 

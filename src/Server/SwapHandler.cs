@@ -16,12 +16,7 @@ namespace DoffAndDonAgain.Server {
       }
       System = system;
 
-      if (System.Config.EnableSwap) {
-        System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacket);
-      }
-      else {
-        System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacketSwapDisabled);
-      }
+      System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacket);
     }
 
     private void OnSwapArmorPacket(IServerPlayer player, SwapArmorPacket packet) {
@@ -29,12 +24,16 @@ namespace DoffAndDonAgain.Server {
       var armorStand = player.Entity.GetEntityArmorStandById(packet.ArmorStandEntityId);
       if (armorStand == null) {
         System.Error.TriggerFromServer(Constants.ERROR_TARGET_LOST, player);
-        return;
       }
       else {
-        swapped = SwapArmorWithStand(player, armorStand);
+        if (System.Config.EnableSwap) {
+          swapped = SwapArmorWithStand(player, armorStand);
+          OnSwapcompleted(player, swapped);
+        }
+        else {
+          System.Error.TriggerFromServer(Constants.ERROR_SWAP_DISABLED, player);
+        }
       }
-      OnSwapcompleted(player, swapped);
     }
 
     private bool SwapArmorWithStand(IServerPlayer swapper, EntityArmorStand armorStand) {
@@ -64,10 +63,6 @@ namespace DoffAndDonAgain.Server {
 
     private void OnSuccessfulSwap(IServerPlayer player) {
       player.Entity.ConsumeSaturation(System.Config.SaturationCostPerSwap);
-    }
-
-    private void OnSwapArmorPacketSwapDisabled(IServerPlayer wouldBeSwapper, SwapArmorPacket packet) {
-      System.Error.TriggerFromServer(Constants.ERROR_SWAP_DISABLED, wouldBeSwapper);
     }
   }
 }

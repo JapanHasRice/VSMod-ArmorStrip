@@ -15,12 +15,7 @@ namespace DoffAndDonAgain.Server {
       }
       System = system;
 
-      if (System.Config.EnableDon) {
-        System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacket);
-      }
-      else {
-        System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacketDonDisabled);
-      }
+      System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacket);
     }
 
     private void OnDonPacket(IServerPlayer donner, DonArmorPacket packet) {
@@ -28,12 +23,16 @@ namespace DoffAndDonAgain.Server {
       var armorStand = donner?.Entity.GetEntityArmorStandById(packet.ArmorStandEntityId);
       if (armorStand == null) {
         System.Error.TriggerFromServer(Constants.ERROR_TARGET_LOST, donner);
-        return;
       }
       else {
-        donned = DonFromArmorStand(donner, armorStand);
+        if (System.Config.EnableDon) {
+          donned = DonFromArmorStand(donner, armorStand);
+          OnDonCompleted(donner, donned);
+        }
+        else {
+          System.Error.TriggerFromServer(Constants.ERROR_DON_DISABLED, donner);
+        }
       }
-      OnDonCompleted(donner, donned);
     }
 
     private bool DonFromArmorStand(IServerPlayer donner, EntityArmorStand armorStand) {
@@ -55,10 +54,6 @@ namespace DoffAndDonAgain.Server {
 
     private void OnSuccessfulDon(IServerPlayer donner) {
       donner.Entity.ConsumeSaturation(System.Config.SaturationCostPerDon);
-    }
-
-    private void OnDonPacketDonDisabled(IServerPlayer wouldBeDonner, DonArmorPacket packet) {
-      System.Error.TriggerFromServer(Constants.ERROR_DON_DISABLED, wouldBeDonner);
     }
   }
 }
