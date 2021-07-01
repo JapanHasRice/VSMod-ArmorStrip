@@ -41,7 +41,9 @@ namespace DoffAndDonAgain.Server {
         if (playerArmorSlots[i].Empty && armorStandArmorSlots[i].Empty) { continue; }
         swapped = playerArmorSlots[i].TryFlipWith(armorStandArmorSlots[i]) || swapped;
       }
-      if (swapped) { armorStand.UpdateRender(); }
+      if (swapped) {
+        System.ArmorStandRerenderHandler?.UpdateRender(armorStand);
+      }
       return swapped;
     }
 

@@ -57,6 +57,7 @@ namespace DoffAndDonAgain {
       ServerAPI = api;
       ServerChannel = api.Network.GetChannel(Constants.MOD_ID);
 
+      ArmorStandRerenderHandler = new ArmorStandRerenderHandler(this);
       DoffHandler = new DoffHandler(this);
       DonHandler = new DonHandler(this);
       SwapHandler = new SwapHandler(this);

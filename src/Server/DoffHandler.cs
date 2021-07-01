@@ -57,7 +57,7 @@ namespace DoffAndDonAgain.Server {
                            doffer: doffer.Entity,
                            donner: armorStand,
                            onDoffWithoutDonner: dropOrKeepArmorWhenDoffingToStand,
-                           onDonnedOneOrMore: armorStand.UpdateRender);
+                           onDonnedOneOrMore: () => { System.ArmorStandRerenderHandler?.UpdateRender(armorStand); });
     }
 
     private void OnDoffCompleted(IServerPlayer doffer, bool successful) {
