@@ -4,13 +4,12 @@ using Vintagestory.API.Client;
 
 namespace DoffAndDonAgain.Client {
   public class SwapInputHandler : ArmorManipulationInputHandler {
-    private float RequiredSaturation { get; set; }
     public SwapInputHandler(DoffAndDonSystem system) : base(system) {
       System.ClientAPI.Input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
       System.ClientAPI.Input.SetHotKeyHandler(Constants.SWAP_CODE, OnTryToSwap);
 
-      HandsRequired = System.Config.HandsNeededToDoff;
-      RequiredSaturation = (System.Config.SaturationCostPerDoff + System.Config.SaturationCostPerDon) * 0.6f;
+      HandsRequired = System.Config.HandsNeededToSwap;
+      SaturationRequired = System.Config.SaturationCostPerSwap;
     }
 
     private bool OnTryToSwap(KeyCombination kc) {
@@ -32,7 +31,7 @@ namespace DoffAndDonAgain.Client {
     private bool CanPlayerSwap(out long armorStandEntityId, out string errorCode) {
       return IsTargetingArmorStand(out armorStandEntityId, out errorCode)
              && HasEnoughHandsFree(out errorCode)
-             && HasEnoughSaturation(RequiredSaturation, out errorCode);
+             && HasEnoughSaturation(out errorCode);
     }
   }
 }

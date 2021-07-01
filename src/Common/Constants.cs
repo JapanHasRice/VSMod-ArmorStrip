@@ -2,19 +2,28 @@ using Vintagestory.API.Client;
 
 namespace DoffAndDonAgain.Common {
   public static class Constants {
+
+    #region Config
     public const string FILENAME = "DoffAndDonAgainConfig.json";
     public const float DEFAULT_DOFF_COST = 20;
-    public const float MIN_DOFF_COST = 0;
-    public readonly static string SaturationCostPerDoffDescription = $"Satiety required to quickly remove all of your armor. [Default: {DEFAULT_DOFF_COST}, Min: {MIN_DOFF_COST}]";
+    public const float MIN_SATURATION_COST = 0;
+    public readonly static string SaturationCostPerDoffDescription = $"Satiety required to doff. [Default: {DEFAULT_DOFF_COST}, Min: {MIN_SATURATION_COST}]";
     public const float DEFAULT_DON_COST = DEFAULT_DOFF_COST;
-    public const float MIN_DON_COST = MIN_DOFF_COST;
-    public readonly static string SaturationCostPerDonDescription = $"Satiety required to quickly put on armor from an armor stand. [Default: {DEFAULT_DON_COST}, Min: {MIN_DON_COST}]";
+    public readonly static string SaturationCostPerDonDescription = $"Satiety required to don armor from an armor stand. [Default: {DEFAULT_DON_COST}, Min: {MIN_SATURATION_COST}]";
+    public const float DEFAULT_SWAP_COST = (DEFAULT_DOFF_COST + DEFAULT_DON_COST) * 0.6f;
+    public readonly static string SaturationCostPerSwapDescription = $"Satiety required to swap armor with an armor stand. [Default: {DEFAULT_SWAP_COST}, Min: {MIN_SATURATION_COST}]";
     public const int DEFAULT_HANDS_FREE = 2;
     public const int MIN_HANDS_FREE = 0;
     public const int MAX_HANDS_FREE = 2;
-    public readonly static string HandsNeededToDoffDescription = $"Number of available (empty) hands needed to doff or don. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
+    public readonly static string HandsNeededToDoffDescription = $"Number of available (empty) hands needed to doff. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
+    public readonly static string HandsNeededToDonDescription = $"Number of available (empty) hands needed to don. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
+    public readonly static string HandsNeededToSwapDescription = $"Number of available (empty) hands needed to swap. [Default: {DEFAULT_HANDS_FREE}, Min: {MIN_HANDS_FREE}, Max: {MAX_HANDS_FREE}]";
     public const bool DEFAULT_DROP_ON_STAND_DOFF = false;
     public readonly static string DropArmorWhenDoffingToStandDescription = $"If enabled, when doffing to an armor stand, any armor that cannot be placed on the stand is dropped to the ground as if the player had doffed without an armor stand. [Default: {DEFAULT_DROP_ON_STAND_DOFF}]";
+
+    #endregion
+
+    #region Code
 
     public const string MOD_ID = "doffanddonagain";
     public const GlKeys DEFAULT_KEY = GlKeys.U;
@@ -25,6 +34,10 @@ namespace DoffAndDonAgain.Common {
     public const string SWAP_CODE = "swaparmor";
     public const string SWAP_DESC = "Doff and Don: Swap all armor with targeted Armor Stand";
 
+    #endregion
+
+    #region Errors
+
     public const string ERROR_BOTH_HANDS = "Need both hands free.";
     public const string ERROR_ONE_HAND = "Need at least 1 free hand.";
     public const string ERROR_SATURATION = "Not enough satiety, need at least {0}.";
@@ -33,5 +46,7 @@ namespace DoffAndDonAgain.Common {
     public const string ERROR_UNDOFFABLE = "Nothing to doff or the armor stand does not have room.";
     public const string ERROR_UNDONNABLE = "Nothing to don or you do not have room.";
     public const string ERROR_COULD_NOT_SWAP = "Nothing to swap, or none of the armor could be exchanged.";
+
+    #endregion
   }
 }

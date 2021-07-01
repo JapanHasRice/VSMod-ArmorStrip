@@ -8,7 +8,8 @@ namespace DoffAndDonAgain.Client {
       System.ClientAPI.Input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
       System.ClientAPI.Input.SetHotKeyHandler(Constants.DON_CODE, OnTryToDon);
 
-      HandsRequired = System.Config.HandsNeededToDoff;
+      HandsRequired = System.Config.HandsNeededToDon;
+      SaturationRequired = System.Config.SaturationCostPerDon;
     }
 
     private bool OnTryToDon(KeyCombination kc) {
@@ -30,7 +31,7 @@ namespace DoffAndDonAgain.Client {
     private bool CanPlayerDon(out long armorStandEntityId, out string errorCode) {
       return IsTargetingArmorStand(out armorStandEntityId, out errorCode)
              && HasEnoughHandsFree(out errorCode)
-             && HasEnoughSaturation(System.Config.SaturationCostPerDon, out errorCode);
+             && HasEnoughSaturation(out errorCode);
     }
   }
 }

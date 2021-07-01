@@ -8,6 +8,7 @@ namespace DoffAndDonAgain.Client {
     protected DoffAndDonSystem System { get; }
     protected IClientPlayer Player => System.ClientAPI.World.Player;
     protected EntityPlayer PlayerEntity => Player.Entity;
+    protected float SaturationRequired { get; set; }
     private int _handsRequired;
     public int HandsRequired {
       get => _handsRequired;
@@ -43,6 +44,7 @@ namespace DoffAndDonAgain.Client {
       }
       System = system;
       HandsRequired = 0;
+      SaturationRequired = 0;
     }
 
     protected EntityArmorStand GetTargetedArmorStandEntity() => Player.CurrentEntitySelection?.Entity as EntityArmorStand;
@@ -73,13 +75,13 @@ namespace DoffAndDonAgain.Client {
     private bool IsLeftHandEmpty() => PlayerEntity.LeftHandItemSlot.Empty;
     private bool IsRightHandEmpty() => PlayerEntity.RightHandItemSlot.Empty;
 
-    protected bool HasEnoughSaturation(float neededSaturation, out string errorCode) {
+    protected bool HasEnoughSaturation(out string errorCode) {
       errorCode = null;
       var currentSaturation = PlayerEntity.WatchedAttributes.GetTreeAttribute("hunger")?.TryGetFloat("currentsaturation");
       // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
-      bool enoughSaturation = currentSaturation == null ? true : currentSaturation >= neededSaturation;
+      bool enoughSaturation = currentSaturation == null ? true : currentSaturation >= SaturationRequired;
       if (!enoughSaturation) {
-        errorCode = System.Error.GetErrorText(Constants.ERROR_SATURATION, neededSaturation);
+        errorCode = System.Error.GetErrorText(Constants.ERROR_SATURATION, SaturationRequired);
       }
       return enoughSaturation;
     }

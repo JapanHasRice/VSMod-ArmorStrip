@@ -7,17 +7,32 @@ namespace DoffAndDonAgain.Common {
   public class DoffAndDonAgainConfig {
     public string GameplaySectionTitle = "=== Gameplay Settings ===";
 
+    public string DoffConfigOptions = "--- Doff ---";
+
     public string SaturationCostPerDoffDescription = Constants.SaturationCostPerDoffDescription;
     public float SaturationCostPerDoff = Constants.DEFAULT_DOFF_COST;
-
-    public string SaturationCostPerDonDescription = Constants.SaturationCostPerDonDescription;
-    public float SaturationCostPerDon = Constants.DEFAULT_DON_COST;
 
     public string HandsNeededToDoffDescription = Constants.HandsNeededToDoffDescription;
     public int HandsNeededToDoff = Constants.DEFAULT_HANDS_FREE;
 
     public string DropArmorWhenDoffingToStandDescription = Constants.DropArmorWhenDoffingToStandDescription;
     public bool DropArmorWhenDoffingToStand = Constants.DEFAULT_DROP_ON_STAND_DOFF;
+
+    public string DonConfigOptions = "--- Don ---";
+
+    public string SaturationCostPerDonDescription = Constants.SaturationCostPerDonDescription;
+    public float SaturationCostPerDon = Constants.DEFAULT_DON_COST;
+
+    public string HandsNeededToDonDescription = Constants.HandsNeededToDonDescription;
+    public int HandsNeededToDon = Constants.DEFAULT_HANDS_FREE;
+
+    public string SwapConfigOptions = "--- Swap ---";
+
+    public string SaturationCostPerSwapDescription = Constants.SaturationCostPerSwapDescription;
+    public float SaturationCostPerSwap = Constants.DEFAULT_SWAP_COST;
+
+    public string HandsNeededToSwapDescription = Constants.HandsNeededToSwapDescription;
+    public int HandsNeededToSwap = Constants.DEFAULT_HANDS_FREE;
 
     public static DoffAndDonAgainConfig LoadOrCreateDefault(ICoreAPI api) {
       DoffAndDonAgainConfig config = TryLoadModConfig(api, Constants.FILENAME);
@@ -56,10 +71,13 @@ namespace DoffAndDonAgain.Common {
 
     public static void Clamp(DoffAndDonAgainConfig config) {
       if (config == null) { return; }
-      config.SaturationCostPerDoff = Math.Max(config.SaturationCostPerDoff, Constants.MIN_DOFF_COST);
-      config.SaturationCostPerDon = Math.Max(config.SaturationCostPerDon, Constants.MIN_DON_COST);
+      config.SaturationCostPerDoff = Math.Max(config.SaturationCostPerDoff, Constants.MIN_SATURATION_COST);
+      config.SaturationCostPerDon = Math.Max(config.SaturationCostPerDon, Constants.MIN_SATURATION_COST);
+      config.SaturationCostPerSwap = Math.Max(config.SaturationCostPerSwap, Constants.MIN_SATURATION_COST);
 
       config.HandsNeededToDoff = GameMath.Clamp(config.HandsNeededToDoff, Constants.MIN_HANDS_FREE, Constants.MAX_HANDS_FREE);
+      config.HandsNeededToDon = GameMath.Clamp(config.HandsNeededToDon, Constants.MIN_HANDS_FREE, Constants.MAX_HANDS_FREE);
+      config.HandsNeededToSwap = GameMath.Clamp(config.HandsNeededToSwap, Constants.MIN_HANDS_FREE, Constants.MAX_HANDS_FREE);
     }
 
     public static void Save(ICoreAPI api, DoffAndDonAgainConfig config, string filename) {

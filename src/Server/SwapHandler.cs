@@ -57,7 +57,7 @@ namespace DoffAndDonAgain.Server {
     }
 
     private void OnSuccessfulSwap(IServerPlayer player) {
-      player.Entity.ConsumeSaturation((System.Config.SaturationCostPerDoff + System.Config.SaturationCostPerDon) * 0.6f);
+      player.Entity.ConsumeSaturation(System.Config.SaturationCostPerSwap);
     }
   }
 }

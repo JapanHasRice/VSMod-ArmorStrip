@@ -9,6 +9,7 @@ namespace DoffAndDonAgain.Client {
       System.ClientAPI.Input.SetHotKeyHandler(Constants.DOFF_CODE, OnTryToDoff);
 
       HandsRequired = System.Config.HandsNeededToDoff;
+      SaturationRequired = System.Config.SaturationCostPerDoff;
     }
 
     private bool OnTryToDoff(KeyCombination kc) {
@@ -27,7 +28,7 @@ namespace DoffAndDonAgain.Client {
     }
 
     private bool CanPlayerDoff(out string errorCode) {
-      return HasEnoughHandsFree(out errorCode) && HasEnoughSaturation(System.Config.SaturationCostPerDoff, out errorCode);
+      return HasEnoughHandsFree(out errorCode) && HasEnoughSaturation(out errorCode);
     }
   }
 }
