@@ -9,6 +9,12 @@ namespace DoffAndDonAgain.Common {
 
     public string DoffConfigOptions = "--- Doff: Remove armor ---";
 
+    public string EnableDoffToGroundDescription = Constants.EnableDoffToGroundDescription;
+    public bool EnableDoffToGround = Constants.DEFAULT_ENABLE_GROUND_DOFF;
+
+    public string EnableDoffToArmorStandDescription = Constants.EnableDoffToArmorStandDescription;
+    public bool EnableDoffToArmorStand = Constants.DEFAULT_ENABLE_STAND_DOFF;
+
     public string SaturationCostPerDoffDescription = Constants.SaturationCostPerDoffDescription;
     public float SaturationCostPerDoff = Constants.DEFAULT_DOFF_COST;
 

@@ -31,7 +31,12 @@ namespace DoffAndDonAgain.Server {
       var armorStand = doffer?.Entity.GetEntityArmorStandById(packet.ArmorStandEntityId);
       if (armorStand == null) {
         if (packet.ArmorStandEntityId == null) {
-          doffed = DoffToGround(doffer);
+          if (System.Config.EnableDoffToGround) {
+            doffed = DoffToGround(doffer);
+          }
+          else {
+            System.Error.TriggerFromServer(Constants.ERROR_DOFF_GROUND_DISABLED, doffer);
+          }
         }
         else {
           // Armor stand entity id was provided, but was not found nearby the player for some reason.
@@ -41,7 +46,13 @@ namespace DoffAndDonAgain.Server {
         }
       }
       else {
-        doffed = DoffToArmorStand(doffer, armorStand);
+        if (System.Config.EnableDoffToArmorStand) {
+          doffed = DoffToArmorStand(doffer, armorStand);
+        }
+        else {
+          System.Error.TriggerFromServer(Constants.ERROR_DOFF_STAND_DISABLED, doffer);
+          return;
+        }
       }
       OnDoffCompleted(doffer, doffed);
     }

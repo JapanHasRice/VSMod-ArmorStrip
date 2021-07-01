@@ -24,6 +24,10 @@ namespace DoffAndDonAgain.Common {
     public readonly static string EnableDonDescription = $"If enabled, player can quickly equip armor from an armor stand they are currently targeting. [Default: {DEFAULT_ENABLE_DON}]";
     public const bool DEFAULT_ENABLE_SWAP = true;
     public readonly static string EnableSwapDescription = $"If enabled, player can quickly swap armor with an armor stand they are currently targeting. [Default: {DEFAULT_ENABLE_SWAP}]";
+    public const bool DEFAULT_ENABLE_GROUND_DOFF = true;
+    public readonly static string EnableDoffToGroundDescription = $"If enabled, player can quickly unequip armor and throw it on the ground. [Default: {DEFAULT_ENABLE_GROUND_DOFF}]";
+    public const bool DEFAULT_ENABLE_STAND_DOFF = true;
+    public readonly static string EnableDoffToArmorStandDescription = $"If enabled, player can quickly unequip armor, placing it on the currently targeted armor stand. [Default: {DEFAULT_ENABLE_STAND_DOFF}]";
 
     #endregion
 
@@ -54,6 +58,8 @@ namespace DoffAndDonAgain.Common {
     public const string ERROR_COULD_NOT_SWAP = "Nothing to swap, or none of the armor could be exchanged.";
     public const string ERROR_DON_DISABLED = "Donning armor is disabled by configuration.";
     public const string ERROR_SWAP_DISABLED = "Swapping armor is disabled by configuration.";
+    public const string ERROR_DOFF_GROUND_DISABLED = "Doffing armor to the ground is disabled by configuration.";
+    public const string ERROR_DOFF_STAND_DISABLED = "Doffing armor to an armor stand is disabled by configuration.";
 
     #endregion
   }

@@ -13,9 +13,8 @@ namespace DoffAndDonAgain.Client {
     }
 
     private bool OnTryToDoff(KeyCombination kc) {
-      string errorCode;
-      if (CanPlayerDoff(out errorCode)) {
-        SendDoffRequest(GetTargetedArmorStandEntity()?.EntityId);
+      if (CanPlayerDoff(out long? armorStandEntityId, out string errorCode)) {
+        SendDoffRequest(armorStandEntityId);
       }
       else {
         System.Error.TriggerFromClient(errorCode);
@@ -27,8 +26,37 @@ namespace DoffAndDonAgain.Client {
       System.ClientChannel.SendPacket(new DoffArmorPacket(armorStandEntityId));
     }
 
-    private bool CanPlayerDoff(out string errorCode) {
-      return HasEnoughHandsFree(out errorCode) && HasEnoughSaturation(out errorCode);
+    private bool CanPlayerDoff(out long? armorStandEntityId, out string errorCode) {
+      return IsDoffEnabled(out armorStandEntityId, out errorCode)
+             && HasEnoughHandsFree(out errorCode)
+             && HasEnoughSaturation(out errorCode);
+    }
+
+    private bool IsDoffEnabled(out long? armorStandEntityId, out string errorCode) {
+      armorStandEntityId = GetTargetedArmorStandEntity()?.EntityId;
+      return armorStandEntityId == null ? IsDoffToGroundEnabled(out errorCode) : IsDoffToArmorStandEnabled(out errorCode);
+    }
+
+    private bool IsDoffToGroundEnabled(out string errorCode) {
+      errorCode = null;
+      if (System.Config.EnableDoffToGround) {
+        return true;
+      }
+      else {
+        errorCode = System.Error.GetErrorText(Constants.ERROR_DOFF_GROUND_DISABLED);
+        return false;
+      }
+    }
+
+    private bool IsDoffToArmorStandEnabled(out string errorCode) {
+      errorCode = null;
+      if (System.Config.EnableDoffToArmorStand) {
+        return true;
+      }
+      else {
+        errorCode = System.Error.GetErrorText(Constants.ERROR_DOFF_STAND_DISABLED);
+        return false;
+      }
     }
   }
 }
