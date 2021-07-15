@@ -1,15 +1,15 @@
 using ProtoBuf;
 
-namespace DoffAndDonAgain {
+namespace DoffAndDonAgain.Common.Network {
   [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
-  public class DoffArmorPacket {
+  public class SwapArmorPacket {
     // EntityID of the armor stand the doffer is targeting, if any.
-    public long? ArmorStandEntityId;
+    public long ArmorStandEntityId;
 
-    public DoffArmorPacket(long? entityId) {
+    public SwapArmorPacket(long entityId) {
       this.ArmorStandEntityId = entityId;
     }
 
-    public DoffArmorPacket() {}
+    public SwapArmorPacket() { }
   }
 }
