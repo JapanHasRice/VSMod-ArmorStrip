@@ -54,7 +54,13 @@ namespace DoffAndDonAgain.Server {
     // Drop armor that cannot be donned by the target when doffing.
     protected bool DropUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
       if (doffer == null) return false;
-      return doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true);
+      if (doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true)) {
+        doffer.Entity.World.PlaySoundAt(new AssetLocation("sounds/player/quickthrow"), doffer.Entity, randomizePitch: true, range: 10);
+        return true;
+      }
+      else {
+        return false;
+      }
     }
   }
 }
