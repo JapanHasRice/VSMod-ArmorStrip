@@ -12,6 +12,7 @@ namespace DoffAndDonAgain {
     public EnumAppSide Side => Api.Side;
     public ErrorManager Error { get; private set; }
     public DoffAndDonAgainConfig Config { get; private set; }
+    public SoundManager Sounds { get; private set; }
 
     public ICoreClientAPI ClientAPI { get; private set; }
     public IClientNetworkChannel ClientChannel { get; private set; }
@@ -37,6 +38,7 @@ namespace DoffAndDonAgain {
 
       Error = new ErrorManager(this);
       Config = DoffAndDonAgainConfig.LoadOrCreateDefault(api);
+      Sounds = new SoundManager(this);
     }
 
     public override void StartClientSide(ICoreClientAPI api) {

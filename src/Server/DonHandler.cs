@@ -7,7 +7,6 @@ using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
   public class DonHandler : OneWayArmorTransfer {
-    private DoffAndDonSystem System { get; }
     public DonHandler(DoffAndDonSystem system) {
       if (system.Side != EnumAppSide.Server) {
         system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(DonHandler));

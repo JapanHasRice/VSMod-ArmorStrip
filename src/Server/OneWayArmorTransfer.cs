@@ -9,6 +9,8 @@ namespace DoffAndDonAgain.Server {
 
     protected delegate void OnDonnedOneOrMore();
 
+    protected DoffAndDonSystem System { get; set; }
+
     protected bool TransferArmor(IServerPlayer initiatingPlayer, EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
       if (doffer == null) { return false; }
       bool doffed = false;
@@ -32,6 +34,7 @@ namespace DoffAndDonAgain.Server {
             donnerDonned = true;
             sinkSlot.MarkDirty();
             doffed = true;
+            System?.Sounds?.PlayArmorShufflingSounds(initiatingPlayer, sinkSlot.Itemstack.Item);
           }
           else {
             doffed = onDoffWithoutDonner?.Invoke(initiatingPlayer, sourceSlot) ?? true || doffed;
@@ -55,7 +58,7 @@ namespace DoffAndDonAgain.Server {
     protected bool DropUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
       if (doffer == null) return false;
       if (doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true)) {
-        doffer.Entity.World.PlaySoundAt(new AssetLocation("sounds/player/quickthrow"), doffer.Entity, randomizePitch: true, range: 10);
+        System?.Sounds?.PlayWooshSound(doffer);
         return true;
       }
       else {

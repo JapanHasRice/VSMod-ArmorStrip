@@ -7,7 +7,6 @@ using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
   public class DoffHandler : OneWayArmorTransfer {
-    private DoffAndDonSystem System { get; }
     private OnDoffWithoutDonner dropOrKeepArmorWhenDoffingToStand;
 
     public DoffHandler(DoffAndDonSystem system) {

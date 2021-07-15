@@ -38,18 +38,22 @@ namespace DoffAndDonAgain.Server {
 
     private bool SwapArmorWithStand(IServerPlayer swapper, EntityArmorStand armorStand) {
       if (swapper == null || armorStand == null) { return false; }
-      bool swapped = false;
+      bool swappedAnything = false;
       var playerArmorSlots = swapper.Entity.GetArmorSlots();
       var armorStandArmorSlots = armorStand.GetArmorSlots();
 
       for (int i = 0; i < playerArmorSlots.Count; i++) {
         if (playerArmorSlots[i].Empty && armorStandArmorSlots[i].Empty) { continue; }
-        swapped = playerArmorSlots[i].TryFlipWith(armorStandArmorSlots[i]) || swapped;
+        bool swapped = playerArmorSlots[i].TryFlipWith(armorStandArmorSlots[i]);
+        swappedAnything = swapped || swappedAnything;
+        if (swapped) {
+          System.Sounds?.PlayArmorShufflingSounds(swapper, playerArmorSlots[i]?.Itemstack?.Item, armorStandArmorSlots[i]?.Itemstack?.Item);
+        }
       }
-      if (swapped) {
+      if (swappedAnything) {
         System.ArmorStandRerenderHandler?.UpdateRender(armorStand);
       }
-      return swapped;
+      return swappedAnything;
     }
 
     private void OnSwapcompleted(IServerPlayer player, bool successful) {
