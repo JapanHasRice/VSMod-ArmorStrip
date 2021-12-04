@@ -8,6 +8,8 @@ using Vintagestory.GameContent;
 namespace DoffAndDonAgain.Server {
   public class DonHandler : OneWayArmorTransfer {
     protected bool ShouldDonTool;
+    protected bool ShouldDonOnlyToHotbar;
+
     public DonHandler(DoffAndDonSystem system) {
       if (system.Side != EnumAppSide.Server) {
         system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(DonHandler));
@@ -18,6 +20,7 @@ namespace DoffAndDonAgain.Server {
       System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacket);
 
       ShouldDonTool = System.Config.EnableToolDonning;
+      ShouldDonOnlyToHotbar = System.Config.DonToolOnlyToHotbar;
     }
 
     private void OnDonPacket(IServerPlayer donner, DonArmorPacket packet) {
@@ -43,7 +46,7 @@ namespace DoffAndDonAgain.Server {
                                                donner: donner.Entity,
                                                onDoffWithoutDonner: KeepUndonnableOnDoff,
                                                onDonnedOneOrMore: () => { System.ArmorStandRerenderHandler?.UpdateRender(armorStand); });
-      bool toolWasTransferred = ShouldDonTool && TransferTool(donner, armorStand);
+      bool toolWasTransferred = ShouldDonTool && TransferTool(donner, armorStand, donOnlyToHotbar: ShouldDonOnlyToHotbar);
 
       return armorWasTransferred || toolWasTransferred;
     }

@@ -49,13 +49,19 @@ namespace DoffAndDonAgain.Server {
     }
 
     // Tool transfer only available from armor stand to player
-    protected bool TransferTool(IServerPlayer donningPlayer, EntityAgent armorStand, OnDonnedOneOrMore onDonnedOneOrMore = null) {
+    protected bool TransferTool(IServerPlayer donningPlayer, EntityAgent armorStand, bool donOnlyToHotbar, OnDonnedOneOrMore onDonnedOneOrMore = null) {
       if (donningPlayer == null || armorStand == null || armorStand.RightHandItemSlot.Empty) {
         return false;
       }
 
       // skipSlots is an empty list instead of null due to a crash when in creative mode
-      ItemSlot sinkSlot = donningPlayer.InventoryManager.GetBestSuitedSlot(armorStand.RightHandItemSlot, onlyPlayerInventory: true, skipSlots: new List<ItemSlot>());
+      ItemSlot sinkSlot;
+      if (donOnlyToHotbar) {
+        sinkSlot = donningPlayer.InventoryManager.GetBestSuitedHotbarSlot(armorStand.RightHandItemSlot.Inventory, armorStand.RightHandItemSlot);
+      }
+      else {
+        sinkSlot = donningPlayer.InventoryManager.GetBestSuitedSlot(armorStand.RightHandItemSlot, onlyPlayerInventory: true, skipSlots: new List<ItemSlot>());
+      }
 
       if (sinkSlot != null && armorStand.RightHandItemSlot.TryPutInto(donningPlayer.Entity.World, sinkSlot) > 0) {
         sinkSlot.MarkDirty();

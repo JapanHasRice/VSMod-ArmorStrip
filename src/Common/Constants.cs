@@ -30,6 +30,8 @@ namespace DoffAndDonAgain.Common {
     public readonly static string EnableDoffToArmorStandDescription = $"If enabled, player can quickly unequip armor, placing it on the currently targeted armor stand. [Default: {DEFAULT_ENABLE_STAND_DOFF}]";
     public const bool DEFAULT_ENABLE_TOOL_DONNING = true;
     public readonly static string EnableToolDonningDescription = $"If enabled, when targeted armor stand has an equipped tool, player will attempt to take the tool into their inventory. [Default: {DEFAULT_ENABLE_TOOL_DONNING}]\nSee additional options below for rules on how the tool can be placed in the player's inventory, and be mindful of the empty hands setting.";
+    public const bool DEFAULT_DON_TOOL_HOTBAR_ONLY = true;
+    public readonly static string DonToolOnlyToHotbarDescription = $"If enabled, tools donned from armor stands will only be placed in an available hotbar slot. [Default: {DEFAULT_DON_TOOL_HOTBAR_ONLY}]";
 
     #endregion
 

@@ -38,6 +38,9 @@ namespace DoffAndDonAgain.Common {
     public string EnableToolDonningDescription = Constants.EnableToolDonningDescription;
     public bool EnableToolDonning = Constants.DEFAULT_ENABLE_TOOL_DONNING;
 
+    public string DonToolOnlyToHotbarDescription = Constants.DonToolOnlyToHotbarDescription;
+    public bool DonToolOnlyToHotbar = Constants.DEFAULT_DON_TOOL_HOTBAR_ONLY;
+
     public string SwapConfigOptions = "--- Swap: Exchange armor with an armor stand ---";
 
     public string EnableSwapDescription = Constants.EnableSwapDescription;
