@@ -35,7 +35,7 @@ namespace DoffAndDonAgain.Server {
             donnerDonned = true;
             sinkSlot.MarkDirty();
             doffed = true;
-            System?.Sounds?.PlayArmorShufflingSounds(initiatingPlayer, sinkSlot.Itemstack.Item);
+            System.Sounds.PlayArmorShufflingSounds(initiatingPlayer, sinkSlot.Itemstack.Item);
           }
           else {
             doffed = onDoffWithoutDonner?.Invoke(initiatingPlayer, sourceSlot) ?? true || doffed;
@@ -86,7 +86,7 @@ namespace DoffAndDonAgain.Server {
     protected bool DropUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
       if (doffer == null) return false;
       if (doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true)) {
-        System?.Sounds?.PlayWooshSound(doffer);
+        System.Sounds.PlayWooshSound(doffer);
         return true;
       }
       else {

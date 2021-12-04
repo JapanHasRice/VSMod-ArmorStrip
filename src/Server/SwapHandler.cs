@@ -47,7 +47,7 @@ namespace DoffAndDonAgain.Server {
         bool swapped = playerArmorSlots[i].TryFlipWith(armorStandArmorSlots[i]);
         swappedAnything = swapped || swappedAnything;
         if (swapped) {
-          System.Sounds?.PlayArmorShufflingSounds(swapper, playerArmorSlots[i]?.Itemstack?.Item, armorStandArmorSlots[i]?.Itemstack?.Item);
+          System.Sounds.PlayArmorShufflingSounds(swapper, playerArmorSlots[i]?.Itemstack?.Item, armorStandArmorSlots[i]?.Itemstack?.Item);
         }
       }
 
