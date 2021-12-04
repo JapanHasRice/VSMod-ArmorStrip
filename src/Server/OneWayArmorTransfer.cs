@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DoffAndDonAgain.Utility;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
@@ -45,6 +46,24 @@ namespace DoffAndDonAgain.Server {
         }
       }
       return doffed;
+    }
+
+    // Tool transfer only available from armor stand to player
+    protected bool TransferTool(IServerPlayer donningPlayer, EntityAgent armorStand, OnDonnedOneOrMore onDonnedOneOrMore = null) {
+      if (donningPlayer == null || armorStand == null || armorStand.RightHandItemSlot.Empty) {
+        return false;
+      }
+
+      // skipSlots is an empty list instead of null due to a crash when in creative mode
+      ItemSlot sinkSlot = donningPlayer.InventoryManager.GetBestSuitedSlot(armorStand.RightHandItemSlot, onlyPlayerInventory: true, skipSlots: new List<ItemSlot>());
+
+      if (sinkSlot != null && armorStand.RightHandItemSlot.TryPutInto(donningPlayer.Entity.World, sinkSlot) > 0) {
+        sinkSlot.MarkDirty();
+        onDonnedOneOrMore?.Invoke();
+        return true;
+      }
+
+      return false;
     }
 
     // Sample OnDoffWithoutDonner implementation.

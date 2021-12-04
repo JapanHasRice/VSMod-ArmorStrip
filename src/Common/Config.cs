@@ -35,6 +35,9 @@ namespace DoffAndDonAgain.Common {
     public string HandsNeededToDonDescription = Constants.HandsNeededToDonDescription;
     public int HandsNeededToDon = Constants.DEFAULT_HANDS_FREE;
 
+    public string EnableToolDonningDescription = Constants.EnableToolDonningDescription;
+    public bool EnableToolDonning = Constants.DEFAULT_ENABLE_TOOL_DONNING;
+
     public string SwapConfigOptions = "--- Swap: Exchange armor with an armor stand ---";
 
     public string EnableSwapDescription = Constants.EnableSwapDescription;
