@@ -50,9 +50,7 @@ namespace DoffAndDonAgain.Server {
           System.Sounds?.PlayArmorShufflingSounds(swapper, playerArmorSlots[i]?.Itemstack?.Item, armorStandArmorSlots[i]?.Itemstack?.Item);
         }
       }
-      if (swappedAnything) {
-        System.ArmorStandRerenderHandler?.UpdateRender(armorStand);
-      }
+
       return swappedAnything;
     }
 

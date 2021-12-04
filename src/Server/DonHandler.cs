@@ -46,8 +46,7 @@ namespace DoffAndDonAgain.Server {
       bool armorWasTransferred = TransferArmor(initiatingPlayer: donner,
                                                doffer: armorStand,
                                                donner: donner.Entity,
-                                               onDoffWithoutDonner: KeepUndonnableOnDoff,
-                                               onDonnedOneOrMore: () => { System.ArmorStandRerenderHandler?.UpdateRender(armorStand); });
+                                               onDoffWithoutDonner: KeepUndonnableOnDoff);
       bool toolWasTransferred = ShouldDonTool && TransferTool(donner,
                                                               armorStand,
                                                               donOnlyToActiveHotbar: ShouldDonOnlyToActiveHotbar,

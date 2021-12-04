@@ -66,8 +66,7 @@ namespace DoffAndDonAgain.Server {
       return TransferArmor(initiatingPlayer: doffer,
                            doffer: doffer.Entity,
                            donner: armorStand,
-                           onDoffWithoutDonner: dropOrKeepArmorWhenDoffingToStand,
-                           onDonnedOneOrMore: () => { System.ArmorStandRerenderHandler?.UpdateRender(armorStand); });
+                           onDoffWithoutDonner: dropOrKeepArmorWhenDoffingToStand);
     }
 
     private void OnDoffCompleted(IServerPlayer doffer, bool successful) {

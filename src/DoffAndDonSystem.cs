@@ -16,7 +16,6 @@ namespace DoffAndDonAgain {
 
     public ICoreClientAPI ClientAPI { get; private set; }
     public IClientNetworkChannel ClientChannel { get; private set; }
-    public ArmorStandRerenderHandler ArmorStandRerenderHandler { get; private set; }
     public DoffInputHandler DoffInputHandler { get; private set; }
     public DonInputHandler DonInputHandler { get; private set; }
     public SwapInputHandler SwapInputHandler { get; private set; }
@@ -33,7 +32,6 @@ namespace DoffAndDonAgain {
       api.Network.RegisterChannel(Constants.MOD_ID)
         .RegisterMessageType(typeof(DoffArmorPacket))
         .RegisterMessageType(typeof(DonArmorPacket))
-        .RegisterMessageType(typeof(ArmorStandInventoryUpdatedPacket))
         .RegisterMessageType(typeof(SwapArmorPacket));
 
       Error = new ErrorManager(this);
@@ -47,7 +45,6 @@ namespace DoffAndDonAgain {
       ClientAPI = api;
       ClientChannel = api.Network.GetChannel(Constants.MOD_ID);
 
-      ArmorStandRerenderHandler = new ArmorStandRerenderHandler(this);
       DoffInputHandler = new DoffInputHandler(this);
       DonInputHandler = new DonInputHandler(this);
       SwapInputHandler = new SwapInputHandler(this);
@@ -59,7 +56,6 @@ namespace DoffAndDonAgain {
       ServerAPI = api;
       ServerChannel = api.Network.GetChannel(Constants.MOD_ID);
 
-      ArmorStandRerenderHandler = new ArmorStandRerenderHandler(this);
       DoffHandler = new DoffHandler(this);
       DonHandler = new DonHandler(this);
       SwapHandler = new SwapHandler(this);
