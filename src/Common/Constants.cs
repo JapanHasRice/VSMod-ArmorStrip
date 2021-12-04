@@ -5,7 +5,7 @@ namespace DoffAndDonAgain.Common {
 
     #region Config
     public const string FILENAME = "DoffAndDonAgainConfig.json";
-    public const float DEFAULT_DOFF_COST = 20;
+    public const float DEFAULT_DOFF_COST = 0;
     public const float MIN_SATURATION_COST = 0;
     public readonly static string SaturationCostPerDoffDescription = $"Satiety required to doff. [Default: {DEFAULT_DOFF_COST}, Min: {MIN_SATURATION_COST}]";
     public const float DEFAULT_DON_COST = DEFAULT_DOFF_COST;
