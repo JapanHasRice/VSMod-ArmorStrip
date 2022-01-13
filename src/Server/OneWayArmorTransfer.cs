@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DoffAndDonAgain.Utility;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
@@ -34,7 +35,7 @@ namespace DoffAndDonAgain.Server {
             donnerDonned = true;
             sinkSlot.MarkDirty();
             doffed = true;
-            System?.Sounds?.PlayArmorShufflingSounds(initiatingPlayer, sinkSlot.Itemstack.Item);
+            System.Sounds.PlayArmorShufflingSounds(initiatingPlayer, sinkSlot.Itemstack.Item);
           }
           else {
             doffed = onDoffWithoutDonner?.Invoke(initiatingPlayer, sourceSlot) ?? true || doffed;
@@ -45,6 +46,33 @@ namespace DoffAndDonAgain.Server {
         }
       }
       return doffed;
+    }
+
+    // Tool transfer only available from armor stand to player
+    protected bool TransferTool(IServerPlayer donningPlayer, EntityAgent armorStand, bool donOnlyToActiveHotbar, bool donOnlyToHotbar, OnDonnedOneOrMore onDonnedOneOrMore = null) {
+      if (donningPlayer == null || armorStand == null || armorStand.RightHandItemSlot.Empty) {
+        return false;
+      }
+
+      // skipSlots is an empty list instead of null due to a crash when in creative mode
+      ItemSlot sinkSlot;
+      if (donOnlyToActiveHotbar) {
+        sinkSlot = donningPlayer.InventoryManager.ActiveHotbarSlot;
+      }
+      else if (donOnlyToHotbar) {
+        sinkSlot = donningPlayer.InventoryManager.GetBestSuitedHotbarSlot(armorStand.RightHandItemSlot.Inventory, armorStand.RightHandItemSlot);
+      }
+      else {
+        sinkSlot = donningPlayer.InventoryManager.GetBestSuitedSlot(armorStand.RightHandItemSlot, onlyPlayerInventory: true, skipSlots: new List<ItemSlot>());
+      }
+
+      if (sinkSlot != null && armorStand.RightHandItemSlot.TryPutInto(donningPlayer.Entity.World, sinkSlot) > 0) {
+        sinkSlot.MarkDirty();
+        onDonnedOneOrMore?.Invoke();
+        return true;
+      }
+
+      return false;
     }
 
     // Sample OnDoffWithoutDonner implementation.
@@ -58,7 +86,7 @@ namespace DoffAndDonAgain.Server {
     protected bool DropUndonnableOnDoff(IServerPlayer doffer, ItemSlot couldNotBeDonnedSlot) {
       if (doffer == null) return false;
       if (doffer.InventoryManager.DropItem(couldNotBeDonnedSlot, true)) {
-        System?.Sounds?.PlayWooshSound(doffer);
+        System.Sounds.PlayWooshSound(doffer);
         return true;
       }
       else {

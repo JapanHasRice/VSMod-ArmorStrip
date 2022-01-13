@@ -5,7 +5,7 @@ namespace DoffAndDonAgain.Common {
 
     #region Config
     public const string FILENAME = "DoffAndDonAgainConfig.json";
-    public const float DEFAULT_DOFF_COST = 20;
+    public const float DEFAULT_DOFF_COST = 0;
     public const float MIN_SATURATION_COST = 0;
     public readonly static string SaturationCostPerDoffDescription = $"Satiety required to doff. [Default: {DEFAULT_DOFF_COST}, Min: {MIN_SATURATION_COST}]";
     public const float DEFAULT_DON_COST = DEFAULT_DOFF_COST;
@@ -28,6 +28,12 @@ namespace DoffAndDonAgain.Common {
     public readonly static string EnableDoffToGroundDescription = $"If enabled, player can quickly unequip armor and throw it on the ground. [Default: {DEFAULT_ENABLE_GROUND_DOFF}]";
     public const bool DEFAULT_ENABLE_STAND_DOFF = true;
     public readonly static string EnableDoffToArmorStandDescription = $"If enabled, player can quickly unequip armor, placing it on the currently targeted armor stand. [Default: {DEFAULT_ENABLE_STAND_DOFF}]";
+    public const bool DEFAULT_ENABLE_TOOL_DONNING = true;
+    public readonly static string EnableToolDonningDescription = $"If enabled, when targeted armor stand has an equipped tool, player will attempt to take the tool into their inventory. [Default: {DEFAULT_ENABLE_TOOL_DONNING}]\nSee additional options below for rules on how the tool can be placed in the player's inventory, and be mindful of the empty hands setting.";
+    public const bool DEFAULT_DON_TOOL_ACTIVE_HOTBAR_ONLY = true;
+    public readonly static string DonToolOnlyToActiveHotbarDescription = $"If enabled, tools donned from armor stands will only be placed in the currently active hotbar slot. [Default: {DEFAULT_DON_TOOL_ACTIVE_HOTBAR_ONLY}]";
+    public const bool DEFAULT_DON_TOOL_HOTBAR_ONLY = true;
+    public readonly static string DonToolOnlyToHotbarDescription = $"If enabled, tools donned from armor stands will only be placed in an available hotbar slot. [Default: {DEFAULT_DON_TOOL_HOTBAR_ONLY}]";
 
     #endregion
 
