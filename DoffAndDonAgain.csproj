@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <TargetGameVersion>1.16</TargetGameVersion>
+    <TargetFramework>net462</TargetFramework>
+    <TargetGameVersion>1.17</TargetGameVersion>
     <EnvironmentStyle>Rice</EnvironmentStyle>
     <!-- <EnvironmentStyle>Copygirl</EnvironmentStyle> -->
     <VSPath Condition="'$(EnvironmentStyle)' == 'Copygirl'">$(VINTAGE_STORY)</VSPath>
