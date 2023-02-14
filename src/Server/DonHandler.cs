@@ -1,28 +1,29 @@
 using DoffAndDonAgain.Common;
 using DoffAndDonAgain.Common.Network;
 using DoffAndDonAgain.Utility;
-using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
   public class DonHandler : OneWayArmorTransfer {
-    protected bool ShouldDonTool;
-    protected bool ShouldDonOnlyToActiveHotbar;
-    protected bool ShouldDonOnlyToHotbar;
+    protected bool ShouldDonArmor { get; set; } = true;
+    protected bool ShouldDonTool { get; set; } = true;
+    protected bool ShouldDonToolOnlyToActiveHotbar { get; set; } = true;
+    protected bool ShouldDonToolOnlyToHotbar { get; set; } = true;
+    protected float SaturationCostPerDon { get; set; } = 0f;
 
-    public DonHandler(DoffAndDonSystem system) {
-      if (system.Side != EnumAppSide.Server) {
-        system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(DonHandler));
-        return;
-      }
-      System = system;
-
+    public DonHandler(DoffAndDonSystem system) : base(system) {
       System.ServerChannel.SetMessageHandler<DonArmorPacket>(OnDonPacket);
+    }
 
-      ShouldDonTool = System.Config.EnableToolDonning;
-      ShouldDonOnlyToActiveHotbar = System.Config.DonToolOnlyToActiveHotbar;
-      ShouldDonOnlyToHotbar = System.Config.DonToolOnlyToHotbar;
+    protected override void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
+      ShouldDonArmor = serverSettings.EnableDon.Value;
+
+      ShouldDonTool = serverSettings.EnableToolDonning.Value;
+      ShouldDonToolOnlyToActiveHotbar = serverSettings.DonToolOnlyToActiveHotbar.Value;
+      ShouldDonToolOnlyToHotbar = serverSettings.DonToolOnlyToHotbar.Value;
+
+      SaturationCostPerDon = serverSettings.SaturationCostPerDon.Value;
     }
 
     private void OnDonPacket(IServerPlayer donner, DonArmorPacket packet) {
@@ -32,7 +33,7 @@ namespace DoffAndDonAgain.Server {
         System.Error.TriggerFromServer(Constants.ERROR_TARGET_LOST, donner);
       }
       else {
-        if (System.Config.EnableDon) {
+        if (ShouldDonArmor) {
           donned = DonFromArmorStand(donner, armorStand);
           OnDonCompleted(donner, donned);
         }
@@ -49,8 +50,8 @@ namespace DoffAndDonAgain.Server {
                                                onDoffWithoutDonner: KeepUndonnableOnDoff);
       bool toolWasTransferred = ShouldDonTool && TransferTool(donner,
                                                               armorStand,
-                                                              donOnlyToActiveHotbar: ShouldDonOnlyToActiveHotbar,
-                                                              donOnlyToHotbar: ShouldDonOnlyToHotbar);
+                                                              donOnlyToActiveHotbar: ShouldDonToolOnlyToActiveHotbar,
+                                                              donOnlyToHotbar: ShouldDonToolOnlyToHotbar);
 
       return armorWasTransferred || toolWasTransferred;
     }
@@ -65,7 +66,7 @@ namespace DoffAndDonAgain.Server {
     }
 
     private void OnSuccessfulDon(IServerPlayer donner) {
-      donner.Entity.ConsumeSaturation(System.Config.SaturationCostPerDon);
+      donner.Entity.ConsumeSaturation(SaturationCostPerDon);
     }
   }
 }

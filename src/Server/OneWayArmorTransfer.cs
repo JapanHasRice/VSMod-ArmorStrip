@@ -12,6 +12,28 @@ namespace DoffAndDonAgain.Server {
 
     protected DoffAndDonSystem System { get; set; }
 
+    public OneWayArmorTransfer(DoffAndDonSystem system) {
+      if (system.Side != EnumAppSide.Server) {
+        system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(OneWayArmorTransfer));
+        return;
+      }
+      System = system;
+      LoadServerSettings(system.Api);
+    }
+
+    protected void LoadServerSettings(ICoreAPI api) {
+      var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
+      if (configSystem == null) {
+        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(OneWayArmorTransfer), nameof(DoffAndDonConfigurationSystem));
+        LoadServerSettings(new DoffAndDonServerConfig());
+        return;
+      }
+
+      LoadServerSettings(configSystem.ServerSettings);
+    }
+
+    protected abstract void LoadServerSettings(DoffAndDonServerConfig serverSettings);
+
     protected bool TransferArmor(IServerPlayer initiatingPlayer, EntityAgent doffer, EntityAgent donner = null, OnDoffWithoutDonner onDoffWithoutDonner = null, OnDonnedOneOrMore onDonnedOneOrMore = null) {
       if (doffer == null) { return false; }
       bool doffed = false;

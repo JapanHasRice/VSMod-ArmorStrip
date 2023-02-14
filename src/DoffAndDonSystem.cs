@@ -11,7 +11,6 @@ namespace DoffAndDonAgain {
     public ICoreAPI Api { get; private set; }
     public EnumAppSide Side => Api.Side;
     public ErrorManager Error { get; private set; }
-    public DoffAndDonAgainConfig Config { get; private set; }
     public SoundManager Sounds { get; private set; }
 
     public ICoreClientAPI ClientAPI { get; private set; }
@@ -35,7 +34,6 @@ namespace DoffAndDonAgain {
         .RegisterMessageType(typeof(SwapArmorPacket));
 
       Error = new ErrorManager(this);
-      Config = DoffAndDonAgainConfig.LoadOrCreateDefault(api);
       Sounds = new SoundManager(this);
     }
 

@@ -4,12 +4,16 @@ using Vintagestory.API.Client;
 
 namespace DoffAndDonAgain.Client {
   public class DonInputHandler : ArmorManipulationInputHandler {
+    protected bool DonEnabled { get; set; } = true;
     public DonInputHandler(DoffAndDonSystem system) : base(system) {
       System.ClientAPI.Input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
       System.ClientAPI.Input.SetHotKeyHandler(Constants.DON_CODE, OnTryToDon);
+    }
 
-      HandsRequired = System.Config.HandsNeededToDon;
-      SaturationRequired = System.Config.SaturationCostPerDon;
+    protected override void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
+      HandsRequired = serverSettings.HandsNeededToDon.Value;
+      SaturationRequired = serverSettings.SaturationCostPerDon.Value;
+      DonEnabled = serverSettings.EnableDon.Value;
     }
 
     private bool OnTryToDon(KeyCombination kc) {
@@ -38,7 +42,7 @@ namespace DoffAndDonAgain.Client {
 
     private bool IsDonEnabled(out string errorCode) {
       errorCode = null;
-      if (System.Config.EnableDon) {
+      if (DonEnabled) {
         return true;
       }
       else {

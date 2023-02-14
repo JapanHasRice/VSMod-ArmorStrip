@@ -4,12 +4,20 @@ using Vintagestory.API.Client;
 
 namespace DoffAndDonAgain.Client {
   public class DoffInputHandler : ArmorManipulationInputHandler {
+    protected bool DoffToGroundEnabled { get; set; } = true;
+
+    protected bool DoffToArmorStandEnabled { get; set; } = true;
+
     public DoffInputHandler(DoffAndDonSystem system) : base(system) {
       System.ClientAPI.Input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
       System.ClientAPI.Input.SetHotKeyHandler(Constants.DOFF_CODE, OnTryToDoff);
+    }
 
-      HandsRequired = System.Config.HandsNeededToDoff;
-      SaturationRequired = System.Config.SaturationCostPerDoff;
+    protected override void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
+      HandsRequired = serverSettings.HandsNeededToDoff.Value;
+      SaturationRequired = serverSettings.SaturationCostPerDoff.Value;
+      DoffToGroundEnabled = serverSettings.EnableDoffToGround.Value;
+      DoffToArmorStandEnabled = serverSettings.EnableDoffToArmorStand.Value;
     }
 
     private bool OnTryToDoff(KeyCombination kc) {
@@ -39,7 +47,7 @@ namespace DoffAndDonAgain.Client {
 
     private bool IsDoffToGroundEnabled(out string errorCode) {
       errorCode = null;
-      if (System.Config.EnableDoffToGround) {
+      if (DoffToGroundEnabled) {
         return true;
       }
       else {
@@ -50,7 +58,7 @@ namespace DoffAndDonAgain.Client {
 
     private bool IsDoffToArmorStandEnabled(out string errorCode) {
       errorCode = null;
-      if (System.Config.EnableDoffToArmorStand) {
+      if (DoffToArmorStandEnabled) {
         return true;
       }
       else {
