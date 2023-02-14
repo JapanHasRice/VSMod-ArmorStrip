@@ -7,6 +7,9 @@ using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
   public class SwapHandler {
+    protected bool ShouldSwap { get; set; } = true;
+    protected float SaturationCostPerSwap { get; set; } = 0f;
+
     private DoffAndDonSystem System;
 
     public SwapHandler(DoffAndDonSystem system) {
@@ -17,6 +20,23 @@ namespace DoffAndDonAgain.Server {
       System = system;
 
       System.ServerChannel.SetMessageHandler<SwapArmorPacket>(OnSwapArmorPacket);
+      LoadServerSettings(system.Api);
+    }
+
+    protected void LoadServerSettings(ICoreAPI api) {
+      var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
+      if (configSystem == null) {
+        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(SwapHandler), nameof(DoffAndDonConfigurationSystem));
+        LoadServerSettings(new DoffAndDonServerConfig());
+        return;
+      }
+
+      LoadServerSettings(configSystem.ServerSettings);
+    }
+
+    protected virtual void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
+      ShouldSwap = serverSettings.EnableSwap.Value;
+      SaturationCostPerSwap = serverSettings.SaturationCostPerSwap.Value;
     }
 
     private void OnSwapArmorPacket(IServerPlayer player, SwapArmorPacket packet) {
@@ -26,7 +46,7 @@ namespace DoffAndDonAgain.Server {
         System.Error.TriggerFromServer(Constants.ERROR_TARGET_LOST, player);
       }
       else {
-        if (System.Config.EnableSwap) {
+        if (ShouldSwap) {
           swapped = SwapArmorWithStand(player, armorStand);
           OnSwapcompleted(player, swapped);
         }
@@ -64,7 +84,7 @@ namespace DoffAndDonAgain.Server {
     }
 
     private void OnSuccessfulSwap(IServerPlayer player) {
-      player.Entity.ConsumeSaturation(System.Config.SaturationCostPerSwap);
+      player.Entity.ConsumeSaturation(SaturationCostPerSwap);
     }
   }
 }

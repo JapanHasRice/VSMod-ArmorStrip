@@ -1,28 +1,32 @@
 using DoffAndDonAgain.Common;
 using DoffAndDonAgain.Common.Network;
 using DoffAndDonAgain.Utility;
-using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
   public class DoffHandler : OneWayArmorTransfer {
+    protected bool ShouldDoffToGround { get; set; } = true;
+    protected bool ShouldDoffToArmorStand { get; set; } = true;
+    protected float SaturationCostPerDoff { get; set; } = 0f;
+
     private OnDoffWithoutDonner dropOrKeepArmorWhenDoffingToStand;
 
-    public DoffHandler(DoffAndDonSystem system) {
-      if (system.Side != EnumAppSide.Server) {
-        system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(DoffHandler));
-        return;
-      }
-      System = system;
+    public DoffHandler(DoffAndDonSystem system) : base(system) {
       System.ServerChannel.SetMessageHandler<DoffArmorPacket>(OnDoffPacket);
+    }
 
-      if (System.Config.DropArmorWhenDoffingToStand) {
+    protected override void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
+      if (serverSettings.DropArmorWhenDoffingToStand.Value) {
         dropOrKeepArmorWhenDoffingToStand = DropUndonnableOnDoff;
       }
       else {
         dropOrKeepArmorWhenDoffingToStand = KeepUndonnableOnDoff;
       }
+
+      ShouldDoffToGround = serverSettings.EnableDoffToGround.Value;
+      ShouldDoffToArmorStand = serverSettings.EnableDoffToArmorStand.Value;
+      SaturationCostPerDoff = serverSettings.SaturationCostPerDoff.Value;
     }
 
     private void OnDoffPacket(IServerPlayer doffer, DoffArmorPacket packet) {
@@ -31,7 +35,7 @@ namespace DoffAndDonAgain.Server {
       // TODO: Why would you do this?! You know better...
       if (armorStand == null) {
         if (packet.ArmorStandEntityId == null) {
-          if (System.Config.EnableDoffToGround) {
+          if (ShouldDoffToGround) {
             doffed = DoffToGround(doffer);
             OnDoffCompleted(doffer, doffed);
           }
@@ -46,7 +50,7 @@ namespace DoffAndDonAgain.Server {
         }
       }
       else {
-        if (System.Config.EnableDoffToArmorStand) {
+        if (ShouldDoffToArmorStand) {
           doffed = DoffToArmorStand(doffer, armorStand);
           OnDoffCompleted(doffer, doffed);
         }
@@ -79,7 +83,7 @@ namespace DoffAndDonAgain.Server {
     }
 
     private void OnSuccessfulDoff(IServerPlayer doffer) {
-      doffer.Entity.ConsumeSaturation(System.Config.SaturationCostPerDoff);
+      doffer.Entity.ConsumeSaturation(SaturationCostPerDoff);
     }
   }
 }

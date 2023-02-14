@@ -30,34 +30,6 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Launch Client (.NET) [1.15]",
-      "type": "clr",
-      "request": "launch",
-      "preLaunchTask": "Build (Debug)",
-      "program": "${env:VINTAGE_STORY_DEV}/1.15/Vintagestory.exe",
-      "args": [
-        "--playStyle" , "preset-surviveandbuild",
-        "--openWorld" , "modding test world 1.15",
-        "--addModPath", "${workspaceFolder}/bin/Debug/zip"
-      ],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Launch Client (.NET) [1.14]",
-      "type": "clr",
-      "request": "launch",
-      "preLaunchTask": "Build (Debug)",
-      "program": "${env:VINTAGE_STORY_DEV}/1.14/Vintagestory.exe",
-      "args": [
-        "--playStyle" , "preset-surviveandbuild",
-        "--openWorld" , "modding test world 1.14",
-        "--addModPath", "${workspaceFolder}/bin/Debug/zip"
-      ],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
       "name": "Launch Client (.NET) [Copygirl style]",
       "type": "clr",
       "request": "launch",

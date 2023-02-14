@@ -8,7 +8,7 @@ namespace DoffAndDonAgain.Client {
     protected DoffAndDonSystem System { get; }
     protected IClientPlayer Player => System.ClientAPI.World.Player;
     protected EntityPlayer PlayerEntity => Player.Entity;
-    protected float SaturationRequired { get; set; }
+    protected float SaturationRequired { get; set; } = 0f;
     private int _handsRequired;
     public int HandsRequired {
       get => _handsRequired;
@@ -44,8 +44,24 @@ namespace DoffAndDonAgain.Client {
       }
       System = system;
       HandsRequired = 0;
-      SaturationRequired = 0;
+      LoadServerSettings(system.Api);
     }
+
+    protected void LoadServerSettings(ICoreAPI api) {
+      var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
+      if (configSystem == null) {
+        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(ArmorManipulationInputHandler), nameof(DoffAndDonConfigurationSystem));
+        LoadServerSettings(new DoffAndDonServerConfig());
+        return;
+      }
+
+      configSystem.ServerSettingsReceived += LoadServerSettings;
+      if (configSystem.ServerSettings != null) {
+        LoadServerSettings(configSystem.ServerSettings);
+      }
+    }
+
+    protected abstract void LoadServerSettings(DoffAndDonServerConfig serverSettings);
 
     protected EntityArmorStand GetTargetedArmorStandEntity() => Player.CurrentEntitySelection?.Entity as EntityArmorStand;
 
