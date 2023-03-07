@@ -9,9 +9,10 @@ namespace DoffAndDonAgain.Client {
     protected DoffAndDonSystem System { get; }
     protected IClientPlayer Player => System.ClientAPI.World.Player;
     protected EntityPlayer PlayerEntity => Player.Entity;
-    private bool IsLeftHandEmpty => PlayerEntity.LeftHandItemSlot.Empty;
-    private bool IsRightHandEmpty => PlayerEntity.RightHandItemSlot.Empty;
+    protected bool IsLeftHandEmpty => PlayerEntity.LeftHandItemSlot.Empty;
+    protected bool IsRightHandEmpty => PlayerEntity.RightHandItemSlot.Empty;
     protected long? TargetedArmorStandEntityId => (Player.CurrentEntitySelection?.Entity as EntityArmorStand)?.EntityId;
+
     protected bool IsDoffToGroundEnabled { get; set; } = true;
     protected bool IsDoffToArmorStandEnabled { get; set; } = true;
     protected bool IsDonEnabled { get; set; } = true;
@@ -43,11 +44,11 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected void RegisterHotKeys(IInputAPI input, DoffAndDonEventApi eventApi) {
-      input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
-      input.SetHotKeyHandler(Constants.DON_CODE, eventApi.TriggerDonKeyPressed);
-
       input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
       input.SetHotKeyHandler(Constants.DOFF_CODE, eventApi.TriggerDoffKeyPressed);
+
+      input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
+      input.SetHotKeyHandler(Constants.DON_CODE, eventApi.TriggerDonKeyPressed);
 
       input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
       input.SetHotKeyHandler(Constants.SWAP_CODE, eventApi.TriggerSwapKeyPressed);
@@ -70,7 +71,9 @@ namespace DoffAndDonAgain.Client {
     protected void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
       IsDoffToGroundEnabled = serverSettings.EnableDoffToGround.Value;
       IsDoffToArmorStandEnabled = serverSettings.EnableDoffToArmorStand.Value;
+
       IsDonEnabled = serverSettings.EnableDon.Value;
+
       IsSwapEnabled = serverSettings.EnableSwap.Value;
 
       HandsRequired[EnumActionType.Doff] = serverSettings.HandsNeededToDoff.Value;
@@ -82,27 +85,27 @@ namespace DoffAndDonAgain.Client {
       SaturationRequired[EnumActionType.Swap] = serverSettings.SaturationCostPerSwap.Value;
     }
 
-    private void OnDoffKeyPressed(ref ArmorActionEventArgs eventArgs) {
+    protected void OnDoffKeyPressed(ref ArmorActionEventArgs eventArgs) {
       _ = VerifyDoffEnabled(ref eventArgs)
           && VerifyEnoughHandsFree(ref eventArgs)
           && VerifyEnoughSaturation(ref eventArgs);
     }
 
-    private void OnDonKeyPressed(ref ArmorActionEventArgs eventArgs) {
+    protected void OnDonKeyPressed(ref ArmorActionEventArgs eventArgs) {
       _ = VerifyDonEnabled(ref eventArgs)
           && VerifyTargetingArmorStand(ref eventArgs)
           && VerifyEnoughHandsFree(ref eventArgs)
           && VerifyEnoughSaturation(ref eventArgs);
     }
 
-    private void OnSwapKeyPressed(ref ArmorActionEventArgs eventArgs) {
+    protected void OnSwapKeyPressed(ref ArmorActionEventArgs eventArgs) {
       _ = VerifySwapEnabled(ref eventArgs)
           && VerifyTargetingArmorStand(ref eventArgs)
           && VerifyEnoughHandsFree(ref eventArgs)
           && VerifyEnoughSaturation(ref eventArgs);
     }
 
-    private bool VerifyDoffEnabled(ref ArmorActionEventArgs eventArgs) {
+    protected bool VerifyDoffEnabled(ref ArmorActionEventArgs eventArgs) {
       eventArgs.ArmorStandEntityId = TargetedArmorStandEntityId;
       if (eventArgs.ArmorStandEntityId == null) {
         eventArgs.TargetType = EnumTargetType.Nothing;
@@ -112,7 +115,7 @@ namespace DoffAndDonAgain.Client {
       return VerifyDoffToArmorStandEnabled(ref eventArgs);
     }
 
-    private bool VerifyDoffToGroundEnabled(ref ArmorActionEventArgs eventArgs) {
+    protected bool VerifyDoffToGroundEnabled(ref ArmorActionEventArgs eventArgs) {
       eventArgs.Successful = IsDoffToArmorStandEnabled;
       if (!IsDoffToGroundEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_DOFF_GROUND_DISABLED;
@@ -120,7 +123,7 @@ namespace DoffAndDonAgain.Client {
       return eventArgs.Successful;
     }
 
-    private bool VerifyDoffToArmorStandEnabled(ref ArmorActionEventArgs eventArgs) {
+    protected bool VerifyDoffToArmorStandEnabled(ref ArmorActionEventArgs eventArgs) {
       eventArgs.Successful = IsDoffToArmorStandEnabled;
       if (!IsDoffToArmorStandEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_DOFF_STAND_DISABLED;
@@ -128,7 +131,7 @@ namespace DoffAndDonAgain.Client {
       return eventArgs.Successful;
     }
 
-    private bool VerifyDonEnabled(ref ArmorActionEventArgs eventArgs) {
+    protected bool VerifyDonEnabled(ref ArmorActionEventArgs eventArgs) {
       eventArgs.Successful = IsDonEnabled;
       if (!IsDonEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
@@ -136,7 +139,7 @@ namespace DoffAndDonAgain.Client {
       return eventArgs.Successful;
     }
 
-    private bool VerifySwapEnabled(ref ArmorActionEventArgs eventArgs) {
+    protected bool VerifySwapEnabled(ref ArmorActionEventArgs eventArgs) {
       eventArgs.Successful = IsSwapEnabled;
       if (!IsSwapEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;

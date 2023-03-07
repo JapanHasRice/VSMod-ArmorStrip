@@ -20,10 +20,10 @@ namespace DoffAndDonAgain {
 
   [ProtoContract]
   public class ArmorActionEventArgs : EventArgs {
-    public KeyCombination KeyCombination { get; private set; }
+    public KeyCombination KeyCombination { get; }
 
     [ProtoMember(1)]
-    public EnumActionType ActionType { get; private set; }
+    public EnumActionType ActionType { get; }
 
     [ProtoMember(2)]
     public EnumTargetType TargetType { get; set; } = EnumTargetType.NotSet;
@@ -31,20 +31,23 @@ namespace DoffAndDonAgain {
     [ProtoMember(3)]
     public long? ArmorStandEntityId { get; set; } = null;
 
+    [ProtoMember(4)]
     public bool Successful { get; set; } = false;
 
+    [ProtoMember(5)]
     public string ErrorCode { get; set; } = "";
 
+    [ProtoMember(6)]
     public object[] ErrorArgs { get; set; } = new object[0];
+
+    [ProtoMember(7)]
+    public bool DoffExcessToGround { get; set; } = false;
 
     public IServerPlayer ForPlayer { get; set; } = null;
 
-    [ProtoMember(4)]
-    public bool DoffExcessToGround { get; set; } = false;
+    public List<ItemWearable> MovedArmor { get; } = new List<ItemWearable>();
 
-    public List<ItemWearable> MovedArmor { get; private set; } = new List<ItemWearable>();
-
-    public List<ItemWearable> DroppedArmor { get; private set; } = new List<ItemWearable>();
+    public List<ItemWearable> DroppedArmor { get; } = new List<ItemWearable>();
 
     public ArmorActionEventArgs(KeyCombination keyCombination, EnumActionType actionType) {
       KeyCombination = keyCombination;
