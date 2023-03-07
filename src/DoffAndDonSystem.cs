@@ -37,8 +37,6 @@ namespace DoffAndDonAgain {
       ClientAPI = api;
       ClientChannel = api.Network.GetChannel(Constants.MOD_ID);
 
-      RegisterHotKeys(ClientAPI.Input);
-
       ArmorManipulationInputHandler = new ArmorManipulationInputHandler(this);
     }
 
@@ -49,17 +47,6 @@ namespace DoffAndDonAgain {
       ServerChannel = api.Network.GetChannel(Constants.MOD_ID);
 
       ArmorTransferHandler = new ArmorTransferHandler(this);
-    }
-
-    protected void RegisterHotKeys(IInputAPI input) {
-      input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
-      input.SetHotKeyHandler(Constants.DON_CODE, Event.TriggerDonKeyPressed);
-
-      input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
-      input.SetHotKeyHandler(Constants.DOFF_CODE, Event.TriggerDoffKeyPressed);
-
-      input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
-      input.SetHotKeyHandler(Constants.SWAP_CODE, Event.TriggerSwapKeyPressed);
     }
   }
 }

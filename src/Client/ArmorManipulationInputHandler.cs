@@ -33,10 +33,24 @@ namespace DoffAndDonAgain.Client {
         return;
       }
       System = system;
+
       LoadServerSettings(system.Api);
+      RegisterHotKeys(system.ClientAPI.Input, system.Event);
+
       system.Event.OnDoffKeyPressed += OnDoffKeyPressed;
       system.Event.OnDonKeyPressed += OnDonKeyPressed;
       system.Event.OnSwapKeyPressed += OnSwapKeyPressed;
+    }
+
+    protected void RegisterHotKeys(IInputAPI input, DoffAndDonEventApi eventApi) {
+      input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
+      input.SetHotKeyHandler(Constants.DON_CODE, eventApi.TriggerDonKeyPressed);
+
+      input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
+      input.SetHotKeyHandler(Constants.DOFF_CODE, eventApi.TriggerDoffKeyPressed);
+
+      input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
+      input.SetHotKeyHandler(Constants.SWAP_CODE, eventApi.TriggerSwapKeyPressed);
     }
 
     protected void LoadServerSettings(ICoreAPI api) {
