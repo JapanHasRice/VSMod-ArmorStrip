@@ -6,7 +6,7 @@ namespace DoffAndDonAgain {
   public class DoffAndDonConfigurationSystem : ServerOnlyConfigurationSystem<DoffAndDonServerConfig> {
     public override string ChannelName => "japanhasrice.doffanddonagainconfig";
 
-    public override string ServerConfigFilename => "DoffAndDonAgainConfig.json";
+    public override string ServerConfigFilename => "DoffAndDonAgain/ServerConfig.json";
   }
 
   [ProtoContract]

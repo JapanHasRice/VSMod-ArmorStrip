@@ -1,5 +1,4 @@
 using Vintagestory.API.Common;
-using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Common {
   public class SoundManager {
@@ -7,25 +6,48 @@ namespace DoffAndDonAgain.Common {
 
     public SoundManager(DoffAndDonSystem system) {
       System = system;
+
+      system.Event.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
     }
 
-    public void PlayArmorShufflingSounds(IPlayer player, Item movedArmor, Item otherMovedArmor = null) {
-      bool playedFirstSound = false;
-      AssetLocation[] wearableSounds = (movedArmor as ItemWearable)?.FootStepSounds;
-      if (wearableSounds != null && wearableSounds.Length != 0) {
-        AssetLocation armorSound = wearableSounds[System.Api.World.Rand.Next(wearableSounds.Length)];
-        PlaySoundAt(armorSound, player, range: 10);
-        playedFirstSound = true;
+    private void OnAfterServerHandledRequest(ArmorActionEventArgs eventArgs) {
+      if (!eventArgs.Successful) {
+        return;
       }
-      AssetLocation[] otherWearableSounds = (otherMovedArmor as ItemWearable)?.FootStepSounds;
-      if (otherWearableSounds != null && otherWearableSounds.Length != 0) {
-        AssetLocation armorSound = otherWearableSounds[System.Api.World.Rand.Next(otherWearableSounds.Length)];
-        if (playedFirstSound) {
-          System.Api.World.RegisterCallback((float dt) => { PlaySoundAt(armorSound, player, range: 10); }, 300);
+
+      if (eventArgs.MovedArmor.Count > 0) {
+        PlayArmorShufflingSounds(eventArgs);
+      }
+    }
+
+    private void PlayArmorShufflingSounds(ArmorActionEventArgs eventArgs) {
+      int delayMillis = 0;
+      foreach (var wearable in eventArgs.MovedArmor) {
+        if ((wearable.FootStepSounds?.Length ?? 0) == 0) {
+          continue;
+        }
+
+        var sound = wearable.FootStepSounds[System.Api.World.Rand.Next(wearable.FootStepSounds.Length)];
+        if (delayMillis > 0) {
+          System.Api.World.RegisterCallback((dt) => { PlaySoundAt(sound, eventArgs.ForPlayer, range: 10); }, delayMillis);
+          delayMillis += 100;
         }
         else {
-          PlaySoundAt(armorSound, player, range: 10);
+          PlaySoundAt(sound, eventArgs.ForPlayer, range: 10);
+          delayMillis += 300;
         }
+      }
+
+      foreach (var wearable in eventArgs.DroppedArmor) {
+        if ((wearable.FootStepSounds?.Length ?? 0) == 0) {
+          continue;
+        }
+
+        var sound = wearable.FootStepSounds[System.Api.World.Rand.Next(wearable.FootStepSounds.Length)];
+        PlaySoundAt(sound, eventArgs.ForPlayer, range: 10);
+      }
+      if (eventArgs.DroppedArmor.Count > 0) {
+        System.Api.World.RegisterCallback((dt) => PlayWooshSound(eventArgs.ForPlayer), 0);
       }
     }
 

@@ -2,15 +2,16 @@
   "type": "Code",
   "name": "Doff and Don Again",
   "modid": "doffanddonagain",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Quickly take off and put on your armor.",
   "website": "https://github.com/PJ-Mog/VSMod-DoffAndDonAgain",
   "authors": [ "JapanHasRice" ],
   "contributors": [ "xCoiotex" ],
   "dependencies": {
-    "game": "1.16.0",
+    "game": "1.18.0-rc.6",
     "survival": ""
   },
   "side": "Universal",
-  "requiredOnClient": true
+  "requiredOnClient": true,
+  "requiredOnServer": true
 }

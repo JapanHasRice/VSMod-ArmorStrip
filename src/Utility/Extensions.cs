@@ -14,10 +14,9 @@ namespace DoffAndDonAgain.Utility {
       if (armorStandEntityId == null || aroundEntity == null) {
         return null;
       }
-      else {
-        ActionConsumable<Entity> matchesArmorStandId = (Entity entity) => { return entity?.EntityId == armorStandEntityId; };
-        return aroundEntity.World.GetNearestEntity(aroundEntity.Pos.AsBlockPos.ToVec3d(), horRange, vertRange, matchesArmorStandId) as EntityArmorStand;
-      }
+
+      ActionConsumable<Entity> matchesArmorStandId = (Entity entity) => { return entity?.EntityId == armorStandEntityId; };
+      return aroundEntity.World.GetNearestEntity(aroundEntity.Pos.AsBlockPos.ToVec3d(), horRange, vertRange, matchesArmorStandId) as EntityArmorStand;
     }
 
     public static void ConsumeSaturation(this EntityAgent player, float amount) {

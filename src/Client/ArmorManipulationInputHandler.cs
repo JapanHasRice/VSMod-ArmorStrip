@@ -1,41 +1,32 @@
+using System.Collections.Generic;
 using DoffAndDonAgain.Common;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Client {
-  public abstract class ArmorManipulationInputHandler {
+  public class ArmorManipulationInputHandler {
     protected DoffAndDonSystem System { get; }
     protected IClientPlayer Player => System.ClientAPI.World.Player;
     protected EntityPlayer PlayerEntity => Player.Entity;
-    protected float SaturationRequired { get; set; } = 0f;
-    private int _handsRequired;
-    public int HandsRequired {
-      get => _handsRequired;
-      protected set {
-        _handsRequired = value;
-        switch (HandsRequired) {
-          case 2:
-            HasEnoughHandsFree = HasBothHandsFree;
-            break;
-          case 1:
-            HasEnoughHandsFree = HasOneHandFree;
-            break;
-          case 0:
-            HasEnoughHandsFree = LookMomNoHands;
-            break;
-          default:
-            System.Api.Logger.Warning("Attempted to set 'HandsRequired' to an invalid value '{0}', valid values are [0, 1, 2]. Defaulting to 0.", value);
-            _handsRequired = 0;
-            HasEnoughHandsFree = LookMomNoHands;
-            break;
-        }
-      }
-    }
+    protected bool IsLeftHandEmpty => PlayerEntity.LeftHandItemSlot.Empty;
+    protected bool IsRightHandEmpty => PlayerEntity.RightHandItemSlot.Empty;
+    protected long? TargetedArmorStandEntityId => (Player.CurrentEntitySelection?.Entity as EntityArmorStand)?.EntityId;
 
-    protected delegate bool AvailableHandsCheck(out string errorCode);
-
-    protected AvailableHandsCheck HasEnoughHandsFree;
+    protected bool IsDoffToGroundEnabled { get; set; } = true;
+    protected bool IsDoffToArmorStandEnabled { get; set; } = true;
+    protected bool IsDonEnabled { get; set; } = true;
+    protected bool IsSwapEnabled { get; set; } = true;
+    protected Dictionary<EnumActionType, int> HandsRequired { get; set; } = new Dictionary<EnumActionType, int> {
+      { EnumActionType.Doff, 0 },
+      { EnumActionType.Don, 0 },
+      { EnumActionType.Swap, 0 }
+    };
+    protected Dictionary<EnumActionType, float> SaturationRequired { get; set; } = new Dictionary<EnumActionType, float> {
+      { EnumActionType.Doff, 0f },
+      { EnumActionType.Don, 0f },
+      { EnumActionType.Swap, 0f }
+    };
 
     public ArmorManipulationInputHandler(DoffAndDonSystem system) {
       if (system.Side != EnumAppSide.Client) {
@@ -43,8 +34,24 @@ namespace DoffAndDonAgain.Client {
         return;
       }
       System = system;
-      HandsRequired = 0;
+
       LoadServerSettings(system.Api);
+      RegisterHotKeys(system.ClientAPI.Input, system.Event);
+
+      system.Event.OnDoffKeyPressed += OnDoffKeyPressed;
+      system.Event.OnDonKeyPressed += OnDonKeyPressed;
+      system.Event.OnSwapKeyPressed += OnSwapKeyPressed;
+    }
+
+    protected void RegisterHotKeys(IInputAPI input, DoffAndDonEventApi eventApi) {
+      input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
+      input.SetHotKeyHandler(Constants.DOFF_CODE, eventApi.TriggerDoffKeyPressed);
+
+      input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
+      input.SetHotKeyHandler(Constants.DON_CODE, eventApi.TriggerDonKeyPressed);
+
+      input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
+      input.SetHotKeyHandler(Constants.SWAP_CODE, eventApi.TriggerSwapKeyPressed);
     }
 
     protected void LoadServerSettings(ICoreAPI api) {
@@ -61,52 +68,130 @@ namespace DoffAndDonAgain.Client {
       }
     }
 
-    protected abstract void LoadServerSettings(DoffAndDonServerConfig serverSettings);
+    protected void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
+      IsDoffToGroundEnabled = serverSettings.EnableDoffToGround.Value;
+      IsDoffToArmorStandEnabled = serverSettings.EnableDoffToArmorStand.Value;
 
-    protected EntityArmorStand GetTargetedArmorStandEntity() => Player.CurrentEntitySelection?.Entity as EntityArmorStand;
+      IsDonEnabled = serverSettings.EnableDon.Value;
 
-    protected bool HasBothHandsFree(out string errorCode) {
-      errorCode = null;
-      bool bothHandsAreFree = IsLeftHandEmpty() && IsRightHandEmpty();
-      if (!bothHandsAreFree) {
-        errorCode = Constants.ERROR_BOTH_HANDS;
-      }
-      return bothHandsAreFree;
+      IsSwapEnabled = serverSettings.EnableSwap.Value;
+
+      HandsRequired[EnumActionType.Doff] = serverSettings.HandsNeededToDoff.Value;
+      HandsRequired[EnumActionType.Don] = serverSettings.HandsNeededToDon.Value;
+      HandsRequired[EnumActionType.Swap] = serverSettings.HandsNeededToSwap.Value;
+
+      SaturationRequired[EnumActionType.Doff] = serverSettings.SaturationCostPerDoff.Value;
+      SaturationRequired[EnumActionType.Don] = serverSettings.SaturationCostPerDon.Value;
+      SaturationRequired[EnumActionType.Swap] = serverSettings.SaturationCostPerSwap.Value;
     }
 
-    protected bool HasOneHandFree(out string errorCode) {
-      errorCode = null;
-      bool oneHandIsFree = IsRightHandEmpty() || IsLeftHandEmpty();
-      if (!oneHandIsFree) {
-        errorCode = Constants.ERROR_ONE_HAND;
-      }
-      return oneHandIsFree;
+    protected void OnDoffKeyPressed(ref ArmorActionEventArgs eventArgs) {
+      eventArgs.Successful = VerifyDoffEnabled(eventArgs)
+                             && VerifyEnoughHandsFree(eventArgs)
+                             && VerifyEnoughSaturation(eventArgs);
     }
 
-    protected bool LookMomNoHands(out string errorCode) {
-      errorCode = null;
+    protected void OnDonKeyPressed(ref ArmorActionEventArgs eventArgs) {
+      eventArgs.Successful = VerifyDonEnabled(eventArgs)
+                             && VerifyTargetingArmorStand(eventArgs)
+                             && VerifyEnoughHandsFree(eventArgs)
+                             && VerifyEnoughSaturation(eventArgs);
+    }
+
+    protected void OnSwapKeyPressed(ref ArmorActionEventArgs eventArgs) {
+      eventArgs.Successful = VerifySwapEnabled(eventArgs)
+                             && VerifyTargetingArmorStand(eventArgs)
+                             && VerifyEnoughHandsFree(eventArgs)
+                             && VerifyEnoughSaturation(eventArgs);
+    }
+
+    protected bool VerifyDoffEnabled(ArmorActionEventArgs eventArgs) {
+      eventArgs.ArmorStandEntityId = TargetedArmorStandEntityId;
+      if (eventArgs.ArmorStandEntityId == null) {
+        eventArgs.TargetType = EnumTargetType.Nothing;
+        return VerifyDoffToGroundEnabled(eventArgs);
+      }
+      eventArgs.TargetType = EnumTargetType.ArmorStand;
+      return VerifyDoffToArmorStandEnabled(eventArgs);
+    }
+
+    protected bool VerifyDoffToGroundEnabled(ArmorActionEventArgs eventArgs) {
+      if (!IsDoffToGroundEnabled) {
+        eventArgs.ErrorCode = Constants.ERROR_DOFF_GROUND_DISABLED;
+        return false;
+      }
       return true;
     }
 
-    private bool IsLeftHandEmpty() => PlayerEntity.LeftHandItemSlot.Empty;
-    private bool IsRightHandEmpty() => PlayerEntity.RightHandItemSlot.Empty;
-
-    protected bool HasEnoughSaturation(out string errorCode) {
-      errorCode = null;
-      var currentSaturation = PlayerEntity.WatchedAttributes.GetTreeAttribute("hunger")?.TryGetFloat("currentsaturation");
-      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
-      bool enoughSaturation = currentSaturation == null ? true : currentSaturation >= SaturationRequired;
-      if (!enoughSaturation) {
-        errorCode = System.Error.GetErrorText(Constants.ERROR_SATURATION, SaturationRequired);
+    protected bool VerifyDoffToArmorStandEnabled(ArmorActionEventArgs eventArgs) {
+      if (!IsDoffToArmorStandEnabled) {
+        eventArgs.ErrorCode = Constants.ERROR_DOFF_STAND_DISABLED;
+        return false;
       }
-      return enoughSaturation;
+      return true;
     }
 
-    protected bool IsTargetingArmorStand(out long armorStandEntityId, out string errorCode) {
-      errorCode = null;
-      armorStandEntityId = GetTargetedArmorStandEntity()?.EntityId ?? -1;
-      if (armorStandEntityId == -1) {
-        errorCode = Constants.ERROR_MISSING_ARMOR_STAND_TARGET;
+    protected bool VerifyDonEnabled(ArmorActionEventArgs eventArgs) {
+      if (!IsDonEnabled) {
+        eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
+        return false;
+      }
+      return true;
+    }
+
+    protected bool VerifySwapEnabled(ArmorActionEventArgs eventArgs) {
+      if (!IsSwapEnabled) {
+        eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
+        return false;
+      }
+      return true;
+    }
+
+    protected bool VerifyEnoughHandsFree(ArmorActionEventArgs eventArgs) {
+      switch (HandsRequired[eventArgs.ActionType]) {
+        case 2:
+          return VerifyBothHandsFree(eventArgs);
+        case 1:
+          return VerifyOneHandFree(eventArgs);
+        default:
+          return LookMomNoHands(eventArgs);
+      }
+    }
+
+    protected bool VerifyBothHandsFree(ArmorActionEventArgs eventArgs) {
+      if (!IsLeftHandEmpty && IsRightHandEmpty) {
+        eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
+        return false;
+      }
+      return true;
+    }
+
+    protected bool VerifyOneHandFree(ArmorActionEventArgs eventArgs) {
+      if (!IsRightHandEmpty || IsLeftHandEmpty) {
+        eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
+        return false;
+      }
+      return true;
+    }
+
+    protected bool LookMomNoHands(ArmorActionEventArgs eventArgs) => true;
+
+    protected bool VerifyEnoughSaturation(ArmorActionEventArgs eventArgs) {
+      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
+      var requiredSaturation = SaturationRequired[eventArgs.ActionType];
+      var currentSaturation = PlayerEntity.GetBehavior<EntityBehaviorHunger>()?.Saturation ?? requiredSaturation;
+      if (currentSaturation < requiredSaturation) {
+        eventArgs.ErrorCode = Constants.ERROR_SATURATION;
+        eventArgs.ErrorArgs = new string[] { requiredSaturation.ToString() };
+        return false;
+      }
+      return true;
+    }
+
+    protected bool VerifyTargetingArmorStand(ArmorActionEventArgs eventArgs) {
+      eventArgs.ArmorStandEntityId = TargetedArmorStandEntityId;
+      if (eventArgs.ArmorStandEntityId == null) {
+        eventArgs.ErrorCode = Constants.ERROR_MISSING_ARMOR_STAND_TARGET;
         return false;
       }
       return true;
