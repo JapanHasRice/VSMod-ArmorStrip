@@ -23,7 +23,7 @@ namespace DoffAndDonAgain {
     public KeyCombination KeyCombination { get; }
 
     [ProtoMember(1)]
-    public EnumActionType ActionType { get; }
+    public EnumActionType ActionType { get; private set; }
 
     [ProtoMember(2)]
     public EnumTargetType TargetType { get; set; } = EnumTargetType.NotSet;
@@ -38,7 +38,7 @@ namespace DoffAndDonAgain {
     public string ErrorCode { get; set; } = "";
 
     [ProtoMember(6)]
-    public object[] ErrorArgs { get; set; } = new object[0];
+    public string[] ErrorArgs { get; set; } = new string[0];
 
     [ProtoMember(7)]
     public bool DoffExcessToGround { get; set; } = false;

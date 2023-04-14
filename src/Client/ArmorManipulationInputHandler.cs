@@ -182,7 +182,7 @@ namespace DoffAndDonAgain.Client {
       var currentSaturation = PlayerEntity.GetBehavior<EntityBehaviorHunger>()?.Saturation ?? requiredSaturation;
       if (currentSaturation < requiredSaturation) {
         eventArgs.ErrorCode = Constants.ERROR_SATURATION;
-        eventArgs.ErrorArgs = new object[] { requiredSaturation };
+        eventArgs.ErrorArgs = new string[] { requiredSaturation.ToString() };
         return false;
       }
       return true;
