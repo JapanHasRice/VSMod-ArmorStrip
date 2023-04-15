@@ -1,0 +1,20 @@
+[
+  {
+    "op": "add",
+    "path": "/client/behaviors/-",
+    "value": {
+      "code": "doffanddonnable",
+      "armorSlotIds": [ 12, 13, 14 ]
+    },
+    "file": "game:entities/humanoid/player.json"
+  },
+  {
+    "op": "add",
+    "path": "/server/behaviors/-",
+    "value": {
+      "code": "doffanddonnable",
+      "armorSlotIds": [ 12, 13, 14 ]
+    },
+    "file": "game:entities/humanoid/player.json"
+  }
+]

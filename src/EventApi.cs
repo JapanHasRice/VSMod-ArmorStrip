@@ -15,7 +15,7 @@ namespace DoffAndDonAgain {
   public enum EnumTargetType {
     NotSet,
     Nothing,
-    ArmorStand
+    EntityAgent
   }
 
   [ProtoContract]
@@ -29,7 +29,7 @@ namespace DoffAndDonAgain {
     public EnumTargetType TargetType { get; set; } = EnumTargetType.NotSet;
 
     [ProtoMember(3)]
-    public long? ArmorStandEntityId { get; set; } = null;
+    public long? TargetEntityAgentId { get; set; } = null;
 
     [ProtoMember(4)]
     public bool Successful { get; set; } = false;
@@ -57,29 +57,27 @@ namespace DoffAndDonAgain {
     private ArmorActionEventArgs() { }
   }
 
-  public delegate void ActionWithRefArg<T>(ref T t1);
-
   public class DoffAndDonEventApi {
-    public event ActionWithRefArg<ArmorActionEventArgs> OnDoffKeyPressed;
+    public event Action<ArmorActionEventArgs> OnDoffKeyPressed;
     public bool TriggerDoffKeyPressed(KeyCombination keyCombination) {
       var eventArgs = new ArmorActionEventArgs(keyCombination, EnumActionType.Doff);
-      OnDoffKeyPressed?.Invoke(ref eventArgs);
+      OnDoffKeyPressed?.Invoke(eventArgs);
       TriggerAfterInput(eventArgs);
       return eventArgs.Successful;
     }
 
-    public event ActionWithRefArg<ArmorActionEventArgs> OnDonKeyPressed;
+    public event Action<ArmorActionEventArgs> OnDonKeyPressed;
     public bool TriggerDonKeyPressed(KeyCombination keyCombination) {
       var eventArgs = new ArmorActionEventArgs(keyCombination, EnumActionType.Don);
-      OnDonKeyPressed?.Invoke(ref eventArgs);
+      OnDonKeyPressed?.Invoke(eventArgs);
       TriggerAfterInput(eventArgs);
       return eventArgs.Successful;
     }
 
-    public event ActionWithRefArg<ArmorActionEventArgs> OnSwapKeyPressed;
+    public event Action<ArmorActionEventArgs> OnSwapKeyPressed;
     public bool TriggerSwapKeyPressed(KeyCombination keyCombination) {
       var eventArgs = new ArmorActionEventArgs(keyCombination, EnumActionType.Swap);
-      OnSwapKeyPressed?.Invoke(ref eventArgs);
+      OnSwapKeyPressed?.Invoke(eventArgs);
       TriggerAfterInput(eventArgs);
       return eventArgs.Successful;
     }
@@ -89,21 +87,21 @@ namespace DoffAndDonAgain {
       OnAfterInput?.Invoke(eventArgs);
     }
 
-    public event ActionWithRefArg<ArmorActionEventArgs> OnServerReceivedDoffRequest;
+    public event Action<ArmorActionEventArgs> OnServerReceivedDoffRequest;
     public void TriggerServerReceivedDoffRequest(ArmorActionEventArgs eventArgs) {
-      OnServerReceivedDoffRequest?.Invoke(ref eventArgs);
+      OnServerReceivedDoffRequest?.Invoke(eventArgs);
       TriggerAfterServerHandledRequest(eventArgs);
     }
 
-    public event ActionWithRefArg<ArmorActionEventArgs> OnServerReceivedDonRequest;
+    public event Action<ArmorActionEventArgs> OnServerReceivedDonRequest;
     public void TriggerServerReceivedDonRequest(ArmorActionEventArgs eventArgs) {
-      OnServerReceivedDonRequest?.Invoke(ref eventArgs);
+      OnServerReceivedDonRequest?.Invoke(eventArgs);
       TriggerAfterServerHandledRequest(eventArgs);
     }
 
-    public event ActionWithRefArg<ArmorActionEventArgs> OnServerReceivedSwapRequest;
+    public event Action<ArmorActionEventArgs> OnServerReceivedSwapRequest;
     public void TriggerServerReceivedSwapRequest(ArmorActionEventArgs eventArgs) {
-      OnServerReceivedSwapRequest?.Invoke(ref eventArgs);
+      OnServerReceivedSwapRequest?.Invoke(eventArgs);
       TriggerAfterServerHandledRequest(eventArgs);
     }
 
