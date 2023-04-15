@@ -83,5 +83,10 @@ namespace DoffAndDonAgain {
     public static List<ItemSlot> GetMiscSlots(this Entity entity) {
       return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.MiscSlots;
     }
+
+    public static bool CanBeTargetedFor(this EntityAgent engityAgent, EnumActionType actionType) {
+      var result = engityAgent?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.CanBeTargetedFor(actionType) ?? false;
+      return result;
+    }
   }
 }

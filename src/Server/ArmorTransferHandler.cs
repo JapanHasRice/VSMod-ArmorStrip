@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using DoffAndDonAgain.Common;
-using DoffAndDonAgain.Utility;
 using Vintagestory.API.Common;
 using Vintagestory.GameContent;
 
@@ -263,7 +262,7 @@ namespace DoffAndDonAgain.Server {
 
     protected void OnAfterServerHandledRequest(ArmorActionEventArgs eventArgs) {
       if (eventArgs.Successful) {
-        eventArgs.ForPlayer.Entity.ConsumeSaturation(SaturationRequired[eventArgs.ActionType]);
+        eventArgs.ForPlayer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationRequired[eventArgs.ActionType]);
       }
     }
   }

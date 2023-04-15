@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using DoffAndDonAgain.Common;
-using DoffAndDonAgain.Utility;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Client {
   public class ArmorManipulationInputHandler {
