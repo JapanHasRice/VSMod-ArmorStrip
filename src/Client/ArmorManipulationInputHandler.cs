@@ -183,9 +183,10 @@ namespace DoffAndDonAgain.Client {
     protected bool LookMomNoHands(ArmorActionEventArgs eventArgs) => true;
 
     protected bool VerifyEnoughSaturation(ArmorActionEventArgs eventArgs) {
-      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
       var requiredSaturation = SaturationRequired[eventArgs.ActionType];
-      var currentSaturation = PlayerEntity.GetBehavior<EntityBehaviorHunger>()?.Saturation ?? requiredSaturation;
+      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
+      // Current saturation does not utilize EntityBehaviorHunger because that behavior is server-side only
+      float currentSaturation = Player.Entity.WatchedAttributes.GetTreeAttribute("hunger")?.TryGetFloat("currentsaturation") ?? requiredSaturation;
       if (currentSaturation < requiredSaturation) {
         eventArgs.ErrorCode = Constants.ERROR_SATURATION;
         eventArgs.ErrorArgs = new string[] { requiredSaturation.ToString() };
