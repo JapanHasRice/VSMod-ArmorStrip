@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DoffAndDonAgain.Common;
 using DoffAndDonAgain.Utility;
@@ -77,6 +78,7 @@ namespace DoffAndDonAgain.Client {
 
       IsSwapEnabled = serverSettings.EnableSwap.Value;
 
+      Console.WriteLine("doffanddon: don requires " + serverSettings.HandsNeededToDon.Value + " hands.");
       HandsRequired[EnumActionType.Doff] = serverSettings.HandsNeededToDoff.Value;
       HandsRequired[EnumActionType.Don] = serverSettings.HandsNeededToDon.Value;
       HandsRequired[EnumActionType.Swap] = serverSettings.HandsNeededToSwap.Value;
@@ -161,19 +163,21 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool VerifyBothHandsFree(ArmorActionEventArgs eventArgs) {
-      if (!IsLeftHandEmpty && IsRightHandEmpty) {
-        eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
-        return false;
+      if (IsLeftHandEmpty && IsRightHandEmpty) {
+        return true;
       }
-      return true;
+
+      eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
+      return false;
     }
 
     protected bool VerifyOneHandFree(ArmorActionEventArgs eventArgs) {
-      if (!IsRightHandEmpty || IsLeftHandEmpty) {
-        eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
-        return false;
+      if (IsRightHandEmpty || IsLeftHandEmpty) {
+        return true;
       }
-      return true;
+
+      eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
+      return false;
     }
 
     protected bool LookMomNoHands(ArmorActionEventArgs eventArgs) => true;
