@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DoffAndDonAgain.Common;
 using Vintagestory.API.Client;
@@ -76,7 +75,6 @@ namespace DoffAndDonAgain.Client {
 
       IsSwapEnabled = serverSettings.EnableSwap.Value;
 
-      Console.WriteLine("doffanddon: don requires " + serverSettings.HandsNeededToDon.Value + " hands.");
       HandsRequired[EnumActionType.Doff] = serverSettings.HandsNeededToDoff.Value;
       HandsRequired[EnumActionType.Don] = serverSettings.HandsNeededToDon.Value;
       HandsRequired[EnumActionType.Swap] = serverSettings.HandsNeededToSwap.Value;
