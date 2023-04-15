@@ -21,9 +21,14 @@ namespace DoffAndDonAgain {
     public override void Initialize(EntityProperties properties, JsonObject attributes) {
       base.Initialize(properties, attributes);
 
-      armorSlotIds = attributes[nameof(armorSlotIds)].AsObject<int[]>(new int[0]);
-      clothingSlotIds = attributes[nameof(clothingSlotIds)].AsObject<int[]>(new int[0]);
-      miscSlotIds = attributes[nameof(miscSlotIds)].AsObject<int[]>(new int[0]);
+      try {
+        armorSlotIds = attributes[nameof(armorSlotIds)].AsArray<int>(new int[0]);
+        clothingSlotIds = attributes[nameof(clothingSlotIds)].AsArray<int>(new int[0]);
+        miscSlotIds = attributes[nameof(miscSlotIds)].AsArray<int>(new int[0]);
+      }
+      catch (System.Exception e) {
+        entity.World.Logger.Error("DoffAndDonAgain: Error parsing {0} behavior for {1}. Doff/Don/Swap may not work correctly with these entities. {2}", PropertyName(), entity.Code, e);
+      }
       InitializeInventory();
     }
 
@@ -34,8 +39,12 @@ namespace DoffAndDonAgain {
       }
 
       ArmorSlots = new List<ItemSlot>();
-      for (int a = 0; a < armorSlotIds.Length; a++) {
-        var slot = entityInventory[armorSlotIds[a]];
+      for (int a = 0; a < armorSlotIds?.Length; a++) {
+        int inventoryIndex = armorSlotIds[a];
+        if (inventoryIndex < 0 || inventoryIndex >= entityInventory.Count) {
+          continue;
+        }
+        var slot = entityInventory[inventoryIndex];
         if (slot == null) {
           continue;
         }
@@ -43,8 +52,12 @@ namespace DoffAndDonAgain {
       }
 
       ClothingSlots = new List<ItemSlot>();
-      for (int c = 0; c < clothingSlotIds.Length; c++) {
-        var slot = entityInventory[clothingSlotIds[c]];
+      for (int c = 0; c < clothingSlotIds?.Length; c++) {
+        int inventoryIndex = clothingSlotIds[c];
+        if (inventoryIndex < 0 || inventoryIndex >= entityInventory.Count) {
+          continue;
+        }
+        var slot = entityInventory[inventoryIndex];
         if (slot == null) {
           continue;
         }
@@ -52,8 +65,12 @@ namespace DoffAndDonAgain {
       }
 
       MiscSlots = new List<ItemSlot>();
-      for (int m = 0; m < miscSlotIds.Length; m++) {
-        var slot = entityInventory[miscSlotIds[m]];
+      for (int m = 0; m < miscSlotIds?.Length; m++) {
+        int inventoryIndex = miscSlotIds[m];
+        if (inventoryIndex < 0 || inventoryIndex >= entityInventory.Count) {
+          continue;
+        }
+        var slot = entityInventory[inventoryIndex];
         if (slot == null) {
           continue;
         }

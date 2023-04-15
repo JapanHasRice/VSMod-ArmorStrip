@@ -2,11 +2,7 @@
   {
     "op": "add",
     "path": "/client/behaviors/-",
-    "value": {
-      "code": "doffanddonnable",
-      "armorSlotIds": [ 12, 13, 14 ],
-      "miscSlotIds": [ 16 ]
-    },
+    "value": { "code": "doffanddonnable" },
     "file": "game:entities/land/armorstand*"
   },
   {
