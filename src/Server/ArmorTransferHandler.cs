@@ -81,7 +81,7 @@ namespace DoffAndDonAgain.Server {
 
     protected void OnSwapRequest(ArmorActionEventArgs eventArgs) {
       eventArgs.ErrorCode = Constants.ERROR_COULD_NOT_SWAP;
-      TryToSwapArmorWithEntity(eventArgs);
+      TryToSwapWithEntity(eventArgs);
     }
 
     protected void TryDoffToGround(ArmorActionEventArgs eventArgs) {
@@ -114,7 +114,7 @@ namespace DoffAndDonAgain.Server {
         return;
       }
 
-      DoffArmorToEntity(eventArgs, targetEntity);
+      DoffToEntity(eventArgs, targetEntity);
     }
 
     protected void TryDonFromEntity(ArmorActionEventArgs eventArgs) {
@@ -140,7 +140,7 @@ namespace DoffAndDonAgain.Server {
       DonFromEntity(eventArgs, targetEntity);
     }
 
-    protected void TryToSwapArmorWithEntity(ArmorActionEventArgs eventArgs) {
+    protected void TryToSwapWithEntity(ArmorActionEventArgs eventArgs) {
       if (!IsSwapEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
@@ -161,18 +161,19 @@ namespace DoffAndDonAgain.Server {
         return;
       }
 
-      SwapArmorWithEntity(eventArgs, targetEntity);
+      Swap(eventArgs, eventArgs.ForPlayer.GetArmorSlots(), targetEntity.GetArmorSlots());
+      Swap(eventArgs, eventArgs.ForPlayer.GetClothingSlots(), targetEntity.GetClothingSlots());
     }
 
     protected void DoffArmorToGround(ArmorActionEventArgs eventArgs) {
       foreach (var playerArmorSlot in eventArgs.ForPlayer.GetArmorSlots()) {
-        DoffArmorToGround(eventArgs, playerArmorSlot);
+        DoffToGround(eventArgs, playerArmorSlot);
       }
     }
 
-    protected void DoffArmorToGround(ArmorActionEventArgs eventArgs, ItemSlot playerArmorSlot) {
-      var armor = playerArmorSlot.Itemstack?.Collectible as ItemWearable;
-      bool armorDropped = eventArgs.ForPlayer.InventoryManager.DropItem(playerArmorSlot, true);
+    protected void DoffToGround(ArmorActionEventArgs eventArgs, ItemSlot slot) {
+      var armor = slot.Itemstack?.Collectible as ItemWearable;
+      bool armorDropped = eventArgs.ForPlayer.InventoryManager.DropItem(slot, true);
       eventArgs.Successful |= armorDropped;
 
       if (armorDropped) {
@@ -180,19 +181,46 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void DoffArmorToEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
-      TransferArmor(eventArgs, eventArgs.ForPlayer.Entity, targetEntity);
+    protected void DoffToEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
+      Transfer(eventArgs, eventArgs.ForPlayer.GetArmorSlots(), targetEntity.GetArmorSlots(), dropExcessToGround: true);
+      Transfer(eventArgs, eventArgs.ForPlayer.GetClothingSlots(), targetEntity.GetClothingSlots());
     }
 
     protected void DonFromEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
-      TransferArmor(eventArgs, targetEntity, eventArgs.ForPlayer.Entity);
-      DonToolFromEntity(eventArgs, targetEntity);
+      Transfer(eventArgs, targetEntity.GetArmorSlots(), eventArgs.ForPlayer.GetArmorSlots());
+      Transfer(eventArgs, targetEntity.GetClothingSlots(), eventArgs.ForPlayer.GetClothingSlots());
+      DonMiscFromEntity(eventArgs, targetEntity);
     }
 
-    protected void DonToolFromEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
+    protected void Transfer(ArmorActionEventArgs eventArgs, List<ItemSlot> fromSlots, List<ItemSlot> toSlots, bool dropExcessToGround = false) {
+      foreach (var sourceSlot in fromSlots) {
+        if (sourceSlot.Empty) {
+          continue;
+        }
+
+        bool itemMoved = false;
+        foreach (var sinkSlot in toSlots) {
+          itemMoved = sourceSlot.TryPutInto(eventArgs.ForPlayer.Entity.World, sinkSlot) > 0;
+          eventArgs.Successful |= itemMoved;
+
+          if (itemMoved) {
+            if (sinkSlot.Itemstack.Collectible is ItemWearable wearable) {
+              eventArgs.MovedArmor.Add(wearable);
+            }
+            break;
+          }
+        }
+
+        if (dropExcessToGround && !itemMoved && IsDropExcessWhenDoffingToStandEnabled && eventArgs.DoffExcessToGround) {
+          DoffToGround(eventArgs, sourceSlot);
+        }
+      }
+    }
+
+    protected void DonMiscFromEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
       if (!IsDonToolEnabled) { return; }
 
-      foreach (var sourceSlot in targetEntity.GetMiscSlots()) {
+      foreach (var sourceSlot in targetEntity.GetMiscDonFromSlots()) {
         ItemSlot sinkSlot;
         if (ShouldDonToolOnlyToActiveHotbar) {
           sinkSlot = eventArgs.ForPlayer.InventoryManager.ActiveHotbarSlot;
@@ -211,47 +239,21 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void TransferArmor(ArmorActionEventArgs eventArgs, EntityAgent doffingEntity, EntityAgent donningEntity) {
-      foreach (var sourceSlot in doffingEntity.GetArmorSlots()) {
-        if (sourceSlot.Empty) {
-          continue;
-        }
-
-        bool itemMoved = false;
-        foreach (var sinkSlot in donningEntity.GetArmorSlots()) {
-          itemMoved = sourceSlot.TryPutInto(eventArgs.ForPlayer.Entity.World, sinkSlot) > 0;
-          eventArgs.Successful |= itemMoved;
-
-          if (itemMoved) {
-            eventArgs.MovedArmor.Add(sinkSlot.Itemstack.Collectible as ItemWearable);
-            break;
-          }
-        }
-
-        if (!itemMoved && IsDropExcessWhenDoffingToStandEnabled && eventArgs.DoffExcessToGround) {
-          DoffArmorToGround(eventArgs, sourceSlot);
-        }
-      }
-    }
-
-    protected void SwapArmorWithEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
-      var playerArmor = eventArgs.ForPlayer.GetArmorSlots();
-      var targetsArmor = targetEntity.GetArmorSlots();
-
-      foreach (var playerSlot in eventArgs.ForPlayer.GetArmorSlots()) {
+    protected void Swap(ArmorActionEventArgs eventArgs, List<ItemSlot> slots, List<ItemSlot> otherSlots) {
+      foreach (var slot in slots) {
         bool swapped = false;
-        foreach (var targetSlot in targetEntity.GetArmorSlots()) {
-          if (playerSlot.Empty && targetSlot.Empty) {
+        foreach (var otherSlot in otherSlots) {
+          if (slot.Empty && otherSlot.Empty) {
             // TryFlipWith would return true, even though nothing is exchanged.
             continue;
           }
-          swapped = playerSlot.TryFlipWith(targetSlot);
+          swapped = slot.TryFlipWith(otherSlot);
           eventArgs.Successful |= swapped;
           if (swapped) {
-            if (playerSlot.Itemstack?.Collectible is ItemWearable wearable) {
+            if (slot.Itemstack?.Collectible is ItemWearable wearable) {
               eventArgs.MovedArmor.Add(wearable);
             }
-            if (targetSlot.Itemstack?.Collectible is ItemWearable otherWearable) {
+            if (otherSlot.Itemstack?.Collectible is ItemWearable otherWearable) {
               eventArgs.MovedArmor.Add(otherWearable);
             }
             break;

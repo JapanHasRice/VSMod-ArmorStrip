@@ -11,7 +11,7 @@
     "value": {
       "code": "doffanddonnable",
       "armorSlotIds": [ 12, 13, 14 ],
-      "miscSlotIds": [ 16 ]
+      "miscDonFromSlotIds": [ 16, 15 ]
     },
     "file": "game:entities/land/armorstand*"
   }
