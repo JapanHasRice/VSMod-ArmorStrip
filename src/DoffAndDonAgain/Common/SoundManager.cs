@@ -2,15 +2,15 @@ using Vintagestory.API.Common;
 
 namespace DoffAndDonAgain.Common {
   public class SoundManager {
-    private DoffAndDonSystem System { get; }
+    private ICoreAPI Api { get; }
 
-    public SoundManager(DoffAndDonSystem system) {
-      System = system;
+    public SoundManager(DoffAndDonSystem doffAndDonSystem) {
+      Api = doffAndDonSystem.Api;
 
-      system.Event.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
+      doffAndDonSystem.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
     }
 
-    private void OnAfterServerHandledRequest(ArmorActionEventArgs eventArgs) {
+    private void OnAfterServerHandledRequest(DoffAndDonEventArgs eventArgs) {
       if (!eventArgs.Successful) {
         return;
       }
@@ -20,16 +20,16 @@ namespace DoffAndDonAgain.Common {
       }
     }
 
-    private void PlayArmorShufflingSounds(ArmorActionEventArgs eventArgs) {
+    private void PlayArmorShufflingSounds(DoffAndDonEventArgs eventArgs) {
       int delayMillis = 0;
       foreach (var wearable in eventArgs.MovedArmor) {
         if ((wearable.FootStepSounds?.Length ?? 0) == 0) {
           continue;
         }
 
-        var sound = wearable.FootStepSounds[System.Api.World.Rand.Next(wearable.FootStepSounds.Length)];
+        var sound = wearable.FootStepSounds[Api.World.Rand.Next(wearable.FootStepSounds.Length)];
         if (delayMillis > 0) {
-          System.Api.World.RegisterCallback((dt) => { PlaySoundAt(sound, eventArgs.ForPlayer, range: 10); }, delayMillis);
+          Api.World.RegisterCallback((dt) => { PlaySoundAt(sound, eventArgs.ForPlayer, range: 10); }, delayMillis);
           delayMillis += 100;
         }
         else {
@@ -43,11 +43,11 @@ namespace DoffAndDonAgain.Common {
           continue;
         }
 
-        var sound = wearable.FootStepSounds[System.Api.World.Rand.Next(wearable.FootStepSounds.Length)];
+        var sound = wearable.FootStepSounds[Api.World.Rand.Next(wearable.FootStepSounds.Length)];
         PlaySoundAt(sound, eventArgs.ForPlayer, range: 10);
       }
       if (eventArgs.DroppedArmor.Count > 0) {
-        System.Api.World.RegisterCallback((dt) => PlayWooshSound(eventArgs.ForPlayer), 0);
+        Api.World.RegisterCallback((dt) => PlayWooshSound(eventArgs.ForPlayer), 0);
       }
     }
 
@@ -56,7 +56,7 @@ namespace DoffAndDonAgain.Common {
     }
 
     private void PlaySoundAt(AssetLocation sound, IPlayer player, bool randomizePitch = true, float range = 32, float volume = 1) {
-      System.Api.World.PlaySoundAt(sound, player.Entity, randomizePitch: randomizePitch, range: range, volume: volume);
+      Api.World.PlaySoundAt(sound, player.Entity, randomizePitch: randomizePitch, range: range, volume: volume);
     }
   }
 }

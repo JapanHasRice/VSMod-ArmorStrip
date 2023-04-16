@@ -19,18 +19,18 @@ namespace DoffAndDonAgain.Server {
       { EnumActionType.Swap, 0f }
     };
 
-    public TransferHandler(DoffAndDonSystem system) {
-      if (system.Side != EnumAppSide.Server) {
-        system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(TransferHandler));
+    public TransferHandler(DoffAndDonSystem doffAndDonSystem) {
+      if (doffAndDonSystem.Side != EnumAppSide.Server) {
+        doffAndDonSystem.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(TransferHandler));
         return;
       }
-      LoadServerSettings(system.Api);
+      LoadServerSettings(doffAndDonSystem.Api);
 
-      system.Event.OnServerReceivedDoffRequest += OnDoffRequest;
-      system.Event.OnServerReceivedDonRequest += OnDonRequest;
-      system.Event.OnServerReceivedSwapRequest += OnSwapRequest;
+      doffAndDonSystem.OnServerReceivedDoffRequest += OnDoffRequest;
+      doffAndDonSystem.OnServerReceivedDonRequest += OnDonRequest;
+      doffAndDonSystem.OnServerReceivedSwapRequest += OnSwapRequest;
 
-      system.Event.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
+      doffAndDonSystem.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
     }
 
     protected void LoadServerSettings(ICoreAPI api) {
@@ -62,7 +62,7 @@ namespace DoffAndDonAgain.Server {
       SaturationRequired[EnumActionType.Swap] = serverSettings.SaturationCostPerSwap.Value;
     }
 
-    protected void OnDoffRequest(ArmorActionEventArgs eventArgs) {
+    protected void OnDoffRequest(DoffAndDonEventArgs eventArgs) {
       eventArgs.ErrorCode = Constants.ERROR_UNDOFFABLE; // Setting default error code
       switch (eventArgs.TargetType) {
         case EnumTargetType.Nothing:
@@ -74,17 +74,17 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void OnDonRequest(ArmorActionEventArgs eventArgs) {
+    protected void OnDonRequest(DoffAndDonEventArgs eventArgs) {
       eventArgs.ErrorCode = Constants.ERROR_UNDONNABLE; // Setting default error code
       TryDonFromEntity(eventArgs);
     }
 
-    protected void OnSwapRequest(ArmorActionEventArgs eventArgs) {
+    protected void OnSwapRequest(DoffAndDonEventArgs eventArgs) {
       eventArgs.ErrorCode = Constants.ERROR_COULD_NOT_SWAP;
       TryToSwapWithEntity(eventArgs);
     }
 
-    protected void TryDoffToGround(ArmorActionEventArgs eventArgs) {
+    protected void TryDoffToGround(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToGroundEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_DOFF_GROUND_DISABLED;
@@ -94,7 +94,7 @@ namespace DoffAndDonAgain.Server {
       DoffArmorToGround(eventArgs);
     }
 
-    protected void TryDoffToEntity(ArmorActionEventArgs eventArgs) {
+    protected void TryDoffToEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToArmorStandEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_DOFF_STAND_DISABLED;
@@ -117,7 +117,7 @@ namespace DoffAndDonAgain.Server {
       DoffToEntity(eventArgs, targetEntity);
     }
 
-    protected void TryDonFromEntity(ArmorActionEventArgs eventArgs) {
+    protected void TryDonFromEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDonArmorEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
@@ -140,7 +140,7 @@ namespace DoffAndDonAgain.Server {
       DonFromEntity(eventArgs, targetEntity);
     }
 
-    protected void TryToSwapWithEntity(ArmorActionEventArgs eventArgs) {
+    protected void TryToSwapWithEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsSwapEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
@@ -165,13 +165,13 @@ namespace DoffAndDonAgain.Server {
       Swap(eventArgs, eventArgs.ForPlayer.GetClothingSlots(), targetEntity.GetClothingSlots());
     }
 
-    protected void DoffArmorToGround(ArmorActionEventArgs eventArgs) {
+    protected void DoffArmorToGround(DoffAndDonEventArgs eventArgs) {
       foreach (var playerArmorSlot in eventArgs.ForPlayer.GetArmorSlots()) {
         DoffToGround(eventArgs, playerArmorSlot);
       }
     }
 
-    protected void DoffToGround(ArmorActionEventArgs eventArgs, ItemSlot slot) {
+    protected void DoffToGround(DoffAndDonEventArgs eventArgs, ItemSlot slot) {
       var armor = slot.Itemstack?.Collectible as ItemWearable;
       bool armorDropped = eventArgs.ForPlayer.InventoryManager.DropItem(slot, true);
       eventArgs.Successful |= armorDropped;
@@ -181,18 +181,18 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void DoffToEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
+    protected void DoffToEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
       Transfer(eventArgs, eventArgs.ForPlayer.GetArmorSlots(), targetEntity.GetArmorSlots(), dropExcessToGround: true);
       Transfer(eventArgs, eventArgs.ForPlayer.GetClothingSlots(), targetEntity.GetClothingSlots());
     }
 
-    protected void DonFromEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
+    protected void DonFromEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
       Transfer(eventArgs, targetEntity.GetArmorSlots(), eventArgs.ForPlayer.GetArmorSlots());
       Transfer(eventArgs, targetEntity.GetClothingSlots(), eventArgs.ForPlayer.GetClothingSlots());
       DonMiscFromEntity(eventArgs, targetEntity);
     }
 
-    protected void Transfer(ArmorActionEventArgs eventArgs, List<ItemSlot> fromSlots, List<ItemSlot> toSlots, bool dropExcessToGround = false) {
+    protected void Transfer(DoffAndDonEventArgs eventArgs, List<ItemSlot> fromSlots, List<ItemSlot> toSlots, bool dropExcessToGround = false) {
       foreach (var sourceSlot in fromSlots) {
         if (sourceSlot.Empty) {
           continue;
@@ -217,7 +217,7 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void DonMiscFromEntity(ArmorActionEventArgs eventArgs, EntityAgent targetEntity) {
+    protected void DonMiscFromEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
       if (!IsDonToolEnabled) { return; }
 
       foreach (var sourceSlot in targetEntity.GetMiscDonFromSlots()) {
@@ -239,7 +239,7 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void Swap(ArmorActionEventArgs eventArgs, List<ItemSlot> slots, List<ItemSlot> otherSlots) {
+    protected void Swap(DoffAndDonEventArgs eventArgs, List<ItemSlot> slots, List<ItemSlot> otherSlots) {
       foreach (var slot in slots) {
         bool swapped = false;
         foreach (var otherSlot in otherSlots) {
@@ -262,7 +262,7 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
-    protected void OnAfterServerHandledRequest(ArmorActionEventArgs eventArgs) {
+    protected void OnAfterServerHandledRequest(DoffAndDonEventArgs eventArgs) {
       if (eventArgs.Successful) {
         eventArgs.ForPlayer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationRequired[eventArgs.ActionType]);
       }
