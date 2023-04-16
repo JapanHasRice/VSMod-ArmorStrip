@@ -40,9 +40,6 @@ namespace DoffAndDonAgain {
     [ProtoMember(6)]
     public string[] ErrorArgs { get; set; } = new string[0];
 
-    [ProtoMember(7)]
-    public bool DoffExcessToGround { get; set; } = false;
-
     public IServerPlayer ForPlayer { get; set; } = null;
 
     public List<ItemWearable> MovedArmor { get; } = new List<ItemWearable>();

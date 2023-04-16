@@ -16,11 +16,11 @@ namespace DoffAndDonAgain {
 
     public ICoreClientAPI ClientAPI { get; private set; }
     public IClientNetworkChannel ClientChannel { get; private set; }
-    public ArmorManipulationInputHandler ArmorManipulationInputHandler { get; private set; }
+    public InputHandler InputHandler { get; private set; }
 
     public ICoreServerAPI ServerAPI { get; private set; }
     public IServerNetworkChannel ServerChannel { get; private set; }
-    public ArmorTransferHandler ArmorTransferHandler { get; private set; }
+    public TransferHandler TransferHandler { get; private set; }
 
     public override void Start(ICoreAPI api) {
       base.Start(api);
@@ -39,7 +39,7 @@ namespace DoffAndDonAgain {
       ClientAPI = api;
       ClientChannel = api.Network.GetChannel(Constants.MOD_ID);
 
-      ArmorManipulationInputHandler = new ArmorManipulationInputHandler(this);
+      InputHandler = new InputHandler(this);
     }
 
     public override void StartServerSide(ICoreServerAPI api) {
@@ -48,7 +48,7 @@ namespace DoffAndDonAgain {
       ServerAPI = api;
       ServerChannel = api.Network.GetChannel(Constants.MOD_ID);
 
-      ArmorTransferHandler = new ArmorTransferHandler(this);
+      TransferHandler = new TransferHandler(this);
     }
   }
 }

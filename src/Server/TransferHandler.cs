@@ -4,7 +4,7 @@ using Vintagestory.API.Common;
 using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
-  public class ArmorTransferHandler {
+  public class TransferHandler {
     protected bool IsDoffToGroundEnabled { get; set; } = true;
     protected bool IsDoffToArmorStandEnabled { get; set; } = true;
     protected bool IsDropExcessWhenDoffingToStandEnabled { get; set; } = false;
@@ -19,9 +19,9 @@ namespace DoffAndDonAgain.Server {
       { EnumActionType.Swap, 0f }
     };
 
-    public ArmorTransferHandler(DoffAndDonSystem system) {
+    public TransferHandler(DoffAndDonSystem system) {
       if (system.Side != EnumAppSide.Server) {
-        system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(ArmorTransferHandler));
+        system.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(TransferHandler));
         return;
       }
       LoadServerSettings(system.Api);
@@ -36,7 +36,7 @@ namespace DoffAndDonAgain.Server {
     protected void LoadServerSettings(ICoreAPI api) {
       var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
       if (configSystem == null) {
-        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(ArmorTransferHandler), nameof(DoffAndDonConfigurationSystem));
+        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(TransferHandler), nameof(DoffAndDonConfigurationSystem));
         LoadServerSettings(new DoffAndDonServerConfig());
         return;
       }
@@ -211,7 +211,7 @@ namespace DoffAndDonAgain.Server {
           }
         }
 
-        if (dropExcessToGround && !itemMoved && IsDropExcessWhenDoffingToStandEnabled && eventArgs.DoffExcessToGround) {
+        if (dropExcessToGround && !itemMoved && IsDropExcessWhenDoffingToStandEnabled) {
           DoffToGround(eventArgs, sourceSlot);
         }
       }

@@ -4,7 +4,7 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 
 namespace DoffAndDonAgain.Client {
-  public class ArmorManipulationInputHandler {
+  public class InputHandler {
     protected DoffAndDonSystem System { get; }
     protected IClientPlayer Player => System.ClientAPI.World.Player;
     protected EntityPlayer PlayerEntity => Player.Entity;
@@ -27,9 +27,9 @@ namespace DoffAndDonAgain.Client {
       { EnumActionType.Swap, 0f }
     };
 
-    public ArmorManipulationInputHandler(DoffAndDonSystem system) {
+    public InputHandler(DoffAndDonSystem system) {
       if (system.Side != EnumAppSide.Client) {
-        system.Api.Logger.Warning("{0} is a client object instantiated on the server, ignoring.", nameof(ArmorManipulationInputHandler));
+        system.Api.Logger.Warning("{0} is a client object instantiated on the server, ignoring.", nameof(InputHandler));
         return;
       }
       System = system;
@@ -56,7 +56,7 @@ namespace DoffAndDonAgain.Client {
     protected void LoadServerSettings(ICoreAPI api) {
       var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
       if (configSystem == null) {
-        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(ArmorManipulationInputHandler), nameof(DoffAndDonConfigurationSystem));
+        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(InputHandler), nameof(DoffAndDonConfigurationSystem));
         LoadServerSettings(new DoffAndDonServerConfig());
         return;
       }
