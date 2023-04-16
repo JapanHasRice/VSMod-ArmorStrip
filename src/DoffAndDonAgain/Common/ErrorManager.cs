@@ -1,16 +1,17 @@
+using Vintagestory.API.Client;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 
 namespace DoffAndDonAgain.Common {
   public class ErrorManager {
-    private DoffAndDonSystem System { get; }
+    private ICoreClientAPI capi { get; }
     private readonly string langPrefix = $"{Constants.MOD_ID}:";
-    public ErrorManager(DoffAndDonSystem system) {
-      System = system;
-      system.Event.OnAfterInput += OnAfterInput;
+    public ErrorManager(DoffAndDonSystem doffAndDonSystem) {
+      capi = doffAndDonSystem.ClientAPI;
+      doffAndDonSystem.OnAfterInput += OnAfterInput;
     }
 
-    private void OnAfterInput(ArmorActionEventArgs eventArgs) {
+    private void OnAfterInput(DoffAndDonEventArgs eventArgs) {
       if (eventArgs.Successful) {
         return;
       }
@@ -18,7 +19,7 @@ namespace DoffAndDonAgain.Common {
       TriggerFromClient(eventArgs.ErrorCode, eventArgs.ErrorArgs);
     }
 
-    private void OnAfterServerHandledRequest(ArmorActionEventArgs eventArgs) {
+    private void OnAfterServerHandledRequest(DoffAndDonEventArgs eventArgs) {
       if (eventArgs.Successful) {
         return;
       }
@@ -27,7 +28,7 @@ namespace DoffAndDonAgain.Common {
     }
 
     public void TriggerFromClient(string errorCode, params object[] args) {
-      System.ClientAPI?.TriggerIngameError(System, errorCode, GetErrorText(errorCode, args));
+      capi?.TriggerIngameError(this, errorCode, GetErrorText(errorCode, args));
     }
 
     public void TriggerFromServer(string errorCode, IServerPlayer forPlayer, params object[] args) {

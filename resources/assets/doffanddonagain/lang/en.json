@@ -2,8 +2,9 @@
   "Need both hands free.": "Need both hands free.",
   "Need at least 1 free hand.": "Need at least 1 free hand.",
 
-  "Need to be targeting an armor stand.": "Need to be targeting an armor stand.",
-  "Server could not locate the targeted armor stand.": "Server could not locate the targeted armor stand.",
+  "Cannot target players for {0}.": "Cannot target players for {0}.",
+  "Need to be targeting something to {0}.": "Need to be targeting something to {0}.",
+  "Server could not locate the targeted entity.": "Server could not locate the targeted entity.",
 
   "Nothing to doff or the armor stand does not have room.": "Nothing to doff or the armor stand does not have room.",
   "Nothing to don or you do not have room.": "Nothing to don or you do not have room.",

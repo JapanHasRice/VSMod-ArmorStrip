@@ -2,19 +2,18 @@ using System.Collections.Generic;
 using DoffAndDonAgain.Common;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Client {
-  public class ArmorManipulationInputHandler {
+  public class InputHandler {
     protected DoffAndDonSystem System { get; }
     protected IClientPlayer Player => System.ClientAPI.World.Player;
     protected EntityPlayer PlayerEntity => Player.Entity;
     protected bool IsLeftHandEmpty => PlayerEntity.LeftHandItemSlot.Empty;
     protected bool IsRightHandEmpty => PlayerEntity.RightHandItemSlot.Empty;
-    protected long? TargetedArmorStandEntityId => (Player.CurrentEntitySelection?.Entity as EntityArmorStand)?.EntityId;
+    protected EntityAgent TargetedEntityAgent => Player.CurrentEntitySelection?.Entity as EntityAgent;
 
     protected bool IsDoffToGroundEnabled { get; set; } = true;
-    protected bool IsDoffToArmorStandEnabled { get; set; } = true;
+    protected bool IsDoffToEntityEnabled { get; set; } = true;
     protected bool IsDonEnabled { get; set; } = true;
     protected bool IsSwapEnabled { get; set; } = true;
     protected Dictionary<EnumActionType, int> HandsRequired { get; set; } = new Dictionary<EnumActionType, int> {
@@ -28,36 +27,37 @@ namespace DoffAndDonAgain.Client {
       { EnumActionType.Swap, 0f }
     };
 
-    public ArmorManipulationInputHandler(DoffAndDonSystem system) {
-      if (system.Side != EnumAppSide.Client) {
-        system.Api.Logger.Warning("{0} is a client object instantiated on the server, ignoring.", nameof(ArmorManipulationInputHandler));
+    public InputHandler(DoffAndDonSystem doffAndDonSystem) {
+      if (doffAndDonSystem.Side != EnumAppSide.Client) {
+        doffAndDonSystem.Api.Logger.Warning("{0} is a client object instantiated on the server, ignoring.", nameof(InputHandler));
         return;
       }
-      System = system;
+      System = doffAndDonSystem;
 
-      LoadServerSettings(system.Api);
-      RegisterHotKeys(system.ClientAPI.Input, system.Event);
+      LoadServerSettings(doffAndDonSystem.Api);
+      RegisterHotKeys(doffAndDonSystem);
 
-      system.Event.OnDoffKeyPressed += OnDoffKeyPressed;
-      system.Event.OnDonKeyPressed += OnDonKeyPressed;
-      system.Event.OnSwapKeyPressed += OnSwapKeyPressed;
+      doffAndDonSystem.OnDoffKeyPressed += OnDoffKeyPressed;
+      doffAndDonSystem.OnDonKeyPressed += OnDonKeyPressed;
+      doffAndDonSystem.OnSwapKeyPressed += OnSwapKeyPressed;
     }
 
-    protected void RegisterHotKeys(IInputAPI input, DoffAndDonEventApi eventApi) {
+    protected void RegisterHotKeys(DoffAndDonSystem doffAndDonSystem) {
+      var input = doffAndDonSystem.ClientAPI.Input;
       input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
-      input.SetHotKeyHandler(Constants.DOFF_CODE, eventApi.TriggerDoffKeyPressed);
+      input.SetHotKeyHandler(Constants.DOFF_CODE, doffAndDonSystem.TriggerDoffKeyPressed);
 
       input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
-      input.SetHotKeyHandler(Constants.DON_CODE, eventApi.TriggerDonKeyPressed);
+      input.SetHotKeyHandler(Constants.DON_CODE, doffAndDonSystem.TriggerDonKeyPressed);
 
       input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
-      input.SetHotKeyHandler(Constants.SWAP_CODE, eventApi.TriggerSwapKeyPressed);
+      input.SetHotKeyHandler(Constants.SWAP_CODE, doffAndDonSystem.TriggerSwapKeyPressed);
     }
 
     protected void LoadServerSettings(ICoreAPI api) {
       var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
       if (configSystem == null) {
-        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(ArmorManipulationInputHandler), nameof(DoffAndDonConfigurationSystem));
+        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(InputHandler), nameof(DoffAndDonConfigurationSystem));
         LoadServerSettings(new DoffAndDonServerConfig());
         return;
       }
@@ -70,7 +70,7 @@ namespace DoffAndDonAgain.Client {
 
     protected void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
       IsDoffToGroundEnabled = serverSettings.EnableDoffToGround.Value;
-      IsDoffToArmorStandEnabled = serverSettings.EnableDoffToArmorStand.Value;
+      IsDoffToEntityEnabled = serverSettings.EnableDoffToArmorStand.Value;
 
       IsDonEnabled = serverSettings.EnableDon.Value;
 
@@ -85,37 +85,38 @@ namespace DoffAndDonAgain.Client {
       SaturationRequired[EnumActionType.Swap] = serverSettings.SaturationCostPerSwap.Value;
     }
 
-    protected void OnDoffKeyPressed(ref ArmorActionEventArgs eventArgs) {
+    protected void OnDoffKeyPressed(DoffAndDonEventArgs eventArgs) {
       eventArgs.Successful = VerifyDoffEnabled(eventArgs)
                              && VerifyEnoughHandsFree(eventArgs)
                              && VerifyEnoughSaturation(eventArgs);
     }
 
-    protected void OnDonKeyPressed(ref ArmorActionEventArgs eventArgs) {
+    protected void OnDonKeyPressed(DoffAndDonEventArgs eventArgs) {
       eventArgs.Successful = VerifyDonEnabled(eventArgs)
-                             && VerifyTargetingArmorStand(eventArgs)
+                             && VerifyTargetEntityIsValid(eventArgs)
                              && VerifyEnoughHandsFree(eventArgs)
                              && VerifyEnoughSaturation(eventArgs);
     }
 
-    protected void OnSwapKeyPressed(ref ArmorActionEventArgs eventArgs) {
+    protected void OnSwapKeyPressed(DoffAndDonEventArgs eventArgs) {
       eventArgs.Successful = VerifySwapEnabled(eventArgs)
-                             && VerifyTargetingArmorStand(eventArgs)
+                             && VerifyTargetEntityIsValid(eventArgs)
                              && VerifyEnoughHandsFree(eventArgs)
                              && VerifyEnoughSaturation(eventArgs);
     }
 
-    protected bool VerifyDoffEnabled(ArmorActionEventArgs eventArgs) {
-      eventArgs.ArmorStandEntityId = TargetedArmorStandEntityId;
-      if (eventArgs.ArmorStandEntityId == null) {
+    protected bool VerifyDoffEnabled(DoffAndDonEventArgs eventArgs) {
+      eventArgs.TargetEntityAgentId = TargetedEntityAgent?.EntityId;
+      if (eventArgs.TargetEntityAgentId == null) {
         eventArgs.TargetType = EnumTargetType.Nothing;
         return VerifyDoffToGroundEnabled(eventArgs);
       }
-      eventArgs.TargetType = EnumTargetType.ArmorStand;
-      return VerifyDoffToArmorStandEnabled(eventArgs);
+
+      eventArgs.TargetType = EnumTargetType.EntityAgent;
+      return VerifyDoffToEntityEnabled(eventArgs);
     }
 
-    protected bool VerifyDoffToGroundEnabled(ArmorActionEventArgs eventArgs) {
+    protected bool VerifyDoffToGroundEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToGroundEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_DOFF_GROUND_DISABLED;
         return false;
@@ -123,15 +124,15 @@ namespace DoffAndDonAgain.Client {
       return true;
     }
 
-    protected bool VerifyDoffToArmorStandEnabled(ArmorActionEventArgs eventArgs) {
-      if (!IsDoffToArmorStandEnabled) {
+    protected bool VerifyDoffToEntityEnabled(DoffAndDonEventArgs eventArgs) {
+      if (!IsDoffToEntityEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_DOFF_STAND_DISABLED;
         return false;
       }
       return true;
     }
 
-    protected bool VerifyDonEnabled(ArmorActionEventArgs eventArgs) {
+    protected bool VerifyDonEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDonEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
         return false;
@@ -139,7 +140,7 @@ namespace DoffAndDonAgain.Client {
       return true;
     }
 
-    protected bool VerifySwapEnabled(ArmorActionEventArgs eventArgs) {
+    protected bool VerifySwapEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsSwapEnabled) {
         eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
         return false;
@@ -147,7 +148,7 @@ namespace DoffAndDonAgain.Client {
       return true;
     }
 
-    protected bool VerifyEnoughHandsFree(ArmorActionEventArgs eventArgs) {
+    protected bool VerifyEnoughHandsFree(DoffAndDonEventArgs eventArgs) {
       switch (HandsRequired[eventArgs.ActionType]) {
         case 2:
           return VerifyBothHandsFree(eventArgs);
@@ -158,28 +159,31 @@ namespace DoffAndDonAgain.Client {
       }
     }
 
-    protected bool VerifyBothHandsFree(ArmorActionEventArgs eventArgs) {
-      if (!IsLeftHandEmpty && IsRightHandEmpty) {
-        eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
-        return false;
+    protected bool VerifyBothHandsFree(DoffAndDonEventArgs eventArgs) {
+      if (IsLeftHandEmpty && IsRightHandEmpty) {
+        return true;
       }
-      return true;
+
+      eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
+      return false;
     }
 
-    protected bool VerifyOneHandFree(ArmorActionEventArgs eventArgs) {
-      if (!IsRightHandEmpty || IsLeftHandEmpty) {
-        eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
-        return false;
+    protected bool VerifyOneHandFree(DoffAndDonEventArgs eventArgs) {
+      if (IsRightHandEmpty || IsLeftHandEmpty) {
+        return true;
       }
-      return true;
+
+      eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
+      return false;
     }
 
-    protected bool LookMomNoHands(ArmorActionEventArgs eventArgs) => true;
+    protected bool LookMomNoHands(DoffAndDonEventArgs eventArgs) => true;
 
-    protected bool VerifyEnoughSaturation(ArmorActionEventArgs eventArgs) {
-      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
+    protected bool VerifyEnoughSaturation(DoffAndDonEventArgs eventArgs) {
       var requiredSaturation = SaturationRequired[eventArgs.ActionType];
-      var currentSaturation = PlayerEntity.GetBehavior<EntityBehaviorHunger>()?.Saturation ?? requiredSaturation;
+      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
+      // Current saturation does not utilize EntityBehaviorHunger because that behavior is server-side only
+      float currentSaturation = Player.Entity.WatchedAttributes.GetTreeAttribute("hunger")?.TryGetFloat("currentsaturation") ?? requiredSaturation;
       if (currentSaturation < requiredSaturation) {
         eventArgs.ErrorCode = Constants.ERROR_SATURATION;
         eventArgs.ErrorArgs = new string[] { requiredSaturation.ToString() };
@@ -188,13 +192,21 @@ namespace DoffAndDonAgain.Client {
       return true;
     }
 
-    protected bool VerifyTargetingArmorStand(ArmorActionEventArgs eventArgs) {
-      eventArgs.ArmorStandEntityId = TargetedArmorStandEntityId;
-      if (eventArgs.ArmorStandEntityId == null) {
-        eventArgs.ErrorCode = Constants.ERROR_MISSING_ARMOR_STAND_TARGET;
+    protected bool VerifyTargetEntityIsValid(DoffAndDonEventArgs eventArgs) {
+      if (TargetedEntityAgent == null) {
+        eventArgs.ErrorCode = Constants.ERROR_MUST_TARGET_ENTITY;
+        eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString() };
         return false;
       }
-      return true;
+
+      if (TargetedEntityAgent is EntityPlayer) {
+        eventArgs.ErrorCode = Constants.ERROR_INVALID_ENTITY_TARGET;
+        eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString(), TargetedEntityAgent.GetName() };
+        return false;
+      }
+
+      eventArgs.TargetEntityAgentId = TargetedEntityAgent.EntityId;
+      return TargetedEntityAgent.CanBeTargetedFor(eventArgs.ActionType);
     }
   }
 }
