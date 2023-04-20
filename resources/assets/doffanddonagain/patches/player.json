@@ -2,7 +2,11 @@
   {
     "op": "add",
     "path": "/client/behaviors/-",
-    "value": { "code": "doffanddonnable" },
+    "value": {
+      "code": "doffanddonnable",
+      "armorSlotIds": [ 12, 13, 14 ],
+      "clothingSlotIds": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]
+    },
     "file": "game:entities/humanoid/player.json"
   },
   {

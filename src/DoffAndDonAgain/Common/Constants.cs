@@ -20,7 +20,7 @@ namespace DoffAndDonAgain.Common {
     public const string ERROR_BOTH_HANDS = "Need both hands free.";
     public const string ERROR_ONE_HAND = "Need at least 1 free hand.";
     public const string ERROR_SATURATION = "Not enough satiety, need at least {0}.";
-    public const string ERROR_INVALID_ENTITY_TARGET = "Cannot perform {0} on {1}.";
+    public const string ERROR_INVALID_ENTITY_TARGET = "Cannot {0} with {1}.";
     public const string ERROR_MUST_TARGET_ENTITY = "Need to be targeting something to {0}.";
     public const string ERROR_TARGET_LOST = "Server could not locate the targeted entity.";
     public const string ERROR_UNDOFFABLE = "Nothing to doff or the target cannot take the items.";

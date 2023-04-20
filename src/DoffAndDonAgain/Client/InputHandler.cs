@@ -199,14 +199,14 @@ namespace DoffAndDonAgain.Client {
         return false;
       }
 
-      if (TargetedEntityAgent is EntityPlayer) {
+      eventArgs.TargetEntityAgentId = TargetedEntityAgent.EntityId;
+      if (!TargetedEntityAgent.CanBeTargetedFor(eventArgs.ActionType)) {
         eventArgs.ErrorCode = Constants.ERROR_INVALID_ENTITY_TARGET;
         eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString(), TargetedEntityAgent.GetName() };
         return false;
       }
 
-      eventArgs.TargetEntityAgentId = TargetedEntityAgent.EntityId;
-      return TargetedEntityAgent.CanBeTargetedFor(eventArgs.ActionType);
+      return true;
     }
   }
 }

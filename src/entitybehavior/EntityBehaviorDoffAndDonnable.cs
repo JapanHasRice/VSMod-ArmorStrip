@@ -11,9 +11,9 @@ namespace DoffAndDonAgain {
     protected int[] clothingSlotIds;
     protected int[] miscDonFromSlotIds;
 
-    public List<ItemSlot> ArmorSlots;
-    public List<ItemSlot> ClothingSlots;
-    public List<ItemSlot> MiscDonFromSlots;
+    public List<ItemSlot> ArmorSlots = new List<ItemSlot>();
+    public List<ItemSlot> ClothingSlots = new List<ItemSlot>();
+    public List<ItemSlot> MiscDonFromSlots = new List<ItemSlot>();
 
     public EntityBehaviorDoffAndDonnable(Entity entity) : base(entity) { }
 
@@ -85,7 +85,17 @@ namespace DoffAndDonAgain {
     }
 
     public bool CanBeTargetedFor(EnumActionType actionType) {
-      return true;
+      if (entity is EntityPlayer) {
+        return false;
+      }
+
+      int wearableCount = ArmorSlots.Count + ClothingSlots.Count;
+      switch (actionType) {
+        case EnumActionType.Don:
+          return wearableCount + MiscDonFromSlots.Count > 0;
+        default:
+          return wearableCount > 0;
+      }
     }
   }
 

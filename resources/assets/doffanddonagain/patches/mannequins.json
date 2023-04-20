@@ -1,0 +1,30 @@
+[
+  {
+    "op": "add",
+    "path": "/client/behaviors/-",
+    "value": {
+      "code": "doffanddonnable",
+      "armorSlotIds": [ 12, 13, 14 ],
+      "clothingSlotIds": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "miscDonFromSlotIds": [ 16, 15, 17]
+    },
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/server/behaviors/-",
+    "value": {
+      "code": "doffanddonnable",
+      "armorSlotIds": [ 12, 13, 14 ],
+      "clothingSlotIds": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "miscDonFromSlotIds": [ 16, 15, 17]
+    },
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ]
+  }
+]
