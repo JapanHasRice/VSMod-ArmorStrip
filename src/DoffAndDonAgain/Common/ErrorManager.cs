@@ -9,6 +9,7 @@ namespace DoffAndDonAgain.Common {
     public ErrorManager(DoffAndDonSystem doffAndDonSystem) {
       capi = doffAndDonSystem.ClientAPI;
       doffAndDonSystem.OnAfterInput += OnAfterInput;
+      doffAndDonSystem.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
     }
 
     private void OnAfterInput(DoffAndDonEventArgs eventArgs) {
