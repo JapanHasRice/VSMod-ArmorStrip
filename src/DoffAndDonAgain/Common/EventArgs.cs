@@ -35,9 +35,16 @@ namespace DoffAndDonAgain.Common {
     public bool Successful { get; set; } = false;
 
     [ProtoMember(5)]
-    public string ErrorCode { get; set; } = "";
+    public int[] ClientArmorSlotIds { get; set; } = new int[0];
 
     [ProtoMember(6)]
+    public int[] ClientClothingSlotIds { get; set; } = new int[0];
+
+    [ProtoMember(7)]
+    public int[] ClientMiscDonFromSlotIds { get; set; } = new int[0];
+
+    public string ErrorCode { get; set; } = "";
+
     public string[] ErrorArgs { get; set; } = new string[0];
 
     public IServerPlayer ForPlayer { get; set; } = null;

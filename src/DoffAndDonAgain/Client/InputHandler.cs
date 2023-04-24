@@ -16,24 +16,18 @@ namespace DoffAndDonAgain.Client {
     protected bool IsDoffToEntityEnabled { get; set; } = true;
     protected bool IsDonEnabled { get; set; } = true;
     protected bool IsSwapEnabled { get; set; } = true;
-    protected Dictionary<EnumActionType, int> HandsRequired { get; set; } = new Dictionary<EnumActionType, int> {
-      { EnumActionType.Doff, 0 },
-      { EnumActionType.Don, 0 },
-      { EnumActionType.Swap, 0 }
-    };
-    protected Dictionary<EnumActionType, float> SaturationRequired { get; set; } = new Dictionary<EnumActionType, float> {
-      { EnumActionType.Doff, 0f },
-      { EnumActionType.Don, 0f },
-      { EnumActionType.Swap, 0f }
-    };
+    protected Dictionary<int, ActionConsumable<DoffAndDonEventArgs>> HandsRequiredDictionary { get; set; } = new Dictionary<int, ActionConsumable<DoffAndDonEventArgs>>();
+    protected int HandsRequired = 2;
 
     public InputHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Client) {
-        doffAndDonSystem.Api.Logger.Warning("{0} is a client object instantiated on the server, ignoring.", nameof(InputHandler));
-        return;
+        throw new System.Exception($"Tried to create an instance of {nameof(InputHandler)} Server-side or without a valid {nameof(ICoreAPI)} reference.");
       }
       System = doffAndDonSystem;
 
+      HandsRequiredDictionary.Add(0, LookMomNoHands);
+      HandsRequiredDictionary.Add(1, VerifyOneHandFree);
+      HandsRequiredDictionary.Add(2, VerifyBothHandsFree);
       LoadServerSettings(doffAndDonSystem.Api);
       RegisterHotKeys(doffAndDonSystem);
 
@@ -55,54 +49,25 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected void LoadServerSettings(ICoreAPI api) {
-      var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
-      if (configSystem == null) {
-        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(InputHandler), nameof(DoffAndDonConfigurationSystem));
-        LoadServerSettings(new DoffAndDonServerConfig());
-        return;
-      }
-
-      configSystem.ServerSettingsReceived += LoadServerSettings;
-      if (configSystem.ServerSettings != null) {
-        LoadServerSettings(configSystem.ServerSettings);
-      }
-    }
-
-    protected void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
-      IsDoffToGroundEnabled = serverSettings.EnableDoffToGround.Value;
-      IsDoffToEntityEnabled = serverSettings.EnableDoffToArmorStand.Value;
-
-      IsDonEnabled = serverSettings.EnableDon.Value;
-
-      IsSwapEnabled = serverSettings.EnableSwap.Value;
-
-      HandsRequired[EnumActionType.Doff] = serverSettings.HandsNeededToDoff.Value;
-      HandsRequired[EnumActionType.Don] = serverSettings.HandsNeededToDon.Value;
-      HandsRequired[EnumActionType.Swap] = serverSettings.HandsNeededToSwap.Value;
-
-      SaturationRequired[EnumActionType.Doff] = serverSettings.SaturationCostPerDoff.Value;
-      SaturationRequired[EnumActionType.Don] = serverSettings.SaturationCostPerDon.Value;
-      SaturationRequired[EnumActionType.Swap] = serverSettings.SaturationCostPerSwap.Value;
+      var worldConfig = api.World.Config;
+      HandsRequired = worldConfig.GetInt("doffanddon-HandsNeeded", 2);
     }
 
     protected void OnDoffKeyPressed(DoffAndDonEventArgs eventArgs) {
       eventArgs.Successful = VerifyDoffEnabled(eventArgs)
-                             && VerifyEnoughHandsFree(eventArgs)
-                             && VerifyEnoughSaturation(eventArgs);
+                             && VerifyEnoughHandsFree(eventArgs);
     }
 
     protected void OnDonKeyPressed(DoffAndDonEventArgs eventArgs) {
       eventArgs.Successful = VerifyDonEnabled(eventArgs)
                              && VerifyTargetEntityIsValid(eventArgs)
-                             && VerifyEnoughHandsFree(eventArgs)
-                             && VerifyEnoughSaturation(eventArgs);
+                             && VerifyEnoughHandsFree(eventArgs);
     }
 
     protected void OnSwapKeyPressed(DoffAndDonEventArgs eventArgs) {
       eventArgs.Successful = VerifySwapEnabled(eventArgs)
                              && VerifyTargetEntityIsValid(eventArgs)
-                             && VerifyEnoughHandsFree(eventArgs)
-                             && VerifyEnoughSaturation(eventArgs);
+                             && VerifyEnoughHandsFree(eventArgs);
     }
 
     protected bool VerifyDoffEnabled(DoffAndDonEventArgs eventArgs) {
@@ -113,7 +78,7 @@ namespace DoffAndDonAgain.Client {
       }
 
       eventArgs.TargetType = EnumTargetType.EntityAgent;
-      return VerifyDoffToEntityEnabled(eventArgs);
+      return VerifyDoffToEntityEnabled(eventArgs) && VerifyTargetEntityIsValid(eventArgs);
     }
 
     protected bool VerifyDoffToGroundEnabled(DoffAndDonEventArgs eventArgs) {
@@ -149,14 +114,10 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool VerifyEnoughHandsFree(DoffAndDonEventArgs eventArgs) {
-      switch (HandsRequired[eventArgs.ActionType]) {
-        case 2:
-          return VerifyBothHandsFree(eventArgs);
-        case 1:
-          return VerifyOneHandFree(eventArgs);
-        default:
-          return LookMomNoHands(eventArgs);
+      if (!HandsRequiredDictionary.TryGetValue(HandsRequired, out var VerifyMethod)) {
+        VerifyMethod = VerifyBothHandsFree;
       }
+      return VerifyMethod(eventArgs);
     }
 
     protected bool VerifyBothHandsFree(DoffAndDonEventArgs eventArgs) {
@@ -178,19 +139,6 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool LookMomNoHands(DoffAndDonEventArgs eventArgs) => true;
-
-    protected bool VerifyEnoughSaturation(DoffAndDonEventArgs eventArgs) {
-      var requiredSaturation = SaturationRequired[eventArgs.ActionType];
-      // If satiety can't be read or is disabled for any reason, give the benefit of doubt and pass the check.
-      // Current saturation does not utilize EntityBehaviorHunger because that behavior is server-side only
-      float currentSaturation = Player.Entity.WatchedAttributes.GetTreeAttribute("hunger")?.TryGetFloat("currentsaturation") ?? requiredSaturation;
-      if (currentSaturation < requiredSaturation) {
-        eventArgs.ErrorCode = Constants.ERROR_SATURATION;
-        eventArgs.ErrorArgs = new string[] { requiredSaturation.ToString() };
-        return false;
-      }
-      return true;
-    }
 
     protected bool VerifyTargetEntityIsValid(DoffAndDonEventArgs eventArgs) {
       if (TargetedEntityAgent == null) {

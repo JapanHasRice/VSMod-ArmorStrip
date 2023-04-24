@@ -8,7 +8,7 @@
   "authors": [ "JapanHasRice" ],
   "contributors": [ "xCoiotex" ],
   "dependencies": {
-    "game": "1.18.0-rc.6",
+    "game": "1.18.0",
     "survival": ""
   },
   "side": "Universal",

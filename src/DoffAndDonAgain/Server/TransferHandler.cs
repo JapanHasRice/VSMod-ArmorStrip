@@ -13,16 +13,11 @@ namespace DoffAndDonAgain.Server {
     protected bool ShouldDonToolOnlyToActiveHotbar { get; set; } = true;
     protected bool ShouldDonToolOnlyToHotbar { get; set; } = true;
     protected bool IsSwapEnabled { get; set; } = true;
-    protected Dictionary<EnumActionType, float> SaturationRequired { get; set; } = new Dictionary<EnumActionType, float> {
-      { EnumActionType.Doff, 0f },
-      { EnumActionType.Don, 0f },
-      { EnumActionType.Swap, 0f }
-    };
+    protected float SaturationRequired { get; set; } = 0f;
 
     public TransferHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Server) {
-        doffAndDonSystem.Api.Logger.Warning("{0} is a server object instantiated on the client, ignoring.", nameof(TransferHandler));
-        return;
+        throw new System.Exception($"Tried to create an instance of {nameof(TransferHandler)} Client-side or without a valid {nameof(ICoreAPI)} reference.");
       }
       LoadServerSettings(doffAndDonSystem.Api);
 
@@ -34,32 +29,8 @@ namespace DoffAndDonAgain.Server {
     }
 
     protected void LoadServerSettings(ICoreAPI api) {
-      var configSystem = api.ModLoader.GetModSystem<DoffAndDonConfigurationSystem>();
-      if (configSystem == null) {
-        api.Logger.Error("[{0}] {1} was not loaded. Using defaults.", nameof(TransferHandler), nameof(DoffAndDonConfigurationSystem));
-        LoadServerSettings(new DoffAndDonServerConfig());
-        return;
-      }
-
-      LoadServerSettings(configSystem.ServerSettings);
-    }
-
-    protected void LoadServerSettings(DoffAndDonServerConfig serverSettings) {
-      IsDoffToGroundEnabled = serverSettings.EnableDoffToGround.Value;
-      IsDoffToArmorStandEnabled = serverSettings.EnableDoffToArmorStand.Value;
-      IsDropExcessWhenDoffingToStandEnabled = serverSettings.DropArmorWhenDoffingToStand.Value;
-
-      IsDonArmorEnabled = serverSettings.EnableDon.Value;
-
-      IsDonToolEnabled = serverSettings.EnableToolDonning.Value;
-      ShouldDonToolOnlyToActiveHotbar = serverSettings.DonToolOnlyToActiveHotbar.Value;
-      ShouldDonToolOnlyToHotbar = serverSettings.DonToolOnlyToHotbar.Value;
-
-      IsSwapEnabled = serverSettings.EnableSwap.Value;
-
-      SaturationRequired[EnumActionType.Doff] = serverSettings.SaturationCostPerDoff.Value;
-      SaturationRequired[EnumActionType.Don] = serverSettings.SaturationCostPerDon.Value;
-      SaturationRequired[EnumActionType.Swap] = serverSettings.SaturationCostPerSwap.Value;
+      var worldConfig = api.World.Config;
+      SaturationRequired = worldConfig.GetFloat("doffanddon-SaturationCost", 0f);
     }
 
     protected void OnDoffRequest(DoffAndDonEventArgs eventArgs) {
@@ -264,7 +235,7 @@ namespace DoffAndDonAgain.Server {
 
     protected void OnAfterServerHandledRequest(DoffAndDonEventArgs eventArgs) {
       if (eventArgs.Successful) {
-        eventArgs.ForPlayer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationRequired[eventArgs.ActionType]);
+        eventArgs.ForPlayer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationRequired);
       }
     }
   }
