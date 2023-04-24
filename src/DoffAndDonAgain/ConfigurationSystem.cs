@@ -8,6 +8,22 @@ namespace DoffAndDonAgain {
   }
 
   public class ClientSettings : ClientConfig {
+    // GENERAL
+    [JsonProperty, JsonConverter(typeof(SettingConverter<int>))]
+    public Setting<int> HandsNeeded { get; set; } = new Setting<int> {
+      Default = 0,
+      Min = 0,
+      Max = 2,
+      Description = "Number of empty hands required to perform a Doff, Don, or Swap. The greatest value between the client and server configs will be used."
+    };
+
+    [JsonProperty, JsonConverter(typeof(SettingConverter<float>))]
+    public Setting<float> SaturationCost { get; set; } = new Setting<float> {
+      Default = 0f,
+      Min = 0f,
+      Description = "Amount of satiety consumed when performing a Doff, Don, or Swap. The greatest value between the client and server configs will be used."
+    };
+
     // DOFF
     [JsonProperty, JsonConverter(typeof(SettingConverter<bool>))]
     public Setting<bool> DoffArmorToGround { get; set; } = new Setting<bool> {

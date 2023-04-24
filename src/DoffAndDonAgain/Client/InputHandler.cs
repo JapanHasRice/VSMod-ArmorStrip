@@ -33,7 +33,8 @@ namespace DoffAndDonAgain.Client {
     protected bool IsSwapEnabled { get; set; }
 
     protected Dictionary<int, ActionConsumable<DoffAndDonEventArgs>> HandsRequiredDictionary { get; set; } = new Dictionary<int, ActionConsumable<DoffAndDonEventArgs>>();
-    protected int HandsRequired = 2;
+    protected int HandsNeeded { get; set; }
+    protected float SaturationCost { get; set; }
 
     public InputHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Client) {
@@ -68,7 +69,10 @@ namespace DoffAndDonAgain.Client {
       var worldConfig = api.World.Config;
       var clientSettings = api.ModLoader.GetModSystem<ConfigSystem>()?.ClientSettings ?? new ClientSettings();
 
-      HandsRequired = worldConfig.GetInt("doffanddon-HandsNeeded", 2);
+      HandsNeeded = System.Math.Max(worldConfig.GetInt("doffanddon-HandsNeeded", 2), clientSettings.HandsNeeded.Value);
+      if (clientSettings.SaturationCost.Value > worldConfig.GetFloat("doffanddon-SaturationCost", 0f)) {
+        SaturationCost = clientSettings.SaturationCost.Value;
+      }
 
       ShouldDoffArmorToGround = worldConfig.GetBool("doffanddon-DoffArmorToGround", true) && clientSettings.DoffArmorToGround.Value;
       ShouldDoffClothingToGround = worldConfig.GetBool("doffanddon-DoffClothingToGround", false) && clientSettings.DoffClothingToGround.Value;
@@ -103,6 +107,7 @@ namespace DoffAndDonAgain.Client {
                              && VerifyEnoughHandsFree(eventArgs);
       if (eventArgs.Successful) {
         SetClientDoffSlotIds(eventArgs);
+        eventArgs.SaturationCost = SaturationCost;
       }
     }
 
@@ -112,6 +117,7 @@ namespace DoffAndDonAgain.Client {
                              && VerifyEnoughHandsFree(eventArgs);
       if (eventArgs.Successful) {
         SetClientDonSlotIds(eventArgs);
+        eventArgs.SaturationCost = SaturationCost;
       }
     }
 
@@ -121,6 +127,7 @@ namespace DoffAndDonAgain.Client {
                              && VerifyEnoughHandsFree(eventArgs);
       if (eventArgs.Successful) {
         SetClientSwapSlotIds(eventArgs);
+        eventArgs.SaturationCost = SaturationCost;
       }
     }
 
@@ -168,7 +175,7 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool VerifyEnoughHandsFree(DoffAndDonEventArgs eventArgs) {
-      if (!HandsRequiredDictionary.TryGetValue(HandsRequired, out var VerifyMethod)) {
+      if (!HandsRequiredDictionary.TryGetValue(HandsNeeded, out var VerifyMethod)) {
         VerifyMethod = VerifyBothHandsFree;
       }
       return VerifyMethod(eventArgs);

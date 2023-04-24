@@ -48,6 +48,9 @@ namespace DoffAndDonAgain.Common {
     [ProtoMember(7)]
     public EnumDonMiscBehavior ClientDonMiscBehavior { get; set; }
 
+    [ProtoMember(8)]
+    public float SaturationCost { get; set; }
+
     public string ErrorCode { get; set; } = "";
 
     public string[] ErrorArgs { get; set; } = new string[0];
