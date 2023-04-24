@@ -11,9 +11,9 @@ namespace DoffAndDonAgain {
     protected int[] clothingSlotIds;
     protected int[] miscDonFromSlotIds;
 
-    public List<ItemSlot> ArmorSlots = new List<ItemSlot>();
-    public List<ItemSlot> ClothingSlots = new List<ItemSlot>();
-    public List<ItemSlot> MiscDonFromSlots = new List<ItemSlot>();
+    public List<ItemSlot> ArmorSlots = new List<ItemSlot>(3);
+    public List<ItemSlot> ClothingSlots = new List<ItemSlot>(12);
+    public List<ItemSlot> MiscDonFromSlots = new List<ItemSlot>(5);
 
     public EntityBehaviorDoffAndDonnable(Entity entity) : base(entity) { }
 

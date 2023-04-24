@@ -68,7 +68,7 @@ namespace DoffAndDonAgain.Server {
     protected void TryDoffToEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToArmorStandEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DOFF_STAND_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DOFF_ENTITY_DISABLED;
         return;
       }
 

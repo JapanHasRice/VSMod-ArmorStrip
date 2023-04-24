@@ -7,11 +7,11 @@ namespace DoffAndDonAgain.Common {
     public const string MOD_ID = "doffanddonagain";
     public const GlKeys DEFAULT_KEY = GlKeys.U;
     public const string DOFF_CODE = "doffarmor";
-    public const string DOFF_DESC = "Doff: Remove all armor";
+    public const string DOFF_DESC = "Doff: Remove equipped armor and/or clothing";
     public const string DON_CODE = "donarmor";
-    public const string DON_DESC = "Don: Equip empty armor slots from targeted Entity";
+    public const string DON_DESC = "Don: Equip items from targeted Entity";
     public const string SWAP_CODE = "swaparmor";
-    public const string SWAP_DESC = "Swap: Exchange all armor with targeted Entity";
+    public const string SWAP_DESC = "Swap: Exchange armor and/or clothing with targeted Entity";
 
     #endregion
 
@@ -26,10 +26,10 @@ namespace DoffAndDonAgain.Common {
     public const string ERROR_UNDOFFABLE = "Nothing to doff or the target cannot take the items.";
     public const string ERROR_UNDONNABLE = "Nothing to don or you do not have room.";
     public const string ERROR_COULD_NOT_SWAP = "Nothing to swap, or none of the items could be exchanged.";
-    public const string ERROR_DON_DISABLED = "Donning armor is disabled by configuration.";
-    public const string ERROR_SWAP_DISABLED = "Swapping armor is disabled by configuration.";
-    public const string ERROR_DOFF_GROUND_DISABLED = "Doffing armor to the ground is disabled by configuration.";
-    public const string ERROR_DOFF_STAND_DISABLED = "Doffing armor to an armor stand is disabled by configuration.";
+    public const string ERROR_DON_DISABLED = "Donning is disabled by configuration.";
+    public const string ERROR_SWAP_DISABLED = "Swapping is disabled by configuration.";
+    public const string ERROR_DOFF_GROUND_DISABLED = "Doffing to the ground is disabled by configuration.";
+    public const string ERROR_DOFF_ENTITY_DISABLED = "Doffing to an entity is disabled by configuration.";
 
     #endregion
   }

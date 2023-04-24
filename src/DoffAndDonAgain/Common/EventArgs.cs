@@ -13,9 +13,14 @@ namespace DoffAndDonAgain.Common {
   }
 
   public enum EnumTargetType {
-    NotSet,
-    Nothing,
-    EntityAgent
+    EntityAgent,
+    Nothing
+  }
+
+  public enum EnumDonMiscBehavior {
+    Hotbar,
+    ActiveSlotOnly,
+    Anywhere
   }
 
   [ProtoContract]
@@ -26,10 +31,10 @@ namespace DoffAndDonAgain.Common {
     public EnumActionType ActionType { get; private set; }
 
     [ProtoMember(2)]
-    public EnumTargetType TargetType { get; set; } = EnumTargetType.NotSet;
+    public EnumTargetType TargetType { get; set; }
 
     [ProtoMember(3)]
-    public long? TargetEntityAgentId { get; set; } = null;
+    public long? TargetEntityAgentId { get; set; }
 
     [ProtoMember(4)]
     public bool Successful { get; set; } = false;
@@ -41,7 +46,7 @@ namespace DoffAndDonAgain.Common {
     public int[] ClientClothingSlotIds { get; set; } = new int[0];
 
     [ProtoMember(7)]
-    public int[] ClientMiscDonFromSlotIds { get; set; } = new int[0];
+    public EnumDonMiscBehavior ClientDonMiscBehavior { get; set; }
 
     public string ErrorCode { get; set; } = "";
 

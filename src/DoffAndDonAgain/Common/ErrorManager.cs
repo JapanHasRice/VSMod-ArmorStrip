@@ -5,11 +5,12 @@ using Vintagestory.API.Server;
 namespace DoffAndDonAgain.Common {
   public class ErrorManager {
     private ICoreClientAPI capi { get; }
-    private readonly string langPrefix = $"{Constants.MOD_ID}:";
+    private readonly string langPrefix;
     public ErrorManager(DoffAndDonSystem doffAndDonSystem) {
       capi = doffAndDonSystem.ClientAPI;
       doffAndDonSystem.OnAfterInput += OnAfterInput;
       doffAndDonSystem.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
+      langPrefix = doffAndDonSystem.Mod.Info.ModID + ":";
     }
 
     private void OnAfterInput(DoffAndDonEventArgs eventArgs) {
