@@ -103,32 +103,26 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected void OnDoffKeyPressed(DoffAndDonEventArgs eventArgs) {
+      eventArgs.SaturationCost = SaturationCost;
       eventArgs.Successful = VerifyDoffEnabled(eventArgs)
-                             && VerifyEnoughHandsFree(eventArgs);
-      if (eventArgs.Successful) {
-        SetClientDoffSlotIds(eventArgs);
-        eventArgs.SaturationCost = SaturationCost;
-      }
+                             && VerifyEnoughHandsFree(eventArgs)
+                             && VerifyDoffSlots(eventArgs);
     }
 
     protected void OnDonKeyPressed(DoffAndDonEventArgs eventArgs) {
+      eventArgs.SaturationCost = SaturationCost;
       eventArgs.Successful = VerifyDonEnabled(eventArgs)
                              && VerifyTargetEntityIsValid(eventArgs)
-                             && VerifyEnoughHandsFree(eventArgs);
-      if (eventArgs.Successful) {
-        SetClientDonSlotIds(eventArgs);
-        eventArgs.SaturationCost = SaturationCost;
-      }
+                             && VerifyEnoughHandsFree(eventArgs)
+                             && VerifyDonSlots(eventArgs);
     }
 
     protected void OnSwapKeyPressed(DoffAndDonEventArgs eventArgs) {
+      eventArgs.SaturationCost = SaturationCost;
       eventArgs.Successful = VerifySwapEnabled(eventArgs)
                              && VerifyTargetEntityIsValid(eventArgs)
-                             && VerifyEnoughHandsFree(eventArgs);
-      if (eventArgs.Successful) {
-        SetClientSwapSlotIds(eventArgs);
-        eventArgs.SaturationCost = SaturationCost;
-      }
+                             && VerifyEnoughHandsFree(eventArgs)
+                             && VerifySwapSlots(eventArgs);
     }
 
     protected bool VerifyDoffEnabled(DoffAndDonEventArgs eventArgs) {
@@ -218,34 +212,52 @@ namespace DoffAndDonAgain.Client {
       return true;
     }
 
-    protected void SetClientDoffSlotIds(DoffAndDonEventArgs eventArgs) {
-      if ((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffArmorToGround)
-          || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffArmorToEntities)) {
+    protected bool VerifyDoffSlots(DoffAndDonEventArgs eventArgs) {
+      if (((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffArmorToGround) || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffArmorToEntities))
+          && TargetedEntityAgent.GetArmorSlots().Count > 0) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Where(slot => !slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
-      if ((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffClothingToGround)
-          || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffClothingToEntities)) {
+      if (((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffClothingToGround) || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffClothingToEntities))
+          && TargetedEntityAgent.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Where(slot => !slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
+
+      if (eventArgs.ClientArmorSlotIds.Length + eventArgs.ClientClothingSlotIds.Length < 0) {
+        eventArgs.ErrorCode = Constants.ERROR_UNDOFFABLE;
+        return false;
+      }
+      return true;
     }
 
-    protected void SetClientDonSlotIds(DoffAndDonEventArgs eventArgs) {
-      if (ShouldDonArmor) {
+    protected bool VerifyDonSlots(DoffAndDonEventArgs eventArgs) {
+      if (ShouldDonArmor && TargetedEntityAgent.GetArmorSlots().Count > 0) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Where(slot => slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
-      if (ShouldDonClothing) {
+      if (ShouldDonClothing && TargetedEntityAgent.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Where(slot => slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
       eventArgs.ClientDonMiscBehavior = DonMiscBehavior;
+
+      if (eventArgs.ClientArmorSlotIds.Length + eventArgs.ClientClothingSlotIds.Length < 0
+          && (!ShouldDonMisc
+              || TargetedEntityAgent.GetMiscDonFromSlots().Count <= 0
+              || (DonMiscBehavior == EnumDonMiscBehavior.ActiveSlotOnly
+                  && !PlayerEntity.ActiveHandItemSlot.Empty))) {
+        eventArgs.ErrorCode = Constants.ERROR_UNDONNABLE;
+        return false;
+      }
+
+      return true;
     }
 
-    protected void SetClientSwapSlotIds(DoffAndDonEventArgs eventArgs) {
-      if (ShouldSwapArmor) {
+    protected bool VerifySwapSlots(DoffAndDonEventArgs eventArgs) {
+      if (ShouldSwapArmor && TargetedEntityAgent.GetArmorSlots().Count > 0) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
-      if (ShouldSwapClothing) {
+      if (ShouldSwapClothing && TargetedEntityAgent.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
+      return true;
     }
   }
 }
