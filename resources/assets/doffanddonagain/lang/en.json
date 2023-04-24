@@ -1,4 +1,8 @@
 {
+  "Doff": "Doff",
+  "Don": "Don",
+  "Swap": "Swap",
+
   "Need both hands free.": "Need both hands free.",
   "Need at least 1 free hand.": "Need at least 1 free hand.",
 
@@ -12,10 +16,10 @@
 
   "Not enough satiety, need at least {0}.": "Not enough satiety, need at least {0}.",
 
-  "Donning armor is disabled by configuration.": "Donning armor is disabled by configuration.",
-  "Swapping armor is disabled by configuration.": "Swapping armor is disabled by configuration.",
-  "Doffing armor to the ground is disabled by configuration.": "Doffing armor to the ground is disabled by configuration.",
-  "Doffing armor to an armor stand is disabled by configuration.": "Doffing armor to an armor stand is disabled by configuration.",
+  "Donning is disabled by configuration.": "Donning is disabled by configuration.",
+  "Swapping armor is disabled by configuration.": "Swapping is disabled by configuration.",
+  "Doffing to the ground is disabled by configuration.": "Doffing to the ground is disabled by configuration.",
+  "Doffing to an entity is disabled by configuration.": "Doffing to an entity is disabled by configuration.",
 
   "game:worldconfig-category-doffanddon-general": "Doff and Don Again",
   "game:worldattribute-doffanddon-AllowArmorStandArmor": "Interact with armor on Armor Stands",
