@@ -25,7 +25,7 @@ namespace DoffAndDonAgain.Common {
     public const string ERROR_TARGET_LOST = "Server could not locate the targeted entity.";
     public const string ERROR_UNDOFFABLE = "Nothing to doff or the target cannot take the items.";
     public const string ERROR_UNDONNABLE = "Nothing to don or you do not have room.";
-    public const string ERROR_COULD_NOT_SWAP = "Nothing to swap, or none of the items could be exchanged.";
+    public const string ERROR_UNSWAPPABLE = "Nothing to swap, or none of the items could be exchanged.";
     public const string ERROR_DON_DISABLED = "Donning is disabled by configuration.";
     public const string ERROR_SWAP_DISABLED = "Swapping is disabled by configuration.";
     public const string ERROR_DOFF_GROUND_DISABLED = "Doffing to the ground is disabled by configuration.";

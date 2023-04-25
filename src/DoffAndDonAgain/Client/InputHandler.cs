@@ -34,7 +34,6 @@ namespace DoffAndDonAgain.Client {
     protected bool ShouldSwapClothing { get; set; }
     protected bool IsSwapEnabled { get; set; }
 
-    protected Dictionary<int, ActionConsumable<DoffAndDonEventArgs>> HandsRequiredDictionary { get; set; } = new Dictionary<int, ActionConsumable<DoffAndDonEventArgs>>();
     protected int HandsNeeded { get; set; }
     protected float SaturationCost { get; set; }
 
@@ -44,9 +43,6 @@ namespace DoffAndDonAgain.Client {
       }
       DoffAndDonSystem = doffAndDonSystem;
 
-      HandsRequiredDictionary.Add(0, LookMomNoHands);
-      HandsRequiredDictionary.Add(1, VerifyOneHandFree);
-      HandsRequiredDictionary.Add(2, VerifyBothHandsFree);
       LoadSettings(doffAndDonSystem.Api);
       RegisterHotKeys(doffAndDonSystem);
 
@@ -173,32 +169,8 @@ namespace DoffAndDonAgain.Client {
       return true;
     }
 
-    protected bool VerifyEnoughHandsFree(DoffAndDonEventArgs eventArgs) {
-      if (!HandsRequiredDictionary.TryGetValue(HandsNeeded, out var VerifyMethod)) {
-        VerifyMethod = VerifyBothHandsFree;
-      }
-      return VerifyMethod(eventArgs);
-    }
-
-    protected bool VerifyBothHandsFree(DoffAndDonEventArgs eventArgs) {
-      if (IsLeftHandEmpty && IsRightHandEmpty) {
-        return true;
-      }
-
-      eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
-      return false;
-    }
-
-    protected bool VerifyOneHandFree(DoffAndDonEventArgs eventArgs) {
-      if (IsRightHandEmpty || IsLeftHandEmpty) {
-        return true;
-      }
-
-      eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
-      return false;
-    }
-
-    protected bool LookMomNoHands(DoffAndDonEventArgs eventArgs) => true;
+    protected bool VerifyEnoughHandsFree(DoffAndDonEventArgs eventArgs)
+      => HandsChecker.VerifyEnoughHandsFree(eventArgs, PlayerEntity, HandsNeeded);
 
     protected bool VerifyTargetEntityIsValid(DoffAndDonEventArgs eventArgs) {
       if (TargetedEntityAgent == null) {

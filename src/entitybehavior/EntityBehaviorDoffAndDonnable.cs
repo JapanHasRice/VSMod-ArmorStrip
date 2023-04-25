@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DoffAndDonAgain.Common;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -105,28 +106,35 @@ namespace DoffAndDonAgain {
       return result;
     }
 
-    public static List<ItemSlot> GetArmorSlots(this IServerPlayer player) {
-      return player?.Entity?.GetArmorSlots();
+    public static List<ItemSlot> GetArmorSlots(this IServerPlayer player, int[] selectedSlotIds = null) {
+      return player?.Entity?.GetArmorSlots(selectedSlotIds);
     }
 
-    public static List<ItemSlot> GetClothingSlots(this IServerPlayer player) {
-      return player?.Entity?.GetClothingSlots();
+    public static List<ItemSlot> GetClothingSlots(this IServerPlayer player, int[] selectedSlotIds = null) {
+      return player?.Entity?.GetClothingSlots(selectedSlotIds);
     }
 
-    public static List<ItemSlot> GetMiscDonFromSlots(this IServerPlayer player) {
-      return player?.Entity?.GetMiscDonFromSlots();
+    public static List<ItemSlot> GetMiscDonFromSlots(this IServerPlayer player, int[] selectedSlotIds = null) {
+      return player?.Entity?.GetMiscDonFromSlots(selectedSlotIds);
     }
 
-    public static List<ItemSlot> GetArmorSlots(this Entity entity) {
-      return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.ArmorSlots;
+    public static List<ItemSlot> GetArmorSlots(this Entity entity, int[] selectedSlotIds = null) {
+      return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.ArmorSlots.GetSlots(selectedSlotIds);
     }
 
-    public static List<ItemSlot> GetClothingSlots(this Entity entity) {
-      return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.ClothingSlots;
+    public static List<ItemSlot> GetClothingSlots(this Entity entity, int[] selectedSlotIds = null) {
+      return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.ClothingSlots.GetSlots(selectedSlotIds);
     }
 
-    public static List<ItemSlot> GetMiscDonFromSlots(this Entity entity) {
-      return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.MiscDonFromSlots;
+    public static List<ItemSlot> GetMiscDonFromSlots(this Entity entity, int[] selectedSlotIds = null) {
+      return entity?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.MiscDonFromSlots.GetSlots(selectedSlotIds);
+    }
+
+    private static List<ItemSlot> GetSlots(this List<ItemSlot> allSlots, int[] selectedSlotIds = null) {
+      if (allSlots == null || selectedSlotIds == null) {
+        return allSlots;
+      }
+      return allSlots.Where(slot => selectedSlotIds.Contains(slot.Inventory.GetSlotId(slot))).ToList();
     }
   }
 }

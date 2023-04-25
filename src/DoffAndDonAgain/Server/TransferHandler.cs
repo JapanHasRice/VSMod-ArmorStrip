@@ -5,32 +5,40 @@ using Vintagestory.GameContent;
 
 namespace DoffAndDonAgain.Server {
   public class TransferHandler {
-    protected bool IsDoffToGroundEnabled { get; set; } = true;
-    protected bool IsDoffToArmorStandEnabled { get; set; } = true;
-    protected bool IsDropExcessWhenDoffingToStandEnabled { get; set; } = false;
-    protected bool IsDonArmorEnabled { get; set; } = true;
-    protected bool IsDonToolEnabled { get; set; } = true;
-    protected bool ShouldDonToolOnlyToActiveHotbar { get; set; } = true;
-    protected bool ShouldDonToolOnlyToHotbar { get; set; } = true;
-    protected bool IsSwapEnabled { get; set; } = true;
-    protected float SaturationRequired { get; set; } = 0f;
+    protected ICoreAPI Api;
+    protected bool CanDoffArmorToGround => Api.World.Config.GetBool("doffanddon-DoffArmorToGround", true);
+    protected bool CanDoffClothingToGround => Api.World.Config.GetBool("doffanddon-DoffClothingToGround", false);
+    protected bool IsDoffToGroundEnabled => CanDoffArmorToGround || CanDoffClothingToGround;
+
+    protected bool CanDoffArmorToEntities => Api.World.Config.GetBool("doffanddon-DoffArmorToEntities", true);
+    protected bool CanDoffClothingToEntities => Api.World.Config.GetBool("doffanddon-DoffClothingToEntities", true);
+    protected bool IsDoffToEntitiesEnabled => CanDoffArmorToEntities || CanDoffClothingToEntities;
+    protected bool CanDropUnplaceableArmor => Api.World.Config.GetBool("doffanddon-DropUnplaceableArmor", false);
+    protected bool CanDropUnplaceableClothing => Api.World.Config.GetBool("doffanddon-DropUnplaceableClothing", false);
+
+    protected bool CanDonArmorFromEntities => Api.World.Config.GetBool("doffanddon-DonArmorFromEntities", true);
+    protected bool CanDonClothingFromEntities => Api.World.Config.GetBool("doffanddon-DonClothingFromEntities", true);
+    protected bool CanDonMiscFromEntities => Api.World.Config.GetBool("doffanddon-DonMiscFromEntities", true);
+    protected bool IsDonFromEntitiesEnabled => CanDonArmorFromEntities || CanDonClothingFromEntities || CanDonMiscFromEntities;
+
+    protected bool CanSwapArmorWithEntities => Api.World.Config.GetBool("doffanddon-SwapArmorWithEntities", true);
+    protected bool CanSwapClothingWithEntities => Api.World.Config.GetBool("doffanddon-SwapClothingWithEntities", true);
+    protected bool IsSwapWithEntitiesEnabled => CanSwapArmorWithEntities || CanSwapClothingWithEntities;
+
+    protected int HandsNeeded => Api.World.Config.GetInt("doffanddon-HandsNeeded", 2);
+    protected float SaturationRequired => Api.World.Config.GetFloat("doffanddon-SaturationCost", 0f);
 
     public TransferHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Server) {
         throw new System.Exception($"Tried to create an instance of {nameof(TransferHandler)} Client-side or without a valid {nameof(ICoreAPI)} reference.");
       }
-      LoadServerSettings(doffAndDonSystem.Api);
+      Api = doffAndDonSystem.Api;
 
       doffAndDonSystem.OnServerReceivedDoffRequest += OnDoffRequest;
       doffAndDonSystem.OnServerReceivedDonRequest += OnDonRequest;
       doffAndDonSystem.OnServerReceivedSwapRequest += OnSwapRequest;
 
       doffAndDonSystem.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
-    }
-
-    protected void LoadServerSettings(ICoreAPI api) {
-      var worldConfig = api.World.Config;
-      SaturationRequired = worldConfig.GetFloat("doffanddon-SaturationCost", 0f);
     }
 
     protected void OnDoffRequest(DoffAndDonEventArgs eventArgs) {
@@ -51,7 +59,7 @@ namespace DoffAndDonAgain.Server {
     }
 
     protected void OnSwapRequest(DoffAndDonEventArgs eventArgs) {
-      eventArgs.ErrorCode = Constants.ERROR_COULD_NOT_SWAP;
+      eventArgs.ErrorCode = Constants.ERROR_UNSWAPPABLE; // Setting default error code
       TryToSwapWithEntity(eventArgs);
     }
 
@@ -62,11 +70,16 @@ namespace DoffAndDonAgain.Server {
         return;
       }
 
-      DoffArmorToGround(eventArgs);
+      if (CanDoffArmorToGround) {
+        DoffArmorToGround(eventArgs);
+      }
+      if (CanDoffClothingToGround) {
+        DoffClothingToGround(eventArgs);
+      }
     }
 
     protected void TryDoffToEntity(DoffAndDonEventArgs eventArgs) {
-      if (!IsDoffToArmorStandEnabled) {
+      if (!IsDoffToEntitiesEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_DOFF_ENTITY_DISABLED;
         return;
@@ -85,11 +98,16 @@ namespace DoffAndDonAgain.Server {
         return;
       }
 
-      DoffToEntity(eventArgs, targetEntity);
+      if (CanDoffArmorToEntities) {
+        DoffArmorToEntity(eventArgs, targetEntity);
+      }
+      if (CanDoffClothingToEntities) {
+        DoffClothingToEntity(eventArgs, targetEntity);
+      }
     }
 
     protected void TryDonFromEntity(DoffAndDonEventArgs eventArgs) {
-      if (!IsDonArmorEnabled) {
+      if (!IsDonFromEntitiesEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
         return;
@@ -106,13 +124,22 @@ namespace DoffAndDonAgain.Server {
       if (targetEntity == null) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_TARGET_LOST;
+        return;
       }
 
-      DonFromEntity(eventArgs, targetEntity);
+      if (CanDonArmorFromEntities) {
+        DonArmorFromEntity(eventArgs, targetEntity);
+      }
+      if (CanDonClothingFromEntities) {
+        DonClothingFromEntity(eventArgs, targetEntity);
+      }
+      if (CanDonMiscFromEntities) {
+        DonMiscFromEntity(eventArgs, targetEntity);
+      }
     }
 
     protected void TryToSwapWithEntity(DoffAndDonEventArgs eventArgs) {
-      if (!IsSwapEnabled) {
+      if (!IsSwapWithEntitiesEnabled) {
         eventArgs.Successful = false;
         eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
         return;
@@ -132,38 +159,54 @@ namespace DoffAndDonAgain.Server {
         return;
       }
 
-      Swap(eventArgs, eventArgs.ForPlayer.GetArmorSlots(), targetEntity.GetArmorSlots());
-      Swap(eventArgs, eventArgs.ForPlayer.GetClothingSlots(), targetEntity.GetClothingSlots());
+      if (CanSwapArmorWithEntities) {
+        SwapArmorWithEntity(eventArgs, targetEntity);
+      }
+      if (CanSwapClothingWithEntities) {
+        SwapClothingWithEntity(eventArgs, targetEntity);
+      }
     }
 
     protected void DoffArmorToGround(DoffAndDonEventArgs eventArgs) {
-      foreach (var playerArmorSlot in eventArgs.ForPlayer.GetArmorSlots()) {
+      foreach (var playerArmorSlot in eventArgs.ForPlayer.GetArmorSlots(eventArgs.ClientArmorSlotIds)) {
         DoffToGround(eventArgs, playerArmorSlot);
       }
     }
 
-    protected void DoffToGround(DoffAndDonEventArgs eventArgs, ItemSlot slot) {
-      var armor = slot.Itemstack?.Collectible as ItemWearable;
-      bool armorDropped = eventArgs.ForPlayer.InventoryManager.DropItem(slot, true);
-      eventArgs.Successful |= armorDropped;
-
-      if (armorDropped) {
-        eventArgs.DroppedArmor.Add(armor);
+    protected void DoffClothingToGround(DoffAndDonEventArgs eventArgs) {
+      foreach (var playerClothingSlot in eventArgs.ForPlayer.GetClothingSlots(eventArgs.ClientArmorSlotIds)) {
+        DoffToGround(eventArgs, playerClothingSlot);
       }
     }
 
-    protected void DoffToEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
-      Transfer(eventArgs, eventArgs.ForPlayer.GetArmorSlots(), targetEntity.GetArmorSlots(), dropExcessToGround: true);
-      Transfer(eventArgs, eventArgs.ForPlayer.GetClothingSlots(), targetEntity.GetClothingSlots());
+    protected void DoffToGround(DoffAndDonEventArgs eventArgs, ItemSlot slot) {
+      bool itemDropped = eventArgs.ForPlayer.InventoryManager.DropItem(slot, true);
+      eventArgs.Successful |= itemDropped;
+
+      if (itemDropped && slot.Itemstack?.Collectible is ItemWearable wearable) {
+        eventArgs.DroppedArmor.Add(wearable);
+      }
     }
 
-    protected void DonFromEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
-      Transfer(eventArgs, targetEntity.GetArmorSlots(), eventArgs.ForPlayer.GetArmorSlots());
-      Transfer(eventArgs, targetEntity.GetClothingSlots(), eventArgs.ForPlayer.GetClothingSlots());
-      DonMiscFromEntity(eventArgs, targetEntity);
+    protected void DoffArmorToEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
+      bool dropUnplaceable = CanDropUnplaceableArmor && eventArgs.DropUnplaceableArmor;
+      Transfer(eventArgs, eventArgs.ForPlayer.GetArmorSlots(eventArgs.ClientArmorSlotIds), targetEntity.GetArmorSlots(), dropUnplaceableToGround: dropUnplaceable);
     }
 
-    protected void Transfer(DoffAndDonEventArgs eventArgs, List<ItemSlot> fromSlots, List<ItemSlot> toSlots, bool dropExcessToGround = false) {
+    protected void DoffClothingToEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
+      bool dropUnplaceable = CanDropUnplaceableClothing && eventArgs.DropUnplaceableClothing;
+      Transfer(eventArgs, eventArgs.ForPlayer.GetClothingSlots(eventArgs.ClientClothingSlotIds), targetEntity.GetClothingSlots(), dropUnplaceableToGround: dropUnplaceable);
+    }
+
+    protected void DonArmorFromEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
+      Transfer(eventArgs, targetEntity.GetArmorSlots(), eventArgs.ForPlayer.GetArmorSlots(eventArgs.ClientArmorSlotIds));
+    }
+
+    protected void DonClothingFromEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
+      Transfer(eventArgs, targetEntity.GetClothingSlots(), eventArgs.ForPlayer.GetClothingSlots(eventArgs.ClientClothingSlotIds));
+    }
+
+    protected void Transfer(DoffAndDonEventArgs eventArgs, List<ItemSlot> fromSlots, List<ItemSlot> toSlots, bool dropUnplaceableToGround = false) {
       foreach (var sourceSlot in fromSlots) {
         if (sourceSlot.Empty) {
           continue;
@@ -182,32 +225,41 @@ namespace DoffAndDonAgain.Server {
           }
         }
 
-        if (dropExcessToGround && !itemMoved && IsDropExcessWhenDoffingToStandEnabled) {
+        if (dropUnplaceableToGround && !itemMoved) {
           DoffToGround(eventArgs, sourceSlot);
         }
       }
     }
 
     protected void DonMiscFromEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
-      if (!IsDonToolEnabled) { return; }
-
       foreach (var sourceSlot in targetEntity.GetMiscDonFromSlots()) {
         ItemSlot sinkSlot;
-        if (ShouldDonToolOnlyToActiveHotbar) {
-          sinkSlot = eventArgs.ForPlayer.InventoryManager.ActiveHotbarSlot;
-        }
-        else if (ShouldDonToolOnlyToHotbar) {
-          sinkSlot = eventArgs.ForPlayer.InventoryManager.GetBestSuitedHotbarSlot(null, sourceSlot);
-        }
-        else {
-          // skipSlots is an empty list instead of null due to a crash when in creative mode
-          sinkSlot = eventArgs.ForPlayer.InventoryManager.GetBestSuitedSlot(sourceSlot, onlyPlayerInventory: true, skipSlots: new List<ItemSlot>());
+        switch (eventArgs.ClientDonMiscBehavior) {
+          case EnumDonMiscBehavior.ActiveSlotOnly:
+            sinkSlot = eventArgs.ForPlayer.InventoryManager.ActiveHotbarSlot;
+            break;
+          case EnumDonMiscBehavior.Hotbar:
+            sinkSlot = eventArgs.ForPlayer.InventoryManager.GetBestSuitedHotbarSlot(null, sourceSlot);
+            break;
+          case EnumDonMiscBehavior.Anywhere:
+          default:
+            // skipSlots is an empty list instead of null due to a crash when in creative mode
+            sinkSlot = eventArgs.ForPlayer.InventoryManager.GetBestSuitedSlot(sourceSlot, onlyPlayerInventory: true, skipSlots: new List<ItemSlot>());
+            break;
         }
 
         if (sinkSlot != null) {
           eventArgs.Successful |= sourceSlot.TryPutInto(eventArgs.ForPlayer.Entity.World, sinkSlot) > 0;
         }
       }
+    }
+
+    protected void SwapArmorWithEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
+      Swap(eventArgs, eventArgs.ForPlayer.GetArmorSlots(eventArgs.ClientArmorSlotIds), targetEntity.GetArmorSlots());
+    }
+
+    protected void SwapClothingWithEntity(DoffAndDonEventArgs eventArgs, EntityAgent targetEntity) {
+      Swap(eventArgs, eventArgs.ForPlayer.GetClothingSlots(eventArgs.ClientClothingSlotIds), targetEntity.GetClothingSlots());
     }
 
     protected void Swap(DoffAndDonEventArgs eventArgs, List<ItemSlot> slots, List<ItemSlot> otherSlots) {
@@ -233,9 +285,12 @@ namespace DoffAndDonAgain.Server {
       }
     }
 
+    protected bool VerifyEnoughHandsFree(DoffAndDonEventArgs eventArgs)
+      => HandsChecker.VerifyEnoughHandsFree(eventArgs, eventArgs.ForPlayer?.Entity, HandsNeeded);
+
     protected void OnAfterServerHandledRequest(DoffAndDonEventArgs eventArgs) {
       if (eventArgs.Successful) {
-        eventArgs.ForPlayer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(SaturationRequired);
+        eventArgs.ForPlayer.Entity.GetBehavior<EntityBehaviorHunger>()?.ConsumeSaturation(System.Math.Max(SaturationRequired, eventArgs.SaturationCost));
       }
     }
   }
