@@ -1,27 +1,96 @@
 [
+  // The following patches are going to look strange
+  // because worldConfigs (worldattributes) added by
+  // mods inside of worldconfig.json are not present in the
+  // game's worldconfig at time of patching unless the user
+  // has clicked 'Apply' on the Customize screen.
+  // 
+  // Therefore, these patches are written in such a way that
+  // if no worldconfigs for the mod existed, the final result
+  // of the patching correlates with the default settings.
   {
     "op": "add",
-    "path": "/client/behaviors/-",
+    "path": "/doffanddonTEMP",
     "value": {
       "code": "doffanddonnable",
-      "armorSlotIds": [ 12, 13, 14 ],
+      "armorSlotIds": [ ],
       "clothingSlotIds": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      "miscDonFromSlotIds": [ 16, 15, 17]
+      "miscDonFromSlotIds": [ ]
     },
     "file": "mannequins:entities/land/mannequin-stand.json",
     "dependsOn": [
       { "modid": "mannequins" }
     ]
   },
+
+
   {
-    "op": "add",
+    "op": "addeach",
+    "path": "/doffanddonTEMP/armorSlotIds/-",
+    "value": [ 12, 13, 14 ],
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ],
+    "condition": {
+      "when": "doffanddonagainAllowMannequinArmor",
+      "isValue": "true"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/doffanddonTEMP/clothingSlotIds/-",
+    "value": [ ],
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ],
+    "condition": {
+      "when": "doffanddonagainAllowMannequinClothing",
+      "isValue": "false"
+    }
+  },
+  {
+    "op": "addeach",
+    "path": "/doffanddonTEMP/miscDonFromSlotIds/-",
+    "value": [ 16, 15 ],
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ],
+    "condition": {
+      "when": "doffanddonagainAllowMannequinHands",
+      "isValue": "true"
+    }
+  },
+  {
+    "op": "addeach",
+    "path": "/doffanddonTEMP/miscDonFromSlotIds/-",
+    "value": [ 17 ],
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ],
+    "condition": {
+      "when": "doffanddonagainAllowMannequinBackpack",
+      "isValue": "true"
+    }
+  },
+
+
+  {
+    "op": "copy",
+    "fromPath": "/doffanddonTEMP",
+    "path": "/client/behaviors/-",
+    "file": "mannequins:entities/land/mannequin-stand.json",
+    "dependsOn": [
+      { "modid": "mannequins" }
+    ]
+  }
+  {
+    "op": "move",
+    "fromPath": "/doffanddonTEMP",
     "path": "/server/behaviors/-",
-    "value": {
-      "code": "doffanddonnable",
-      "armorSlotIds": [ 12, 13, 14 ],
-      "clothingSlotIds": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      "miscDonFromSlotIds": [ 16, 15, 17]
-    },
     "file": "mannequins:entities/land/mannequin-stand.json",
     "dependsOn": [
       { "modid": "mannequins" }

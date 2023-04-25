@@ -1,17 +1,6 @@
 [
-  {
-    "op": "add",
-    "path": "/client/behaviors/-",
-    "value": {
-      "code": "doffanddonnable",
-      "armorSlotIds": [ 12, 13, 14 ],
-      "miscDonFromSlotIds": [ 16, 15 ]
-    },
-    "file": "game:entities/land/armorstand*"
-  },
-
-  // The following patches are going to look strange,
-  // but it's because worldConfigs (worldattributes) added by
+  // The following patches are going to look strange
+  // because worldConfigs (worldattributes) added by
   // mods inside of worldconfig.json are not present in the
   // game's worldconfig at time of patching unless the user
   // has clicked 'Apply' on the Customize screen.
@@ -25,17 +14,20 @@
     "value": {
       "code": "doffanddonnable",
       "armorSlotIds": [ 12, 13, 14 ],
+      "clothingSlotIds": [ ],
       "miscDonFromSlotIds": [ 16, 15 ]
     },
     "file": "game:entities/land/armorstand*"
   },
+
+
   {
     "op": "replace",
     "path": "/doffanddonTEMP/armorSlotIds",
     "value": [],
     "file": "game:entities/land/armorstand*",
     "condition": {
-      "when": "doffanddon-AllowArmorStandArmor",
+      "when": "doffanddonagainAllowArmorStandArmor",
       "isValue": "false"
     }
   },
@@ -45,7 +37,7 @@
     "value": [],
     "file": "game:entities/land/armorstand*",
     "condition": {
-      "when": "doffanddon-AllowArmorStandHands",
+      "when": "doffanddonagainAllowArmorStandHands",
       "isValue": "false"
     }
   },
