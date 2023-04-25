@@ -6,27 +6,27 @@ using Vintagestory.GameContent;
 namespace DoffAndDonAgain.Server {
   public class TransferHandler {
     protected ICoreAPI Api;
-    protected bool CanDoffArmorToGround => Api.World.Config.GetBool("doffanddon-DoffArmorToGround", true);
-    protected bool CanDoffClothingToGround => Api.World.Config.GetBool("doffanddon-DoffClothingToGround", false);
+    protected bool CanDoffArmorToGround => WorldConfig.DoffArmorToGround.AsBool(Api);
+    protected bool CanDoffClothingToGround => WorldConfig.DoffClothingToGround.AsBool(Api);
     protected bool IsDoffToGroundEnabled => CanDoffArmorToGround || CanDoffClothingToGround;
 
-    protected bool CanDoffArmorToEntities => Api.World.Config.GetBool("doffanddon-DoffArmorToEntities", true);
-    protected bool CanDoffClothingToEntities => Api.World.Config.GetBool("doffanddon-DoffClothingToEntities", true);
+    protected bool CanDoffArmorToEntities => WorldConfig.DoffArmorToEntities.AsBool(Api);
+    protected bool CanDoffClothingToEntities => WorldConfig.DoffClothingToEntities.AsBool(Api);
     protected bool IsDoffToEntitiesEnabled => CanDoffArmorToEntities || CanDoffClothingToEntities;
-    protected bool CanDropUnplaceableArmor => Api.World.Config.GetBool("doffanddon-DropUnplaceableArmor", false);
-    protected bool CanDropUnplaceableClothing => Api.World.Config.GetBool("doffanddon-DropUnplaceableClothing", false);
+    protected bool CanDropUnplaceableArmor => WorldConfig.DropUnplaceableArmor.AsBool(Api);
+    protected bool CanDropUnplaceableClothing => WorldConfig.DropUnplaceableClothing.AsBool(Api);
 
-    protected bool CanDonArmorFromEntities => Api.World.Config.GetBool("doffanddon-DonArmorFromEntities", true);
-    protected bool CanDonClothingFromEntities => Api.World.Config.GetBool("doffanddon-DonClothingFromEntities", true);
-    protected bool CanDonMiscFromEntities => Api.World.Config.GetBool("doffanddon-DonMiscFromEntities", true);
+    protected bool CanDonArmorFromEntities => WorldConfig.DonArmorFromEntities.AsBool(Api);
+    protected bool CanDonClothingFromEntities => WorldConfig.DonClothingFromEntities.AsBool(Api);
+    protected bool CanDonMiscFromEntities => WorldConfig.DonMiscFromEntities.AsBool(Api);
     protected bool IsDonFromEntitiesEnabled => CanDonArmorFromEntities || CanDonClothingFromEntities || CanDonMiscFromEntities;
 
-    protected bool CanSwapArmorWithEntities => Api.World.Config.GetBool("doffanddon-SwapArmorWithEntities", true);
-    protected bool CanSwapClothingWithEntities => Api.World.Config.GetBool("doffanddon-SwapClothingWithEntities", true);
+    protected bool CanSwapArmorWithEntities => WorldConfig.SwapArmorWithEntities.AsBool(Api);
+    protected bool CanSwapClothingWithEntities => WorldConfig.SwapClothingWithEntities.AsBool(Api);
     protected bool IsSwapWithEntitiesEnabled => CanSwapArmorWithEntities || CanSwapClothingWithEntities;
 
-    protected int HandsNeeded => Api.World.Config.GetInt("doffanddon-HandsNeeded", 2);
-    protected float SaturationRequired => Api.World.Config.GetFloat("doffanddon-SaturationCost", 0f);
+    protected int HandsNeeded => WorldConfig.HandsNeeded.AsInt(Api);
+    protected float SaturationRequired => WorldConfig.SaturationCost.AsFloat(Api);
 
     public TransferHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Server) {

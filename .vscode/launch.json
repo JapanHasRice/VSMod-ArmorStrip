@@ -14,8 +14,9 @@
         "--addModPath", "${workspaceFolder}/bin/Debug/zip"
       ],
       "env": {
-        // "TEXTURE_DEBUG_DISPOSE": "1",
-        // "VAO_DEBUG_DISPOSE": "1"
+        "WORLDCONFIG": "${workspaceFolder}/resources/worldconfig.json"
+        // ,"TEXTURE_DEBUG_DISPOSE": "1"
+        // ,"VAO_DEBUG_DISPOSE": "1"
       },
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"

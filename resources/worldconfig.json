@@ -1,131 +1,271 @@
 {
+  "PlayStyles": [],
   "WorldConfigAttributes": [
-    // General
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-general",
-      "Code": "doffanddon-AllowArmorStandArmor",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainGeneral",
+      "Code": "doffanddonagainAllowArmorStandArmor",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-general",
-      "Code": "doffanddon-AllowArmorStandHands",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainGeneral",
+      "Code": "doffanddonagainAllowArmorStandHands",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     },
     {
-      "DataType": "DoubleInput",
-      "Category": "doffanddon-general",
-      "Code": "doffanddon-SaturationCost",
+      "DataType": 2,
+      "Category": "doffanddonagainGeneral",
+      "Code": "doffanddonagainSaturationCost",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": false,
       "Default": "0",
-      "OnCustomizeScreen": false
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": 0.0
     },
     {
-      "DataType": "IntRange",
-      "Category": "doffanddon-general",
-      "Code": "doffanddon-HandsNeeded",
+      "DataType": 3,
+      "Category": "doffanddonagainGeneral",
+      "Code": "doffanddonagainHandsNeeded",
+      "Min": 0.0,
+      "Max": 2.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": false,
       "Default": "2",
-      "Min": 0,
-      "Max": 2,
-      "OnCustomizeScreen": false
-    },
-
-    // Mannequins
-    {
-      "DataType": "Bool",
-      "Category": "doffanddon-mannequins",
-      "Code": "doffanddon-AllowMannequinArmor",
-      "Default": "false"
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": 2
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-mannequins",
-      "Code": "doffanddon-AllowMannequinClothing",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainMannequins",
+      "Code": "doffanddonagainAllowMannequinArmor",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "False",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": false
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-mannequins",
-      "Code": "doffanddon-AllowMannequinHands",
-      "Default": "false"
+      "DataType": 0,
+      "Category": "doffanddonagainMannequins",
+      "Code": "doffanddonagainAllowMannequinClothing",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-mannequins",
-      "Code": "doffanddon-AllowMannequinBackpack",
-      "Default": "false"
-    },
-
-    // Doff
-    {
-      "DataType": "Bool",
-      "Category": "doffanddon-doff",
-      "Code": "doffanddon-DoffArmorToEntities",
-      "Default": "true"
-    },
-    {
-      "DataType": "Bool",
-      "Category": "doffanddon-doff",
-      "Code": "doffanddon-DoffArmorToGround",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainMannequins",
+      "Code": "doffanddonagainAllowMannequinHands",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "False",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": false
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-doff",
-      "Code": "doffanddon-DropUnplaceableArmor",
-      "Default": "false"
+      "DataType": 0,
+      "Category": "doffanddonagainMannequins",
+      "Code": "doffanddonagainAllowMannequinBackpack",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "False",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": false
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-doff",
-      "Code": "doffanddon-DoffClothingToEntities",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainDoff",
+      "Code": "doffanddonagainDoffArmorToGround",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-doff",
-      "Code": "doffanddon-DoffClothingToGround",
-      "Default": "false"
+      "DataType": 0,
+      "Category": "doffanddonagainDoff",
+      "Code": "doffanddonagainDoffArmorToEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-doff",
-      "Code": "doffanddon-DropUnplaceableClothing",
-      "Default": "false"
-    },
-
-    // Don
-    {
-      "DataType": "Bool",
-      "Category": "doffanddon-don",
-      "Code": "doffanddon-DonArmorFromEntities",
-      "Default": "true"
-    },
-    {
-      "DataType": "Bool",
-      "Category": "doffanddon-don",
-      "Code": "doffanddon-DonClothingFromEntities",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainDoff",
+      "Code": "doffanddonagainDropUnplaceableArmor",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "False",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": false
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-don",
-      "Code": "doffanddon-DonMiscFromEntities",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainDoff",
+      "Code": "doffanddonagainDoffClothingToGround",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "False",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": false
     },
-
-    // Swap
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-swap",
-      "Code": "doffanddon-SwapArmorWithEntities",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainDoff",
+      "Code": "doffanddonagainDoffClothingToEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     },
     {
-      "DataType": "Bool",
-      "Category": "doffanddon-swap",
-      "Code": "doffanddon-SwapClothingWithEntities",
-      "Default": "true"
+      "DataType": 0,
+      "Category": "doffanddonagainDoff",
+      "Code": "doffanddonagainDropUnplaceableClothing",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "False",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": false
+    },
+    {
+      "DataType": 0,
+      "Category": "doffanddonagainDon",
+      "Code": "doffanddonagainDonArmorFromEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
+    },
+    {
+      "DataType": 0,
+      "Category": "doffanddonagainDon",
+      "Code": "doffanddonagainDonClothingFromEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
+    },
+    {
+      "DataType": 0,
+      "Category": "doffanddonagainDon",
+      "Code": "doffanddonagainDonMiscFromEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
+    },
+    {
+      "DataType": 0,
+      "Category": "doffanddonagainSwap",
+      "Code": "doffanddonagainSwapArmorWithEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
+    },
+    {
+      "DataType": 0,
+      "Category": "doffanddonagainSwap",
+      "Code": "doffanddonagainSwapClothingWithEntities",
+      "Min": 0.0,
+      "Max": 0.0,
+      "Step": 0.0,
+      "OnCustomizeScreen": true,
+      "Default": "True",
+      "Values": null,
+      "Names": null,
+      "OnlyDuringWorldCreate": false,
+      "TypedDefault": true
     }
   ]
 }

@@ -64,28 +64,27 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected void LoadSettings(ICoreAPI api) {
-      var worldConfig = api.World.Config;
       var clientSettings = api.ModLoader.GetModSystem<ConfigSystem>()?.ClientSettings ?? new ClientSettings();
 
-      HandsNeeded = System.Math.Max(worldConfig.GetInt("doffanddon-HandsNeeded", 2), clientSettings.HandsNeeded.Value);
-      if (clientSettings.SaturationCost.Value > worldConfig.GetFloat("doffanddon-SaturationCost", 0f)) {
+      HandsNeeded = System.Math.Max(WorldConfig.HandsNeeded.AsInt(api), clientSettings.HandsNeeded.Value);
+      if (clientSettings.SaturationCost.Value > WorldConfig.SaturationCost.AsFloat(api)) {
         SaturationCost = clientSettings.SaturationCost.Value;
       }
 
-      ShouldDoffArmorToGround = worldConfig.GetBool("doffanddon-DoffArmorToGround", true) && clientSettings.DoffArmorToGround.Value;
-      ShouldDoffClothingToGround = worldConfig.GetBool("doffanddon-DoffClothingToGround", false) && clientSettings.DoffClothingToGround.Value;
+      ShouldDoffArmorToGround = WorldConfig.DoffArmorToGround.AsBool(api) && clientSettings.DoffArmorToGround.Value;
+      ShouldDoffClothingToGround = WorldConfig.DoffClothingToGround.AsBool(api) && clientSettings.DoffClothingToGround.Value;
       IsDoffToGroundEnabled = ShouldDoffArmorToGround || ShouldDoffClothingToGround;
 
-      ShouldDoffArmorToEntities = worldConfig.GetBool("doffanddon-DoffArmorToEntities", true) && clientSettings.DoffArmorToEntities.Value;
-      ShouldDoffClothingToEntities = worldConfig.GetBool("doffanddon-DoffClothingToEntities", true) && clientSettings.DoffClothingToEntities.Value;
+      ShouldDoffArmorToEntities = WorldConfig.DoffArmorToEntities.AsBool(api) && clientSettings.DoffArmorToEntities.Value;
+      ShouldDoffClothingToEntities = WorldConfig.DoffClothingToEntities.AsBool(api) && clientSettings.DoffClothingToEntities.Value;
       IsDoffToEntityEnabled = ShouldDoffArmorToEntities || ShouldDoffClothingToEntities;
 
       ShouldDropUnplaceableArmor = clientSettings.DropUnplaceableArmor.Value;
       ShouldDropUnplaceableClothing = clientSettings.DropUnplaceableClothing.Value;
 
-      ShouldDonArmor = worldConfig.GetBool("doffanddon-DonArmorFromEntities", true) && clientSettings.DonArmorFromEntities.Value;
-      ShouldDonClothing = worldConfig.GetBool("doffanddon-DonClothingFromEntities", true) && clientSettings.DonClothingFromEntities.Value;
-      ShouldDonMisc = worldConfig.GetBool("doffanddon-DonMiscFromEntities", true) && clientSettings.DonMiscFromEntities.Value;
+      ShouldDonArmor = WorldConfig.DonArmorFromEntities.AsBool(api) && clientSettings.DonArmorFromEntities.Value;
+      ShouldDonClothing = WorldConfig.DonClothingFromEntities.AsBool(api) && clientSettings.DonClothingFromEntities.Value;
+      ShouldDonMisc = WorldConfig.DonMiscFromEntities.AsBool(api) && clientSettings.DonMiscFromEntities.Value;
       IsDonEnabled = ShouldDonArmor || ShouldDonClothing || ShouldDonMisc;
 
       if (clientSettings.DonMiscOnlyToActiveHotbar.Value) {
@@ -98,8 +97,8 @@ namespace DoffAndDonAgain.Client {
         DonMiscBehavior = EnumDonMiscBehavior.Anywhere;
       }
 
-      ShouldSwapArmor = worldConfig.GetBool("doffanddon-SwapArmorWithEntities", true) && clientSettings.SwapArmorWithEntities.Value;
-      ShouldSwapClothing = worldConfig.GetBool("doffanddon-SwapClothingWithEntities", true) && clientSettings.SwapClothingWithEntities.Value;
+      ShouldSwapArmor = WorldConfig.SwapArmorWithEntities.AsBool(api) && clientSettings.SwapArmorWithEntities.Value;
+      ShouldSwapClothing = WorldConfig.SwapClothingWithEntities.AsBool(api) && clientSettings.SwapClothingWithEntities.Value;
       IsSwapEnabled = ShouldSwapArmor || ShouldSwapClothing;
     }
 
