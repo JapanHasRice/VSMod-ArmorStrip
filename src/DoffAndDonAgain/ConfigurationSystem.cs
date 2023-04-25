@@ -49,6 +49,18 @@ namespace DoffAndDonAgain {
       Description = "If disabled, equipped clothing will not be doffed to entities. If enabled, follows the Server's settings."
     };
 
+    [JsonProperty, JsonConverter(typeof(SettingConverter<bool>))]
+    public Setting<bool> DropUnplaceableArmor { get; set; } = new Setting<bool> {
+      Default = false,
+      Description = "If disabled, equipped armor that cannot be doffed to an entity will be dropped onto the ground. If enabled, follows the Server's settings."
+    };
+
+    [JsonProperty, JsonConverter(typeof(SettingConverter<bool>))]
+    public Setting<bool> DropUnplaceableClothing { get; set; } = new Setting<bool> {
+      Default = false,
+      Description = "If disabled, equipped clothing that cannot be doffed to an entity will be dropped onto the ground. If enabled, follows the Server's settings."
+    };
+
     // DON
     [JsonProperty, JsonConverter(typeof(SettingConverter<bool>))]
     public Setting<bool> DonArmorFromEntities { get; set; } = new Setting<bool> {

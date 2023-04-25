@@ -51,6 +51,12 @@ namespace DoffAndDonAgain.Common {
     [ProtoMember(8)]
     public float SaturationCost { get; set; }
 
+    [ProtoMember(9)]
+    public bool DropUnplaceableArmor { get; set; }
+
+    [ProtoMember(10)]
+    public bool DropUnplaceableClothing { get; set; }
+
     public string ErrorCode { get; set; } = "";
 
     public string[] ErrorArgs { get; set; } = new string[0];

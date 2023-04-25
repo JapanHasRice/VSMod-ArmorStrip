@@ -21,6 +21,8 @@ namespace DoffAndDonAgain.Client {
     protected bool ShouldDoffClothingToEntities { get; set; }
     protected bool IsDoffToGroundEnabled { get; set; }
     protected bool IsDoffToEntityEnabled { get; set; }
+    protected bool ShouldDropUnplaceableArmor { get; set; }
+    protected bool ShouldDropUnplaceableClothing { get; set; }
 
     protected bool ShouldDonArmor { get; set; }
     protected bool ShouldDonClothing { get; set; }
@@ -81,6 +83,9 @@ namespace DoffAndDonAgain.Client {
       ShouldDoffArmorToEntities = worldConfig.GetBool("doffanddon-DoffArmorToEntities", true) && clientSettings.DoffArmorToEntities.Value;
       ShouldDoffClothingToEntities = worldConfig.GetBool("doffanddon-DoffClothingToEntities", true) && clientSettings.DoffClothingToEntities.Value;
       IsDoffToEntityEnabled = ShouldDoffArmorToEntities || ShouldDoffClothingToEntities;
+
+      ShouldDropUnplaceableArmor = clientSettings.DropUnplaceableArmor.Value;
+      ShouldDropUnplaceableClothing = clientSettings.DropUnplaceableClothing.Value;
 
       ShouldDonArmor = worldConfig.GetBool("doffanddon-DonArmorFromEntities", true) && clientSettings.DonArmorFromEntities.Value;
       ShouldDonClothing = worldConfig.GetBool("doffanddon-DonClothingFromEntities", true) && clientSettings.DonClothingFromEntities.Value;
@@ -216,10 +221,12 @@ namespace DoffAndDonAgain.Client {
       if (((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffArmorToGround) || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffArmorToEntities))
           && TargetedEntityAgent.GetArmorSlots().Count > 0) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Where(slot => !slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
+        eventArgs.DropUnplaceableArmor = ShouldDropUnplaceableArmor;
       }
       if (((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffClothingToGround) || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffClothingToEntities))
           && TargetedEntityAgent.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Where(slot => !slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
+        eventArgs.DropUnplaceableClothing = ShouldDropUnplaceableClothing;
       }
 
       if (eventArgs.ClientArmorSlotIds.Length + eventArgs.ClientClothingSlotIds.Length < 0) {
