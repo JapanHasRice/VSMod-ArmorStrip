@@ -24,7 +24,7 @@ namespace DoffAndDonAgain {
       base.Start(api);
       Api = api;
 
-      api.RegisterEntityBehaviorClass("doffanddonnable", typeof(EntityBehaviorDoffAndDonnable));
+      api.RegisterEntityBehaviorClass(EntityBehaviorDoffAndDonnable.Name, typeof(EntityBehaviorDoffAndDonnable));
 
       Network = new NetworkManager(this);
       Error = new ErrorManager(this);

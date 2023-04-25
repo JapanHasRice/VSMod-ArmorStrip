@@ -8,6 +8,7 @@ using Vintagestory.API.Server;
 
 namespace DoffAndDonAgain {
   public class EntityBehaviorDoffAndDonnable : EntityBehavior {
+    public const string Name = "doffanddonnable";
     protected int[] armorSlotIds;
     protected int[] clothingSlotIds;
     protected int[] miscDonFromSlotIds;
@@ -18,7 +19,7 @@ namespace DoffAndDonAgain {
 
     public EntityBehaviorDoffAndDonnable(Entity entity) : base(entity) { }
 
-    public override string PropertyName() => "doffanddonnable";
+    public override string PropertyName() => EntityBehaviorDoffAndDonnable.Name;
 
     public override void Initialize(EntityProperties properties, JsonObject attributes) {
       base.Initialize(properties, attributes);
