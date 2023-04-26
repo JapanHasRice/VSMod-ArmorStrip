@@ -174,7 +174,7 @@ namespace DoffAndDonAgain.Common {
     public static double AsDouble(this WorldConfigurationAttribute attribute, ICoreAPI api) {
       switch (attribute.DataType) {
         case EnumDataType.DoubleInput:
-          return api.World.Config.GetDouble(attribute.Code, (double)attribute.TypedDefault);
+          return api.World.Config.GetDecimal(attribute.Code, (float)attribute.TypedDefault);
         default:
           LogError(attribute, api, typeof(double));
           return default(double);
