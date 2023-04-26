@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DoffAndDonAgain.Common;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Datastructures;
@@ -13,9 +14,9 @@ namespace DoffAndDonAgain {
     protected int[] clothingSlotIds;
     protected int[] miscDonFromSlotIds;
 
-    public List<ItemSlot> ArmorSlots = new List<ItemSlot>(3);
-    public List<ItemSlot> ClothingSlots = new List<ItemSlot>(12);
-    public List<ItemSlot> MiscDonFromSlots = new List<ItemSlot>(5);
+    public List<ItemSlot> ArmorSlots = new List<ItemSlot>(0);
+    public List<ItemSlot> ClothingSlots = new List<ItemSlot>(0);
+    public List<ItemSlot> MiscDonFromSlots = new List<ItemSlot>(0);
 
     public EntityBehaviorDoffAndDonnable(Entity entity) : base(entity) { }
 
@@ -32,7 +33,20 @@ namespace DoffAndDonAgain {
       catch (System.Exception e) {
         entity.World.Logger.Error("DoffAndDonAgain: Error parsing {0} behavior for {1}. Doff/Don/Swap may not work correctly with these entities. {2}", PropertyName(), entity.Code, e);
       }
-      InitializeInventory();
+
+      if (entity.Api is ICoreClientAPI capi && entity is EntityPlayer entityPlayer) {
+        capi.Event.IsPlayerReady += OnIsPlayerReady;
+      }
+      else {
+        InitializeInventory();
+      }
+    }
+
+    private bool OnIsPlayerReady(ref EnumHandling handling) {
+      if (entity.Api is ICoreClientAPI capi && entity == capi.World.Player?.Entity) {
+        InitializeInventory();
+      }
+      return true;
     }
 
     private void InitializeInventory() {
@@ -41,7 +55,7 @@ namespace DoffAndDonAgain {
         return;
       }
 
-      ArmorSlots = new List<ItemSlot>();
+      ArmorSlots = new List<ItemSlot>(3);
       for (int a = 0; a < armorSlotIds?.Length; a++) {
         int inventoryIndex = armorSlotIds[a];
         if (inventoryIndex < 0 || inventoryIndex >= entityInventory.Count) {
@@ -54,7 +68,7 @@ namespace DoffAndDonAgain {
         ArmorSlots.Add(slot);
       }
 
-      ClothingSlots = new List<ItemSlot>();
+      ClothingSlots = new List<ItemSlot>(12);
       for (int c = 0; c < clothingSlotIds?.Length; c++) {
         int inventoryIndex = clothingSlotIds[c];
         if (inventoryIndex < 0 || inventoryIndex >= entityInventory.Count) {
@@ -67,7 +81,7 @@ namespace DoffAndDonAgain {
         ClothingSlots.Add(slot);
       }
 
-      MiscDonFromSlots = new List<ItemSlot>();
+      MiscDonFromSlots = new List<ItemSlot>(5);
       for (int m = 0; m < miscDonFromSlotIds?.Length; m++) {
         int inventoryIndex = miscDonFromSlotIds[m];
         if (inventoryIndex < 0 || inventoryIndex >= entityInventory.Count) {
@@ -83,6 +97,9 @@ namespace DoffAndDonAgain {
 
     public override void OnEntityLoaded() {
       base.OnEntityLoaded();
+      if (entity.Api is ICoreClientAPI capi && entity is EntityPlayer) {
+        return;
+      }
       InitializeInventory();
     }
 
