@@ -86,7 +86,7 @@
     "dependsOn": [
       { "modid": "mannequins" }
     ]
-  }
+  },
   {
     "op": "move",
     "fromPath": "/doffanddonTEMP",
