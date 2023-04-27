@@ -17,12 +17,14 @@ namespace DoffAndDonAgain {
     public ICoreClientAPI ClientAPI { get; private set; }
     public InputHandler InputHandler { get; private set; }
 
-    public ICoreServerAPI ServerAPI { get; private set; }
     public TransferHandler TransferHandler { get; private set; }
 
     public override void Start(ICoreAPI api) {
       base.Start(api);
       Api = api;
+      if (api is ICoreClientAPI capi) {
+        ClientAPI = capi;
+      }
 
       api.RegisterEntityBehaviorClass(EntityBehaviorDoffAndDonnable.Name, typeof(EntityBehaviorDoffAndDonnable));
 
@@ -34,15 +36,11 @@ namespace DoffAndDonAgain {
     public override void StartClientSide(ICoreClientAPI api) {
       base.StartClientSide(api);
 
-      ClientAPI = api;
-
       InputHandler = new InputHandler(this);
     }
 
     public override void StartServerSide(ICoreServerAPI api) {
       base.StartServerSide(api);
-
-      ServerAPI = api;
 
       TransferHandler = new TransferHandler(this);
     }
