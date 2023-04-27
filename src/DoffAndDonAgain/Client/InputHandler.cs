@@ -52,13 +52,13 @@ namespace DoffAndDonAgain.Client {
 
     protected void RegisterHotKeys(DoffAndDonSystem doffAndDonSystem) {
       var input = doffAndDonSystem.ClientAPI.Input;
-      input.RegisterHotKey(Constants.DOFF_CODE, Constants.DOFF_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
+      input.RegisterHotKey(Constants.DOFF_CODE, Lang.Get(Constants.DOFF_DESC.WithModPrefix()), Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
       input.SetHotKeyHandler(Constants.DOFF_CODE, doffAndDonSystem.TriggerDoffKeyPressed);
 
-      input.RegisterHotKey(Constants.DON_CODE, Constants.DON_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
+      input.RegisterHotKey(Constants.DON_CODE, Lang.Get(Constants.DON_DESC.WithModPrefix()), Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
       input.SetHotKeyHandler(Constants.DON_CODE, doffAndDonSystem.TriggerDonKeyPressed);
 
-      input.RegisterHotKey(Constants.SWAP_CODE, Constants.SWAP_DESC, Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
+      input.RegisterHotKey(Constants.SWAP_CODE, Lang.Get(Constants.SWAP_DESC.WithModPrefix()), Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
       input.SetHotKeyHandler(Constants.SWAP_CODE, doffAndDonSystem.TriggerSwapKeyPressed);
     }
 
@@ -137,7 +137,8 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyDoffToGroundEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToGroundEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DOFF_GROUND_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.DOFF_GROUND };
         return false;
       }
       return true;
@@ -145,7 +146,8 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyDoffToEntityEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToEntityEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DOFF_ENTITY_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.DOFF_ENTITY };
         return false;
       }
       return true;
@@ -153,7 +155,8 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyDonEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDonEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.DON };
         return false;
       }
       return true;
@@ -161,7 +164,8 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifySwapEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsSwapEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.SWAP };
         return false;
       }
       return true;
@@ -173,14 +177,14 @@ namespace DoffAndDonAgain.Client {
     protected bool VerifyTargetEntityIsValid(DoffAndDonEventArgs eventArgs) {
       if (TargetedEntityAgent == null) {
         eventArgs.ErrorCode = Constants.ERROR_MUST_TARGET_ENTITY;
-        eventArgs.ErrorArgs = new string[] { Lang.GetMatching(ModId + ":" + eventArgs.ActionType.ToString()) };
+        eventArgs.ErrorArgs = new[] { eventArgs.ActionType.ToString() };
         return false;
       }
 
       eventArgs.TargetEntityAgentId = TargetedEntityAgent.EntityId;
       if (!TargetedEntityAgent.CanBeTargetedFor(eventArgs.ActionType)) {
         eventArgs.ErrorCode = Constants.ERROR_INVALID_ENTITY_TARGET;
-        eventArgs.ErrorArgs = new string[] { Lang.GetMatching(ModId + ":" + eventArgs.ActionType.ToString()), TargetedEntityAgent.GetName() };
+        eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString(), TargetedEntityAgent.GetName() };
         return false;
       }
 

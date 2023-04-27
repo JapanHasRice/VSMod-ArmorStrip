@@ -1,25 +1,25 @@
 {
+  "Doff - Remove equipped armor and/or clothing": "Doff: Remove equipped armor and/or clothing",
+  "Don - Equip items from targeted Entity": "Don: Equip items from targeted Entity",
+  "Swap - Exchange armor and/or clothing with targeted Entity": "Swap: Exchange armor and/or clothing with targeted Entity",
+
   "Doff": "Doff",
+  "Doff to the ground": "Doff to the ground",
+  "Doff to an entity": "Doff to an entity",
   "Don": "Don",
   "Swap": "Swap",
-
-  "Need both hands free.": "Need both hands free.",
-  "Need at least 1 free hand.": "Need at least 1 free hand.",
-
-  "Cannot {0} with {1}.": "Cannot {0} with {1}.",
+  "Cannot {0} with {1}.": "Cannot {0} with {1}.", // Cannot {Doff/Don/Swap} with {NameOfEntity}
   "Need to be targeting something to {0}.": "Need to be targeting something to {0}.",
+  "{0} is disabled by configuration": "{0} is disabled by configuration", // {Don/Swap/Doff to the ground/Doff to an entity}
+
   "Server could not locate the targeted entity.": "Server could not locate the targeted entity.",
 
   "Nothing to doff or the target cannot take the items.": "Nothing to doff or the target cannot take the items.",
   "Nothing to don or you do not have room.": "Nothing to don or you do not have room.",
   "Nothing to swap, or none of the items could be exchanged.": "Nothing to swap, or none of the items could be exchanged.",
 
-  "Not enough satiety, need at least {0}.": "Not enough satiety, need at least {0}.",
-
-  "Donning is disabled by configuration.": "Donning is disabled by configuration.",
-  "Swapping armor is disabled by configuration.": "Swapping is disabled by configuration.",
-  "Doffing to the ground is disabled by configuration.": "Doffing to the ground is disabled by configuration.",
-  "Doffing to an entity is disabled by configuration.": "Doffing to an entity is disabled by configuration.",
+  "Need both hands free.": "Need both hands free.",
+  "Need at least 1 free hand.": "Need at least 1 free hand.",
 
   "game:worldconfig-category-doffanddonagainGeneral": "Doff and Don Again",
   "game:worldattribute-doffanddonagainAllowArmorStandArmor": "Interact with armor on Armor Stands",

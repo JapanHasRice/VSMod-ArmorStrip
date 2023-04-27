@@ -66,7 +66,8 @@ namespace DoffAndDonAgain.Server {
     protected void TryDoffToGround(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToGroundEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DOFF_GROUND_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.DOFF_GROUND };
         return;
       }
 
@@ -81,7 +82,8 @@ namespace DoffAndDonAgain.Server {
     protected void TryDoffToEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToEntitiesEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DOFF_ENTITY_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.DOFF_ENTITY };
         return;
       }
 
@@ -109,7 +111,8 @@ namespace DoffAndDonAgain.Server {
     protected void TryDonFromEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDonFromEntitiesEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DON_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.DON };
         return;
       }
 
@@ -141,7 +144,8 @@ namespace DoffAndDonAgain.Server {
     protected void TryToSwapWithEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsSwapWithEntitiesEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_SWAP_DISABLED;
+        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
+        eventArgs.ErrorArgs = new[] { Constants.SWAP };
         return;
       }
 

@@ -5,12 +5,12 @@ using Vintagestory.API.Server;
 namespace DoffAndDonAgain.Common {
   public class ErrorManager {
     private ICoreClientAPI capi { get; }
-    private readonly string langPrefix;
+
     public ErrorManager(DoffAndDonSystem doffAndDonSystem) {
       capi = doffAndDonSystem.ClientAPI;
+
       doffAndDonSystem.OnAfterInput += OnAfterInput;
       doffAndDonSystem.OnAfterServerHandledRequest += OnAfterServerHandledRequest;
-      langPrefix = doffAndDonSystem.Mod.Info.ModID + ":";
     }
 
     private void OnAfterInput(DoffAndDonEventArgs eventArgs) {
@@ -30,17 +30,21 @@ namespace DoffAndDonAgain.Common {
     }
 
     public void TriggerFromClient(string errorCode, params object[] args) {
-      capi?.TriggerIngameError(this, errorCode, GetErrorText(errorCode, args));
+      ModPrefixArgs(errorCode, args);
+      capi?.TriggerIngameError(this, errorCode, Lang.Get(errorCode, args));
     }
 
     public void TriggerFromServer(string errorCode, IServerPlayer forPlayer, params object[] args) {
-      forPlayer?.SendIngameError(errorCode, GetErrorText(errorCode, args));
+      ModPrefixArgs(errorCode, args);
+      var playersLangCode = forPlayer?.LanguageCode ?? "en";
+      forPlayer?.SendIngameError(errorCode, Lang.GetL(playersLangCode, errorCode, args));
     }
 
-    public string GetErrorText(string errorCode, params object[] args) {
-      string prefixedCode = errorCode.StartsWith(langPrefix) ? errorCode : $"{langPrefix}{errorCode}";
-      string displayMessage = Lang.GetMatching(prefixedCode, args).Replace(langPrefix, "");
-      return displayMessage;
+    private static void ModPrefixArgs(string errorCode, params object[] args) {
+      errorCode = errorCode?.WithModPrefix();
+      for (int i = 0; i < args?.Length; i++) {
+        args[i] = Lang.Get(args[i].ToString().WithModPrefix());
+      }
     }
   }
 }
