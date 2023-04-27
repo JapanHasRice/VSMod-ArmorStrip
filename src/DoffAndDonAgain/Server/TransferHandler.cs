@@ -26,7 +26,7 @@ namespace DoffAndDonAgain.Server {
     protected bool IsSwapWithEntitiesEnabled => CanSwapArmorWithEntities || CanSwapClothingWithEntities;
 
     protected int HandsNeeded => WorldConfig.HandsNeeded.AsInt(Api);
-    protected float SaturationRequired => WorldConfig.SaturationCost.AsFloat(Api);
+    protected float SaturationRequired => System.Math.Abs(WorldConfig.SaturationCost.AsFloat(Api));
 
     public TransferHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Server) {
