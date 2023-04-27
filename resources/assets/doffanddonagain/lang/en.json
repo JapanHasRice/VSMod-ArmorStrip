@@ -63,5 +63,55 @@
   "game:worldattribute-doffanddonagainSwapArmorWithEntities": "Allow swapping armor with entities",
   "game:worldattribute-doffanddonagainSwapArmorWithEntities-desc": "On: Swap can exchange armor between a player and a targeted entity.\r\nOff: Players will not be able to swap armor with entities.",
   "game:worldattribute-doffanddonagainSwapClothingWithEntities": "Allow swapping clothing with entities",
-  "game:worldattribute-doffanddonagainSwapClothingWithEntities-desc": "On: Swap can exchange clothing between a player and a targeted entity\r\nOff: Players will not be able to swap clothing with entities."
+  "game:worldattribute-doffanddonagainSwapClothingWithEntities-desc": "On: Swap can exchange clothing between a player and a targeted entity\r\nOff: Players will not be able to swap clothing with entities.",
+
+
+  // INTENTIONAL DUPLICATES
+  //
+  // Worldconfigs defined in worldconfig.json only search `game` domain for translations as of 1.18.1.
+  // This is likely to change when Tyron fixes mod translations for worldconfigs.
+  // These duplicates are to prepare for that likelihood without requiring an update, otherwise the translations would break.
+  "worldconfig-category-doffanddonagainGeneral": "Doff and Don Again",
+  "worldattribute-doffanddonagainAllowArmorStandArmor": "Interact with armor on Armor Stands",
+  "worldattribute-doffanddonagainAllowArmorStandArmor-desc": "On: Allow interaction with the armor placed on vanilla Armor Stands.\r\nOff: Doff and Don Again actions will ignore armor on Armor Stands.",
+  "worldattribute-doffanddonagainAllowArmorStandHands": "Interact with hands of Armor Stands",
+  "worldattribute-doffanddonagainAllowArmorStandHands-desc": "On: Allow interaction with items placed into the hands of vanilla Armor Stands.\r\nOff: Doff and Don Again actions will ignore items in the hands of Armor Stands.",
+
+  "worldconfig-category-doffanddonagainMannequins": "Doff and Don Again\r\n - Other Mods",
+  "worldattribute-doffanddonagainAllowMannequinArmor": "Interact with armor on Mannequins",
+  "worldattribute-doffanddonagainAllowMannequinArmor-desc": "On: Allow interaction with the armor placed on Mannequins from the \"Mannequin Stand\" mod.\r\nOff: Doff and Don Again actions will ignore armor on Mannequins.",
+  "worldattribute-doffanddonagainAllowMannequinClothing": "Interact with clothing on Mannequins",
+  "worldattribute-doffanddonagainAllowMannequinClothing-desc": "On: Allow interaction with the clothing placed on Mannequins from the \"Mannequin Stand\" mod.\r\nOff: Doff and Don Again actions will ignore clothing on Mannequins.",
+  "worldattribute-doffanddonagainAllowMannequinHands": "Interact with hands of Mannequins",
+  "worldattribute-doffanddonagainAllowMannequinHands-desc": "On: Allow interaction with items placed into the hands of Mannequins from the \"Mannequin Stand\" mod.\r\nOff: Doff and Don Again actions will ignore items in the hands of Mannequins.",
+  "worldattribute-doffanddonagainAllowMannequinBackpack": "Interact with backpacks on Mannequins",
+  "worldattribute-doffanddonagainAllowMannequinBackpack-desc": "On: Allow interaction with backpacks placed on Mannequins from the \"Mannequin Stand \" mod.\r\nOff: Doff and Don Again actions will ignore backpacks on Mannequins.",
+
+  "worldconfig-category-doffanddonagainDoff": "Doff and Don Again\r\n - Doff",
+  "worldattribute-doffanddonagainDoffArmorToGround": "Allow Doffing armor to the ground",
+  "worldattribute-doffanddonagainDoffArmorToGround-desc": "On: Doff can drop a player's equipped armor onto the ground.\r\nOff: Players will not be able to drop equipped armor to the ground.",
+  "worldattribute-doffanddonagainDoffArmorToEntities": "Allow Doffing armor to entities",
+  "worldattribute-doffanddonagainDoffArmorToEntities-desc": "On: Doff can move a player's equipped armor onto a targeted entity.\r\nOff: Players will not be able to move equipped armor onto a targeted entity.",
+  "worldattribute-doffanddonagainDropUnplaceableArmor": "Drop unplaceable armor to the ground",
+  "worldattribute-doffanddonagainDropUnplaceableArmor-desc": "On: When Doffing to an entity, any armor that cannot be placed on the entity can be dropped to the ground.\r\nOff: Armor that cannot be placed on the targeted entity will remain equipped to the player.",
+  "worldattribute-doffanddonagainDoffClothingToGround": "Allow Doffing clothing to the ground",
+  "worldattribute-doffanddonagainDoffClothingToGround-desc": "On: Doff can drop a player's equipped clothing onto the ground.\r\nOff: Players will not be able to drop equipped clothing to the ground.",
+  "worldattribute-doffanddonagainDoffClothingToEntities": "Allow Doffing clothing to entities",
+  "worldattribute-doffanddonagainDoffClothingToEntities-desc": "On: Doff can move a player's equipped clothing onto a targeted entity.\r\nOff: Players will not be able to move equipped clothing onto a targeted entity.",
+  "worldattribute-doffanddonagainDropUnplaceableClothing": "Drop unplaceable clothing to the ground",
+  "worldattribute-doffanddonagainDropUnplaceableClothing-desc": "On: When Doffing to an entity, any clothing that cannot be placed on the entity can be dropped to the ground.\r\nOff: Clothing that cannot be placed on the targeted entity will remain equipped to the player.",
+
+  "worldconfig-category-doffanddonagainDon": "Doff and Don Again\r\n - Don",
+  "worldattribute-doffanddonagainDonArmorFromEntities": "Allow Donning armor from entities",
+  "worldattribute-doffanddonagainDonArmorFromEntities-desc": "On: Don can take armor from a targeted entity and equip it to the player.\r\nOff: Players will not be able to equip armor from entities.",
+  "worldattribute-doffanddonagainDonClothingFromEntities": "Allow Donning clothing from entities",
+  "worldattribute-doffanddonagainDonClothingFromEntities-desc": "On: Don can take clothing from a targeted entity and equip it to the player.\r\nOff: Players will not be able to equip clothing from entities.",
+  "worldattribute-doffanddonagainDonMiscFromEntities": "Allow Donning misc. items from entities",
+  "worldattribute-doffanddonagainDonMiscFromEntities-desc": "On: Don can take misc. items from a targeted entity and give them to the player.\r\nOff: Players will not be able to take misc. items from entities.",
+
+  "worldconfig-category-doffanddonagainSwap": "Doff and Don Again\r\n - Swap",
+  "worldattribute-doffanddonagainSwapArmorWithEntities": "Allow swapping armor with entities",
+  "worldattribute-doffanddonagainSwapArmorWithEntities-desc": "On: Swap can exchange armor between a player and a targeted entity.\r\nOff: Players will not be able to swap armor with entities.",
+  "worldattribute-doffanddonagainSwapClothingWithEntities": "Allow swapping clothing with entities",
+  "worldattribute-doffanddonagainSwapClothingWithEntities-desc": "On: Swap can exchange clothing between a player and a targeted entity\r\nOff: Players will not be able to swap clothing with entities."
 }
