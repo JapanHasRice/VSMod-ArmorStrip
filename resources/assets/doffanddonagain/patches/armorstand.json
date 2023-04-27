@@ -1,0 +1,58 @@
+[
+  // The following patches are going to look strange
+  // because worldConfigs (worldattributes) added by
+  // mods inside of worldconfig.json are not present in the
+  // game's worldconfig at time of patching unless the user
+  // has clicked 'Apply' on the Customize screen.
+  // 
+  // Therefore, these patches are written in such a way that
+  // if no worldconfigs for the mod existed, the final result
+  // of the patching correlates with the default settings.
+  {
+    "op": "add",
+    "path": "/doffanddonTEMP",
+    "value": {
+      "code": "doffanddonnable",
+      "armorSlotIds": [ 12, 13, 14 ],
+      "clothingSlotIds": [ ],
+      "miscDonFromSlotIds": [ 16, 15 ]
+    },
+    "file": "game:entities/land/armorstand*"
+  },
+
+
+  {
+    "op": "replace",
+    "path": "/doffanddonTEMP/armorSlotIds",
+    "value": [],
+    "file": "game:entities/land/armorstand*",
+    "condition": {
+      "when": "doffanddonagainAllowArmorStandArmor",
+      "isValue": "false"
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/doffanddonTEMP/miscDonFromSlotIds",
+    "value": [],
+    "file": "game:entities/land/armorstand*",
+    "condition": {
+      "when": "doffanddonagainAllowArmorStandHands",
+      "isValue": "false"
+    }
+  },
+
+
+  {
+    "op": "copy",
+    "fromPath": "/doffanddonTEMP",
+    "path": "/client/behaviors/-",
+    "file": "game:entities/land/armorstand*"
+  },
+  {
+    "op": "move",
+    "fromPath": "/doffanddonTEMP",
+    "path": "/server/behaviors/-",
+    "file": "game:entities/land/armorstand*"
+  }
+]

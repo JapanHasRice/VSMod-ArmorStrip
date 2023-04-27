@@ -2,44 +2,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Client (.NET) [1.16]",
+      "name": "Launch Client (.NET)",
       "type": "clr",
       "request": "launch",
       "preLaunchTask": "Build (Debug)",
-      "program": "${env:VINTAGE_STORY_DEV}/1.16/Vintagestory.exe",
+      "program": "${env:VINTAGE_STORY_DEV}/${input:vsVersion}/Vintagestory.exe",
       "args": [
         "--playStyle" , "preset-surviveandbuild",
-        "--openWorld" , "modding test world 1.16",
+        "--openWorld" , "modding test world ${input:vsVersion} ${workspaceFolderBasename}",
+        "--dataPath", "${env:VINTAGE_STORY_DEV}/../VintagestoryDevDataUS",
         "--addModPath", "${workspaceFolder}/bin/Debug/zip"
       ],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Launch Client (.NET) [1.15]",
-      "type": "clr",
-      "request": "launch",
-      "preLaunchTask": "Build (Debug)",
-      "program": "${env:VINTAGE_STORY_DEV}/1.15/Vintagestory.exe",
-      "args": [
-        "--playStyle" , "preset-surviveandbuild",
-        "--openWorld" , "modding test world 1.15",
-        "--addModPath", "${workspaceFolder}/bin/Debug/zip"
-      ],
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Launch Client (.NET) [1.14]",
-      "type": "clr",
-      "request": "launch",
-      "preLaunchTask": "Build (Debug)",
-      "program": "${env:VINTAGE_STORY_DEV}/1.14/Vintagestory.exe",
-      "args": [
-        "--playStyle" , "preset-surviveandbuild",
-        "--openWorld" , "modding test world 1.14",
-        "--addModPath", "${workspaceFolder}/bin/Debug/zip"
-      ],
+      "env": {
+        "WORLDCONFIG": "${workspaceFolder}/resources/worldconfig.json"
+        // ,"TEXTURE_DEBUG_DISPOSE": "1"
+        // ,"VAO_DEBUG_DISPOSE": "1"
+      },
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
     },
@@ -50,12 +28,24 @@
       "preLaunchTask": "Build (Debug)",
       "program": "${env:VINTAGE_STORY}/Vintagestory.exe",
       "args": [
-        "--playStyle" , "preset-surviveandbuild",
-        "--openWorld" , "modding test world cpg",
+        "--playStyle", "preset-surviveandbuild",
+        "--openWorld", "modding test world cpg",
         "--addModPath", "${workspaceFolder}/bin/Debug/zip"
       ],
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart"
+    }
+  ],
+  "inputs": [
+    {
+      "type": "pickString",
+      "id": "vsVersion",
+      "description": "What version of Vintage Story do you want to launch?",
+      "options": [
+        "1.18",
+        "1.17"
+      ],
+      "default": "1.18"
     }
   ]
 }
