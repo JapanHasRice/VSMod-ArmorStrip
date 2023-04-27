@@ -52,13 +52,13 @@ namespace DoffAndDonAgain.Client {
 
     protected void RegisterHotKeys(DoffAndDonSystem doffAndDonSystem) {
       var input = doffAndDonSystem.ClientAPI.Input;
-      input.RegisterHotKey(Constants.DOFF_CODE, Lang.Get(Constants.DOFF_DESC.WithModPrefix()), Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
+      input.RegisterHotKey(Constants.DOFF_CODE, Lang.Get(Constants.DoffHotkeyDescription), Constants.DEFAULT_KEY, HotkeyType.CharacterControls, ctrlPressed: true);
       input.SetHotKeyHandler(Constants.DOFF_CODE, doffAndDonSystem.TriggerDoffKeyPressed);
 
-      input.RegisterHotKey(Constants.DON_CODE, Lang.Get(Constants.DON_DESC.WithModPrefix()), Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
+      input.RegisterHotKey(Constants.DON_CODE, Lang.Get(Constants.DonHotkeyDescription), Constants.DEFAULT_KEY, HotkeyType.CharacterControls);
       input.SetHotKeyHandler(Constants.DON_CODE, doffAndDonSystem.TriggerDonKeyPressed);
 
-      input.RegisterHotKey(Constants.SWAP_CODE, Lang.Get(Constants.SWAP_DESC.WithModPrefix()), Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
+      input.RegisterHotKey(Constants.SWAP_CODE, Lang.Get(Constants.SwapHotkeyDescription), Constants.DEFAULT_KEY, HotkeyType.CharacterControls, shiftPressed: true);
       input.SetHotKeyHandler(Constants.SWAP_CODE, doffAndDonSystem.TriggerSwapKeyPressed);
     }
 
@@ -137,8 +137,7 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyDoffToGroundEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToGroundEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.DOFF_GROUND };
+        ErrorManager.SetDisabledError(eventArgs);
         return false;
       }
       return true;
@@ -146,8 +145,7 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyDoffToEntityEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToEntityEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.DOFF_ENTITY };
+        ErrorManager.SetDisabledError(eventArgs);
         return false;
       }
       return true;
@@ -155,8 +153,7 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyDonEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsDonEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.DON };
+        ErrorManager.SetDisabledError(eventArgs);
         return false;
       }
       return true;
@@ -164,8 +161,7 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifySwapEnabled(DoffAndDonEventArgs eventArgs) {
       if (!IsSwapEnabled) {
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.SWAP };
+        ErrorManager.SetDisabledError(eventArgs);
         return false;
       }
       return true;
@@ -176,15 +172,13 @@ namespace DoffAndDonAgain.Client {
 
     protected bool VerifyTargetEntityIsValid(DoffAndDonEventArgs eventArgs) {
       if (TargetedEntityAgent == null) {
-        eventArgs.ErrorCode = Constants.ERROR_MUST_TARGET_ENTITY;
-        eventArgs.ErrorArgs = new[] { eventArgs.ActionType.ToString() };
+        ErrorManager.SetMustTargetEntityError(eventArgs);
         return false;
       }
 
       eventArgs.TargetEntityAgentId = TargetedEntityAgent.EntityId;
       if (!TargetedEntityAgent.CanBeTargetedFor(eventArgs.ActionType)) {
-        eventArgs.ErrorCode = Constants.ERROR_INVALID_ENTITY_TARGET;
-        eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString(), TargetedEntityAgent.GetName() };
+        ErrorManager.SetInvalidEntityTargetError(eventArgs, TargetedEntityAgent);
         return false;
       }
 
@@ -204,7 +198,7 @@ namespace DoffAndDonAgain.Client {
       }
 
       if (eventArgs.ClientArmorSlotIds.Length + eventArgs.ClientClothingSlotIds.Length < 0) {
-        eventArgs.ErrorCode = Constants.ERROR_UNDOFFABLE;
+        ErrorManager.SetCannotTransferError(eventArgs);
         return false;
       }
       return true;
@@ -224,7 +218,7 @@ namespace DoffAndDonAgain.Client {
               || TargetedEntityAgent?.GetMiscDonFromSlots().Count <= 0
               || (DonMiscBehavior == EnumDonMiscBehavior.ActiveSlotOnly
                   && !PlayerEntity.ActiveHandItemSlot.Empty))) {
-        eventArgs.ErrorCode = Constants.ERROR_UNDONNABLE;
+        ErrorManager.SetCannotTransferError(eventArgs);
         return false;
       }
 
@@ -238,6 +232,12 @@ namespace DoffAndDonAgain.Client {
       if (ShouldSwapClothing && TargetedEntityAgent?.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
+
+      if (eventArgs.ClientArmorSlotIds.Length + eventArgs.ClientClothingSlotIds.Length < 0) {
+        ErrorManager.SetCannotTransferError(eventArgs);
+        return false;
+      }
+
       return true;
     }
   }

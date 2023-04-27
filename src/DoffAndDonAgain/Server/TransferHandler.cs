@@ -42,7 +42,7 @@ namespace DoffAndDonAgain.Server {
     }
 
     protected void OnDoffRequest(DoffAndDonEventArgs eventArgs) {
-      eventArgs.ErrorCode = Constants.ERROR_UNDOFFABLE; // Setting default error code
+      ErrorManager.SetCannotTransferError(eventArgs); // Setting default error code
       switch (eventArgs.TargetType) {
         case EnumTargetType.Nothing:
           TryDoffToGround(eventArgs);
@@ -54,20 +54,19 @@ namespace DoffAndDonAgain.Server {
     }
 
     protected void OnDonRequest(DoffAndDonEventArgs eventArgs) {
-      eventArgs.ErrorCode = Constants.ERROR_UNDONNABLE; // Setting default error code
+      ErrorManager.SetCannotTransferError(eventArgs); // Setting default error code
       TryDonFromEntity(eventArgs);
     }
 
     protected void OnSwapRequest(DoffAndDonEventArgs eventArgs) {
-      eventArgs.ErrorCode = Constants.ERROR_UNSWAPPABLE; // Setting default error code
+      ErrorManager.SetCannotTransferError(eventArgs); // Setting default error code
       TryToSwapWithEntity(eventArgs);
     }
 
     protected void TryDoffToGround(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToGroundEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.DOFF_GROUND };
+        ErrorManager.SetDisabledError(eventArgs);
         return;
       }
 
@@ -82,21 +81,20 @@ namespace DoffAndDonAgain.Server {
     protected void TryDoffToEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDoffToEntitiesEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.DOFF_ENTITY };
+        ErrorManager.SetDisabledError(eventArgs);
         return;
       }
 
       if (eventArgs.TargetEntityAgentId == null) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_MUST_TARGET_ENTITY;
+        ErrorManager.SetMustTargetEntityError(eventArgs);
         return;
       }
 
       EntityAgent targetEntity = eventArgs.ForPlayer?.Entity.World.GetEntityById((long)eventArgs.TargetEntityAgentId) as EntityAgent;
       if (targetEntity == null) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_TARGET_LOST;
+        ErrorManager.SetTargetLostError(eventArgs);
         return;
       }
 
@@ -111,22 +109,20 @@ namespace DoffAndDonAgain.Server {
     protected void TryDonFromEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsDonFromEntitiesEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.DON };
+        ErrorManager.SetDisabledError(eventArgs);
         return;
       }
 
       if (eventArgs.TargetEntityAgentId == null) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_MUST_TARGET_ENTITY;
-        eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString() };
+        ErrorManager.SetMustTargetEntityError(eventArgs);
         return;
       }
 
       EntityAgent targetEntity = eventArgs.ForPlayer?.Entity.World.GetEntityById((long)eventArgs.TargetEntityAgentId) as EntityAgent;
       if (targetEntity == null) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_TARGET_LOST;
+        ErrorManager.SetTargetLostError(eventArgs);
         return;
       }
 
@@ -144,22 +140,20 @@ namespace DoffAndDonAgain.Server {
     protected void TryToSwapWithEntity(DoffAndDonEventArgs eventArgs) {
       if (!IsSwapWithEntitiesEnabled) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_DISABLED;
-        eventArgs.ErrorArgs = new[] { Constants.SWAP };
+        ErrorManager.SetDisabledError(eventArgs);
         return;
       }
 
       if (eventArgs.TargetEntityAgentId == null) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_MUST_TARGET_ENTITY;
-        eventArgs.ErrorArgs = new string[] { eventArgs.ActionType.ToString() };
+        ErrorManager.SetMustTargetEntityError(eventArgs);
         return;
       }
 
       EntityAgent targetEntity = eventArgs.ForPlayer?.Entity.World.GetEntityById((long)eventArgs.TargetEntityAgentId) as EntityAgent;
       if (targetEntity == null) {
         eventArgs.Successful = false;
-        eventArgs.ErrorCode = Constants.ERROR_TARGET_LOST;
+        ErrorManager.SetTargetLostError(eventArgs);
         return;
       }
 

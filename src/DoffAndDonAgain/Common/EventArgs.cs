@@ -57,9 +57,7 @@ namespace DoffAndDonAgain.Common {
     [ProtoMember(10)]
     public bool DropUnplaceableClothing { get; set; }
 
-    public string ErrorCode { get; set; } = "";
-
-    public string[] ErrorArgs { get; set; } = new string[0];
+    public Error Error { get; set; }
 
     public IServerPlayer ForPlayer { get; set; } = null;
 

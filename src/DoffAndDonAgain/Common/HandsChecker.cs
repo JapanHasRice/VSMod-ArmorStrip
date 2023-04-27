@@ -19,7 +19,7 @@ namespace DoffAndDonAgain.Common {
         return true;
       }
 
-      eventArgs.ErrorCode = Constants.ERROR_ONE_HAND;
+      ErrorManager.SetHandsFreeError(eventArgs, 1);
       return false;
     }
 
@@ -28,7 +28,7 @@ namespace DoffAndDonAgain.Common {
         return true;
       }
 
-      eventArgs.ErrorCode = Constants.ERROR_BOTH_HANDS;
+      ErrorManager.SetHandsFreeError(eventArgs, 2);
       return false;
     }
 
