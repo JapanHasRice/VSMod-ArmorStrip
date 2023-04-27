@@ -192,13 +192,13 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool VerifyDoffSlots(DoffAndDonEventArgs eventArgs) {
-      if (((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffArmorToGround) || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffArmorToEntities))
-          && TargetedEntityAgent.GetArmorSlots().Count > 0) {
+      if ((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffArmorToGround)
+           || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffArmorToEntities && TargetedEntityAgent?.GetArmorSlots().Count > 0)) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Where(slot => !slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
         eventArgs.DropUnplaceableArmor = ShouldDropUnplaceableArmor;
       }
-      if (((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffClothingToGround) || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffClothingToEntities))
-          && TargetedEntityAgent.GetClothingSlots().Count > 0) {
+      if ((eventArgs.TargetType == EnumTargetType.Nothing && ShouldDoffClothingToGround)
+           || (eventArgs.TargetType == EnumTargetType.EntityAgent && ShouldDoffClothingToEntities && TargetedEntityAgent?.GetClothingSlots().Count > 0)) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Where(slot => !slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
         eventArgs.DropUnplaceableClothing = ShouldDropUnplaceableClothing;
       }
@@ -211,17 +211,17 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool VerifyDonSlots(DoffAndDonEventArgs eventArgs) {
-      if (ShouldDonArmor && TargetedEntityAgent.GetArmorSlots().Count > 0) {
+      if (ShouldDonArmor && TargetedEntityAgent?.GetArmorSlots().Count > 0) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Where(slot => slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
-      if (ShouldDonClothing && TargetedEntityAgent.GetClothingSlots().Count > 0) {
+      if (ShouldDonClothing && TargetedEntityAgent?.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Where(slot => slot.Empty).Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
       eventArgs.ClientDonMiscBehavior = DonMiscBehavior;
 
       if (eventArgs.ClientArmorSlotIds.Length + eventArgs.ClientClothingSlotIds.Length < 0
           && (!ShouldDonMisc
-              || TargetedEntityAgent.GetMiscDonFromSlots().Count <= 0
+              || TargetedEntityAgent?.GetMiscDonFromSlots().Count <= 0
               || (DonMiscBehavior == EnumDonMiscBehavior.ActiveSlotOnly
                   && !PlayerEntity.ActiveHandItemSlot.Empty))) {
         eventArgs.ErrorCode = Constants.ERROR_UNDONNABLE;
@@ -232,10 +232,10 @@ namespace DoffAndDonAgain.Client {
     }
 
     protected bool VerifySwapSlots(DoffAndDonEventArgs eventArgs) {
-      if (ShouldSwapArmor && TargetedEntityAgent.GetArmorSlots().Count > 0) {
+      if (ShouldSwapArmor && TargetedEntityAgent?.GetArmorSlots().Count > 0) {
         eventArgs.ClientArmorSlotIds = PlayerEntity.GetArmorSlots().Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
-      if (ShouldSwapClothing && TargetedEntityAgent.GetClothingSlots().Count > 0) {
+      if (ShouldSwapClothing && TargetedEntityAgent?.GetClothingSlots().Count > 0) {
         eventArgs.ClientClothingSlotIds = PlayerEntity.GetClothingSlots().Select(slot => slot.Inventory.GetSlotId(slot)).ToArray();
       }
       return true;
