@@ -50,7 +50,7 @@ namespace DoffAndDonAgain {
       var eventArgs = new DoffAndDonEventArgs(keyCombination, EnumActionType.Doff);
       OnDoffKeyPressed?.Invoke(eventArgs);
       TriggerAfterInput(eventArgs);
-      return eventArgs.Successful;
+      return true;
     }
 
     public event Action<DoffAndDonEventArgs> OnDonKeyPressed;
@@ -58,7 +58,7 @@ namespace DoffAndDonAgain {
       var eventArgs = new DoffAndDonEventArgs(keyCombination, EnumActionType.Don);
       OnDonKeyPressed?.Invoke(eventArgs);
       TriggerAfterInput(eventArgs);
-      return eventArgs.Successful;
+      return true;
     }
 
     public event Action<DoffAndDonEventArgs> OnSwapKeyPressed;
@@ -66,7 +66,7 @@ namespace DoffAndDonAgain {
       var eventArgs = new DoffAndDonEventArgs(keyCombination, EnumActionType.Swap);
       OnSwapKeyPressed?.Invoke(eventArgs);
       TriggerAfterInput(eventArgs);
-      return eventArgs.Successful;
+      return true;
     }
 
     public event Action<DoffAndDonEventArgs> OnAfterInput;
