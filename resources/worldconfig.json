@@ -30,7 +30,7 @@
       "TypedDefault": true
     },
     {
-      "DataType": 2,
+      "DataType": 1,
       "Category": "doffanddonagainGeneral",
       "Code": "doffanddonagainSaturationCost",
       "Min": 0.0,
@@ -41,7 +41,7 @@
       "Values": null,
       "Names": null,
       "OnlyDuringWorldCreate": false,
-      "TypedDefault": 0.0
+      "TypedDefault": 0
     },
     {
       "DataType": 3,
