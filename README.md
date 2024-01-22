@@ -12,7 +12,7 @@
   - Allows individual players to tweak *Doff and Don Again*'s behavior while still operating within the Server's rules.
   - If a Server's (or singleplayer world's) worldconfig is more restrictive than the client's settings, the Server's settings will be used.
   - These settings will follow you between worlds, singleplayer or multiplayer.
-- New `doffanddonnable` entity behavior to define what *Doff and Don Again* can interact with.
+- New `doffanddonnable` entity behavior to customize what *Doff and Don Again* can interact with.
 
 ## Description
 Out spelunking and need to patch up your wounds but you're wearing full plate? *Doff* it! Drop all that armor at the touch of a button (or two, default: Ctrl + U).

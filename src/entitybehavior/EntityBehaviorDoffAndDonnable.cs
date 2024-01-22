@@ -34,8 +34,13 @@ namespace DoffAndDonAgain {
         entity.World.Logger.Error("DoffAndDonAgain: Error parsing {0} behavior for {1}. Doff/Don/Swap may not work correctly with these entities. {2}", PropertyName(), entity.Code, e);
       }
 
-      if (entity.Api is ICoreClientAPI capi && entity is EntityPlayer entityPlayer) {
-        capi.Event.IsPlayerReady += OnIsPlayerReady;
+      if (entity is EntityPlayer) {
+        if (entity.Api is ICoreClientAPI capi) {
+          capi.Event.IsPlayerReady += OnIsPlayerReady;
+        }
+        else if (entity.Api is ICoreServerAPI sapi) {
+          sapi.Event.PlayerNowPlaying += OnIsPlayerReady;
+        }
       }
       else {
         InitializeInventory();
@@ -43,10 +48,12 @@ namespace DoffAndDonAgain {
     }
 
     private bool OnIsPlayerReady(ref EnumHandling handling) {
-      if (entity.Api is ICoreClientAPI capi && entity == capi.World.Player?.Entity) {
-        InitializeInventory();
-      }
+      InitializeInventory();
       return true;
+    }
+
+    private void OnIsPlayerReady(IServerPlayer player) {
+      InitializeInventory();
     }
 
     private void InitializeInventory() {
@@ -103,6 +110,14 @@ namespace DoffAndDonAgain {
       InitializeInventory();
     }
 
+    public override void OnEntitySpawn() {
+      base.OnEntitySpawn();
+      if (entity.Api is ICoreClientAPI && entity is EntityPlayer) {
+        return;
+      }
+      InitializeInventory();
+    }
+
     public bool CanBeTargetedFor(EnumActionType actionType) {
       if (entity is EntityPlayer) {
         return false;
@@ -119,9 +134,9 @@ namespace DoffAndDonAgain {
   }
 
   public static class DoffAndDonnableExtensions {
-    public static bool CanBeTargetedFor(this EntityAgent engityAgent, EnumActionType actionType) {
-      var result = engityAgent?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.CanBeTargetedFor(actionType) ?? false;
-      return result;
+    public static bool CanBeTargetedFor(this EntityAgent entityAgent, EnumActionType actionType) {
+      var result = entityAgent?.GetBehavior<EntityBehaviorDoffAndDonnable>()?.CanBeTargetedFor(actionType);
+      return result ?? false;
     }
 
     public static List<ItemSlot> GetArmorSlots(this IServerPlayer player, int[] selectedSlotIds = null) {

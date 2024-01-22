@@ -26,7 +26,7 @@ namespace DoffAndDonAgain.Server {
     protected bool IsSwapWithEntitiesEnabled => CanSwapArmorWithEntities || CanSwapClothingWithEntities;
 
     protected int HandsNeeded => WorldConfig.HandsNeeded.AsInt(Api);
-    protected float SaturationRequired => System.Math.Abs(WorldConfig.SaturationCost.AsFloat(Api));
+    protected int SaturationRequired => System.Math.Abs(WorldConfig.SaturationCost.AsInt(Api));
 
     public TransferHandler(DoffAndDonSystem doffAndDonSystem) {
       if (doffAndDonSystem.Side != EnumAppSide.Server) {
@@ -237,7 +237,7 @@ namespace DoffAndDonAgain.Server {
             sinkSlot = eventArgs.ForPlayer.InventoryManager.ActiveHotbarSlot;
             break;
           case EnumDonMiscBehavior.Hotbar:
-            sinkSlot = eventArgs.ForPlayer.InventoryManager.GetBestSuitedHotbarSlot(null, sourceSlot);
+            sinkSlot = eventArgs.ForPlayer.InventoryManager.GetHotbarInventory().GetBestSuitedSlot(sourceSlot).slot;
             break;
           case EnumDonMiscBehavior.Anywhere:
           default:

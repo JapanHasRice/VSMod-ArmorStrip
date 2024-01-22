@@ -19,7 +19,7 @@ namespace DoffAndDonAgain.Common {
     };
 
     public static readonly WorldConfigurationAttribute SaturationCost = new WorldConfigurationAttribute {
-      DataType = EnumDataType.DoubleInput,
+      DataType = EnumDataType.IntInput,
       Category = WorldConfigCategoryGeneral,
       Code = Constants.MOD_ID + nameof(SaturationCost),
       Default = 0.ToString(),

@@ -66,7 +66,7 @@ namespace DoffAndDonAgain.Client {
       var clientSettings = api.ModLoader.GetModSystem<ConfigSystem>()?.ClientSettings ?? new ClientSettings();
 
       HandsNeeded = System.Math.Max(WorldConfig.HandsNeeded.AsInt(api), clientSettings.HandsNeeded.Value);
-      if (clientSettings.SaturationCost.Value > System.Math.Abs(WorldConfig.SaturationCost.AsFloat(api))) {
+      if (clientSettings.SaturationCost.Value > System.Math.Abs(WorldConfig.SaturationCost.AsInt(api))) {
         SaturationCost = clientSettings.SaturationCost.Value;
       }
 
